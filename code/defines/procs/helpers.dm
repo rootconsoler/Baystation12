@@ -119,7 +119,7 @@
 			K += item
 	return K
 
-/proc/sanitize_simple(var/t,var/list/repl_chars = list("\n"="#","\t"="#","ÿ"="ß"))
+/proc/sanitize_simple(var/t,var/list/repl_chars = list("\n"="#","\t"="#","ÿ"="____255;"))
 	for(var/char in repl_chars)
 		var/index = findtext(t, char)
 		while(index)
@@ -138,7 +138,14 @@
 	return t
 
 /proc/sanitize(var/t,var/list/repl_chars = null)
-	return html_encode(sanitize_simple(t,repl_chars))
+	t = html_encode(sanitize_simple(t,repl_chars))
+
+	var/index = findtext(t, "____255;")
+	while(index)
+		t = copytext(t, 1, index) + "&#255;" + copytext(t, index+8)
+		index = findtext(t, "____255;")
+
+	return t
 
 /proc/strip_html(var/t,var/limit=MAX_MESSAGE_LEN)
 	return sanitize(strip_html_simple(t))
