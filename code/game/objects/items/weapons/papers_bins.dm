@@ -145,6 +145,11 @@ NOTEBOOK
 					break
 		while(lentext(t) > MAX_PAPER_MESSAGE_LEN)
 
+		var/index = findtext(t, "ÿ")
+		while(index)
+			t = copytext(t, 1, index) + "&#1103;" + copytext(t, index+1)
+			index = findtext(t, "ÿ")
+
 
 		if ((!in_range(src, usr) && src.loc != user && !( istype(src.loc, /obj/item/weapon/clipboard) ) && src.loc.loc != user && user.equipped() != P))
 			return
