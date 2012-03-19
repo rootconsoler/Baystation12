@@ -463,7 +463,7 @@
 						return
 				if("Message")
 					var/t = input(U, "Please enter message", name, null) as text
-					t = copytext(sanitize(t), 1, MAX_MESSAGE_LEN)
+					t = copytext(sanitize(t,,1), 1, MAX_MESSAGE_LEN)
 					if (!t)
 						return
 					if (!in_range(src, U) && loc != U)
