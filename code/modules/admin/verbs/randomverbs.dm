@@ -47,6 +47,8 @@
 
 	var/msg = input("Message:", text("Subtle PM to [M.key]")) as text
 
+	msg = sanitize(msg)
+
 	if (!msg)
 		return
 	if(usr)
@@ -67,6 +69,8 @@
 
 	var/msg = input("Message:", text("Enter the text you wish to appear to everyone:")) as text
 
+	msg = sanitize(msg)
+
 	if (!msg)
 		return
 	world << "[msg]"
@@ -81,6 +85,9 @@
 		src << "Only administrators may use this command."
 		return
 	var/msg = input("Message:", text("Enter the text you wish to appear to your target:")) as text
+
+	msg = sanitize(msg)
+
 	M << msg
 	log_admin("DirectNarrate: [key_name(usr)] to ([M.name]/[M.key]): [msg]")
 	message_admins("\blue \bold DirectNarrate: [key_name(usr)] to ([M.name]/[M.key]): [msg]<BR>", 1)
@@ -98,6 +105,9 @@
 		if (!( ismob(M) ))
 			return
 		var/t = input("Message:", text("Private message to [M.key]"))  as text|null
+
+		t = sanitize(t)
+
 		if(holder.rank != "Game Admin" && holder.rank != "Game Master")
 			t = strip_html(t,500)
 		if (!( t ))
