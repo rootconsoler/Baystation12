@@ -114,10 +114,10 @@ THERMAL GLASSES
 		var/obj/item/clothing/under/V = new U
 		src.clothing_choices += V
 
-	for(var/U in typesof(/obj/item/clothing/under/rank)-(/obj/item/clothing/under/rank))
+//	for(var/U in typesof(/obj/item/clothing/under/rank)-(/obj/item/clothing/under/rank))
 
-		var/obj/item/clothing/under/V = new U
-		src.clothing_choices += V
+//		var/obj/item/clothing/under/V = new U
+//		src.clothing_choices += V
 
 	return
 
@@ -163,7 +163,7 @@ THERMAL GLASSES
 
 	var/obj/item/clothing/under/A
 
-	A = input("Select Colour to change it to", "BOOYEA", A) in clothing_choices
+	A = input("Select Colour to change it to", "BOOYEA", A) in clothing_choices|null
 
 	if(!A)
 		return
@@ -321,6 +321,12 @@ THERMAL GLASSES
 		usr << "You button up the labcoat."
 	else if(src.icon_state == "labcoat_cmo")
 		src.icon_state = "labcoat_cmo_open"
+		usr << "You unbutton the labcoat."
+	else if(src.icon_state == "labcoat_cmoalt_open")
+		src.icon_state = "labcoat_cmoalt"
+		usr << "You button up the labcoat."
+	else if(src.icon_state == "labcoat_cmoalt")
+		src.icon_state = "labcoat_cmoalt_open"
 		usr << "You unbutton the labcoat."
 	else if(src.icon_state == "labcoat_gen_open")
 		src.icon_state = "labcoat_gen"
