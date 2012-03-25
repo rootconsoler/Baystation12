@@ -1030,10 +1030,14 @@ datum
 					var/heat = conduction_coefficient*delta_temperature* \
 						(self_heat_capacity*model.heat_capacity/(self_heat_capacity+model.heat_capacity))
 
+					var/temp_group_multiplier = group_multiplier
+					if(!temp_group_multiplier)
+						temp_group_multiplier = 1
+
 					if(border_multiplier)
-						temperature -= heat*border_multiplier/(self_heat_capacity*group_multiplier)
+						temperature -= heat*border_multiplier/(self_heat_capacity*temp_group_multiplier)
 					else
-						temperature -= heat/(self_heat_capacity*group_multiplier)
+						temperature -= heat/(self_heat_capacity*temp_group_multiplier)
 
 		temperature_turf_share(turf/simulated/sharer, conduction_coefficient)
 			var/delta_temperature = (temperature_archived - sharer.temperature)
