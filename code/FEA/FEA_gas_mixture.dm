@@ -1030,10 +1030,8 @@ datum
 					var/heat = conduction_coefficient*delta_temperature* \
 						(self_heat_capacity*model.heat_capacity/(self_heat_capacity+model.heat_capacity))
 
-					var/temp_group_multiplier = group_multiplier
-					if(!temp_group_multiplier)
-						temp_group_multiplier = 1
-
+					ASSERT(self_heat_capacity != 0) // Trying to solve a runtime error - Abi79
+					ASSERT(group_multiplier != 0)
 					if(border_multiplier)
 						temperature -= heat*border_multiplier/(self_heat_capacity*temp_group_multiplier)
 					else
