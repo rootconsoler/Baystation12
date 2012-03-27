@@ -87,6 +87,7 @@
 	src.load_motd()
 	src.load_rules()
 	src.load_admins()
+	src.load_donators()
 	if (config.usewhitelist)
 		load_whitelist()
 	LoadBansjob()
