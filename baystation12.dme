@@ -374,6 +374,7 @@
 #include "code\game\communications.dm"
 #include "code\game\dna.dm"
 #include "code\game\dna_mutations.dm"
+#include "code\game\donators.dm"
 #include "code\game\hud.dm"
 #include "code\game\json.dm"
 #include "code\game\landmarks.dm"
@@ -423,7 +424,7 @@
 #include "code\game\gamemodes\game_mode.dm"
 #include "code\game\gamemodes\gameticker.dm"
 #include "code\game\gamemodes\intercept_report.dm"
-#include "code\game\gamemodes\objective.dm"
+#include "code\game\gamemodes\newobjective.dm"
 #include "code\game\gamemodes\setupgame.dm"
 #include "code\game\gamemodes\autotraitor\autotraitor.dm"
 #include "code\game\gamemodes\blob\blob.dm"
@@ -1128,5 +1129,5 @@
 #include "code\ZAS\Processing.dm"
 #include "code\ZAS\Variable Settings.dm"
 #include "interface\skin.dmf"
-#include "maps\tgstation.2.0.8.dmm"
+#include "maps\tgstation.2.0.8b.dmm"
 // END_INCLUDE

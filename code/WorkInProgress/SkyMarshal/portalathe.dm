@@ -12,7 +12,9 @@
 		if(!istype(target, /obj/machinery/light))
 			return
 		var/obj/machinery/light/L = target
-		if(L.stat > 1) //Burned or broke
-			L.stat = 0
+		if(L.status > 1) //Burned or broke
+			L.status = 0
+			L.on = 1
+			L.update()
 			user.visible_message("[user] repairs \the [target] on the spot with their [src]!","You repair the lightbulb!")
 		return
