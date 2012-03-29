@@ -1033,9 +1033,9 @@ datum
 					ASSERT(self_heat_capacity != 0) // Trying to solve a runtime error - Abi79
 					ASSERT(group_multiplier != 0)
 					if(border_multiplier)
-						temperature -= heat*border_multiplier/(self_heat_capacity*temp_group_multiplier)
+						temperature -= heat*border_multiplier/(self_heat_capacity*group_multiplier)
 					else
-						temperature -= heat/(self_heat_capacity*temp_group_multiplier)
+						temperature -= heat/(self_heat_capacity*group_multiplier)
 
 		temperature_turf_share(turf/simulated/sharer, conduction_coefficient)
 			var/delta_temperature = (temperature_archived - sharer.temperature)
