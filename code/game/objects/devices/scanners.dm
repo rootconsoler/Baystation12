@@ -1,4 +1,3 @@
-
 /*
 CONTAINS:
 T-RAY
@@ -116,6 +115,7 @@ MASS SPECTROMETER
 			else
 				src.amount--
 				var/obj/item/weapon/f_card/F = new /obj/item/weapon/f_card( user.loc )
+				F.fingerprints = list()
 				F.amount = 1
 				F.fingerprints += md5(M.dna.uni_identity)
 				F.icon_state = "fingerprint1"
