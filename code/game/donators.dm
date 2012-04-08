@@ -46,20 +46,19 @@ world/proc/load_donators()
 		return
 
 	if(!donator)
-		var/exists = 0
-		for(var/datum/donators/D)
-			if(D.ownerkey == ckey)
-				exists = 1
-				donator = D
-				break
-		if(!exists)
-			donator = new /datum/donators()
-			donator.owner = src
-			donator.ownerkey = ckey
-			if(donators[ckey])
-				donator.maxmoney = donators[ckey]
-				donator.money = donator.maxmoney
-
+		// var/exists = 0 - that var just for what?
+		// for(var/datum/donators/D)
+		//	if(D.ownerkey == ckey)
+		//		exists = 1
+		//		donator = D
+		//		break
+		// if(!exists) - :facepalm: code
+		donator = new /datum/donators()
+		donator.owner = src
+		donator.ownerkey = ckey
+		if(donators[ckey])
+			donator.money = donators[ckey] 
+			// donator.money = donator.maxmoney - so, maxmoney = donators[ckey], money = maxmoney
 	donator.donatorpanel()
 
 
