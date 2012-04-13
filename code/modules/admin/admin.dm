@@ -1,4 +1,7 @@
 
+var/global/BSACooldown = 0
+
+
 ////////////////////////////////
 /proc/message_admins(var/text, var/admin_ref = 0)
 	var/rendered = "<span class=\"admin\"><span class=\"prefix\">ADMIN LOG:</span> <span class=\"message\">[text]</span></span>"
@@ -78,6 +81,20 @@
 		var/datum/player_info/P = new
 		P.author = usr.key
 		P.content = add
+		var/modifyer = "th"
+		switch(time2text(world.timeofday, "DD"))
+			if("01","21","31")
+				modifyer = "st"
+			if("02","22",)
+				modifyer = "nd"
+			if("03","23")
+				modifyer = "rd"
+		var/day_string = "[time2text(world.timeofday, "DD")][modifyer]"
+		if(copytext(day_string,1,2) == "0")
+			day_string = copytext(day_string,2)
+		var/full_date = time2text(world.timeofday, "DDD, Month DD of YYYY")
+		var/day_loc = findtext(full_date, time2text(world.timeofday, "DD"))
+		P.timestamp = "[copytext(full_date,1,day_loc)][day_string][copytext(full_date,day_loc+2)]"
 
 		infos += P
 
@@ -241,13 +258,17 @@
 				jobban_unban(M, job)
 				href_list["jobban2"] = 1
 			else
-				ban_unban_log_save("[key_name(usr)] jobbanned [key_name(M)] from [job]")
+				var/reason = input(usr,"Reason?","reason","griefer") as text|null
+				if(!reason)
+					return
+				ban_unban_log_save("[key_name(usr)] jobbanned [key_name(M)] from [job]. reason: [reason]")
 				log_admin("[key_name(usr)] banned [key_name(M)] from [job]")
 				feedback_inc("ban_job",1)
 				M << "\red<BIG><B>You have been jobbanned by [usr.client.ckey] from [job].</B></BIG>"
+				M << "\red <B>The reason is: [reason]</B>"
 				M << "\red Jooban can be lifted only on demand."
 				message_admins("\blue [key_name_admin(usr)] banned [key_name_admin(M)] from [job]", 1)
-				jobban_fullban(M, job)
+				jobban_fullban(M, job, reason)
 				href_list["jobban2"] = 1 // lets it fall through and refresh
 
 
@@ -886,6 +907,92 @@
 					cl.jumptomob(M)
 
 
+
+
+
+	if (href_list["BlueSpaceArtillery"])
+		var/mob/M = locate(href_list["BlueSpaceArtillery"])
+		if(!M)
+			return
+
+		var/choice = alert(src.owner, "Are you sure you wish to hit [key_name(M)] with Blue Space Artillery?",  "Confirm Firing?" , "Yes" , "No")
+		if (choice == "No")
+			return
+
+		if(BSACooldown)
+			src.owner << "Standby!  Reload cycle in progress!  Gunnary crews ready in five seconds!"
+			return
+
+		BSACooldown = 1
+		spawn(50)
+			BSACooldown = 0
+
+
+		M << "You've been hit by bluespace artillery!"
+		log_admin("[key_name(M)] has been hit by Bluespace Artillery fired by [src.owner]")
+		message_admins("[key_name(M)] has been hit by Bluespace Artillery fired by [src.owner]")
+		var/obj/effect/stop/S
+		S = new /obj/effect/stop
+		S.victim = M
+		S.loc = M.loc
+		spawn(20)
+			del(S)
+
+		var/turf/T = get_turf(M)
+		if(T && (istype(T,/turf/simulated/floor/)))
+			if(prob(80))
+				T:break_tile_to_plating()
+			else
+				T:break_tile()
+
+		if(M.health == 1)
+			M.gib()
+		else
+			M.adjustBruteLoss( min( 99 , (M.health - 1) )    )
+			M.Stun(20)
+			M.Weaken(20)
+			M.stuttering = 20
+
+	if (href_list["CentcommReply"])
+		var/mob/M = locate(href_list["CentcommReply"])
+		if(!M)
+			return
+		if(!istype(M, /mob/living/carbon/human))
+			alert("Centcomm cannot transmit to non-humans.")
+			return
+		if((!istype(M:l_ear, /obj/item/device/radio/headset)) && (!istype(M:r_ear, /obj/item/device/radio/headset)))
+			alert("The person you're trying to reply to doesn't have a headset!  Centcomm cannot transmit directly to them.")
+			return
+		var/input = input(src.owner, "Please enter a message to reply to [key_name(M)] via their headset.","Outgoing message from Centcomm", "")
+		if(!input)
+			return
+
+		src.owner << "You sent [input] to [M] via a secure channel."
+		log_admin("[src.owner] replied to [key_name(M)]'s Centcomm message with the message [input].")
+		M << "You hear something crackle in your headset for a moment before a voice speaks.  \"Please stand by for a message from Central Command.  Message as follows. [input].  Message ends.\""
+
+		return
+
+	if (href_list["SyndicateReply"])
+		var/mob/M = locate(href_list["SyndicateReply"])
+		if(!M)
+			return
+		if(!istype(M, /mob/living/carbon/human))
+			alert("The Syndicate cannot transmit to non-humans.")
+			return
+		if((!istype(M:l_ear, /obj/item/device/radio/headset)) && (!istype(M:r_ear, /obj/item/device/radio/headset)))
+			alert("The person you're trying to reply to doesn't have a headset!  Centcomm cannot transmit directly to them.")
+			return
+		var/input = input(src.owner, "Please enter a message to reply to [key_name(M)] via their headset.","Outgoing message from The Syndicate", "")
+		if(!input)
+			return
+
+		src.owner << "You sent [input] to [M] via a secure channel."
+		log_admin("[src.owner] replied to [key_name(M)]'s Syndicate message with the message [input].")
+		M << "You hear something crackle in your headset for a moment before a voice speaks.  \"Please stand by for a message from your benefactor.  Message as follows, agent. [input].  Message ends.\""
+
+		return
+
 	if (href_list["jumpto"])
 		if(rank in list("Badmin", "Game Admin", "Game Master"))
 			var/mob/M = locate(href_list["jumpto"])
@@ -1482,7 +1589,7 @@
 						for(var/mob/living/carbon/human/H in world)
 							if(H.client)
 								H << "\red <B>You suddenly feel stupid.</B>"
-							H.brainloss = 60
+							H.setBrainLoss(60)
 						message_admins("[key_name_admin(usr)] made everybody retarded")
 					else
 						alert("You cannot perform this action. You must be of a higher administrative rank!")
@@ -1754,16 +1861,6 @@
 					J.spawn_positions = -1
 					message_admins("[key_name_admin(usr)] has removed the cap on security officers.")
 		return
-	if(href_list["vsc"])
-		if ((src.rank in list( "Moderator", "Temporary Admin", "Admin Candidate", "Trial Admin", "Badmin", "Game Admin", "Game Master" )))
-			if(href_list["vsc"] == "airflow")
-				vsc.ChangeSettingsDialog(usr,vsc.settings)
-			if(href_list["vsc"] == "plasma")
-				vsc.ChangeSettingsDialog(usr,vsc.plc.settings)
-			if(href_list["vsc"] == "load")
-				LoadTweaks()
-			if(href_list["vsc"] == "save")
-				SaveTweaks()
 	if (href_list["rnd_max"])
 		for(var/obj/machinery/computer/rdconsole/C in world)
 			for(var/datum/tech/T in C.files.known_tech)
@@ -1871,6 +1968,7 @@
 /datum/player_info/var
 	author // admin who authored the information
 	content // text content of the information
+	timestamp // Because this is bloody annoying
 
 /obj/admins/proc/player_has_info(var/key as text)
 	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
@@ -1896,13 +1994,18 @@
 	if(!infos)
 		dat += "No information found on the given key.<br>"
 	else
+		var/update_file = 0
 		var/i = 0
 		for(var/datum/player_info/I in infos)
 			i += 1
-			dat += "<font color=#008800>[I.content]</font> <i>by [I.author]</i> "
+			if(!I.timestamp)
+				I.timestamp = "Pre-4/3/2012"
+				update_file = 1
+			dat += "<font color=#008800>[I.content]</font> <i>by [I.author]</i> on <i><font color=blue>[I.timestamp]</i></font> "
 			if(I.author == usr.key)
 				dat += "<A href='?src=\ref[src];remove_player_info=[key];remove_index=[i]'>Remove</A>"
 			dat += "<br><br>"
+		if(update_file) info << infos
 
 	dat += "<br>"
 	dat += "<A href='?src=\ref[src];add_player_info=[key]'>Add Comment</A><br>"
@@ -1925,10 +2028,14 @@
 	return
 
 /obj/admins/proc/Jobbans()
+
 	if ((src.rank in list( "Game Admin", "Game Master"  )))
 		var/dat = "<B>Job Bans!</B><HR><table>"
 		for(var/t in jobban_keylist)
-			dat += text("<tr><td><A href='?src=\ref[src];removejobban=[t]'>[t]</A></td></tr>")
+			var/r = t
+			if( findtext(r,"##") )
+				r = copytext( r, 1, findtext(r,"##") )//removes the description
+			dat += text("<tr><td>[t] (<A href='?src=\ref[src];removejobban=[r]'>unban</A>)</td></tr>")
 		dat += "</table>"
 		usr << browse(dat, "window=ban;size=400x400")
 
@@ -1941,6 +2048,7 @@
 	if(!note_keys)
 		dat += "No notes found."
 	else
+		sortList(note_keys)
 		for(var/t in note_keys)
 			dat += text("<tr><td><A href='?src=\ref[src];view_player_info=[t]'>[t]</A></td></tr>")
 	dat += "</table>"
@@ -1984,13 +2092,7 @@
 	if(lvl >= 5)
 		dat += "<A href='?src=\ref[src];create_mob=1'>Create Mob</A><br>"
 //			if(lvl == 6 )
-	if(lvl >= 3 )
-		dat += "<br><A href='?src=\ref[src];vsc=airflow'>Edit Airflow Settings</A><br>"
-		dat += "<A href='?src=\ref[src];vsc=plasma'>Edit Plasma Settings</A><br>"
-
-		dat += "<br><A href='?src=\ref[src];vsc=load'>Load Settings</A><br>"
-		dat += "<A href='?src=\ref[src];vsc=save'>Save Settings</A><br>"
-	usr << browse(dat, "window=admin2;size=210x340")
+	usr << browse(dat, "window=admin2;size=210x180")
 	return
 /*
 /obj/admins/proc/goons()
@@ -2629,6 +2731,25 @@
 	var/output = {"<html>
 						<head>
 						<title>[time2text(world.realtime,"Day, MMM DD, YYYY")] - Log</title>
+						</head>
+						<body>
+						<pre>
+						[file2text(path)]
+						</pre>
+						</body>
+						</html>"}
+	usr << browse(output,"window=server_logfile")
+	onclose(usr,"server_logfile")
+	return
+
+/obj/admins/proc/view_atk_log()
+	set category = "Admin"
+	set desc="Shows todays server attack log in new window"
+	set name="Show Server Attack Log"
+	var/path = "data/logs/[time2text(world.realtime,"YYYY")]/[time2text(world.realtime,"MM")]-[time2text(world.realtime,"Month")]/[time2text(world.realtime,"DD")]-[time2text(world.realtime,"Day")] Attack.log"
+	var/output = {"<html>
+						<head>
+						<title>[time2text(world.realtime,"Day, MMM DD, YYYY")] - Attack Log</title>
 						</head>
 						<body>
 						<pre>

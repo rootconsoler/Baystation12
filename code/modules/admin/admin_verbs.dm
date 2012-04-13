@@ -25,7 +25,7 @@
 	holder.rank = rank
 
 	if(!holder.state)
-		var/state = alert("Which state do you the admin to begin in?", "Admin-state", "Play", "Observe", "Neither")
+		var/state = alert("Which state do you want the admin to begin in?", "Admin-state", "Play", "Observe", "Neither")
 		if(state == "Play")
 			holder.state = 1
 			admin_play()
@@ -67,6 +67,7 @@
 				verbs += /client/proc/debug_variables
 				//verbs += /client/proc/cmd_modify_object_variables --Merged with view variables
 				verbs += /client/proc/cmd_modify_ticker_variables
+				verbs += /client/proc/toggleadminhelpsound
 
 				// Admin helpers
 				verbs += /client/proc/toggle_view_range
@@ -140,9 +141,11 @@
 			verbs += /client/proc/callprocgen
 			verbs += /client/proc/callprocobj
 			verbs += /client/proc/rnd_check_designs
+			verbs += /client/proc/CarbonCopy
 
 		if (holder.level >= 5)//Game Admin********************************************************************
 			verbs += /obj/admins/proc/view_txt_log
+			verbs += /obj/admins/proc/view_atk_log
 			//verbs += /client/proc/cmd_mass_modify_object_variables --Merged with view variables
 			verbs += /client/proc/cmd_admin_list_open_jobs
 			verbs += /client/proc/cmd_admin_direct_narrate
@@ -167,6 +170,8 @@
 			verbs += /client/proc/restartcontroller //Can call via aproccall --I_hate_easy_things.jpg, Mport --Agouri
 			verbs += /client/proc/Blobize//I need to remember to move/remove this later
 			verbs += /client/proc/toggle_clickproc //TODO ERRORAGE (Temporary proc while the enw clickproc is being tested)
+			verbs += /client/proc/toggle_gravity_on
+			verbs += /client/proc/toggle_gravity_off
 			// Moved over from tg's Game Master:
 			verbs += /client/proc/colorooc
 			verbs += /obj/admins/proc/toggle_aliens			//toggle aliens
@@ -180,6 +185,7 @@
 			verbs += /client/proc/Force_Event_admin
 			verbs += /client/proc/radioalert
 			verbs += /client/proc/make_tajaran
+			verbs += /client/proc/CarbonCopy
 
 		if (holder.level >= 4)//Badmin********************************************************************
 			verbs += /obj/admins/proc/adrev					//toggle admin revives
@@ -223,7 +229,6 @@
 			verbs += /proc/release
 			verbs += /client/proc/toggleprayers
 			verbs += /client/proc/editappear
-			verbs += /client/proc/Zone_Info
 
 		if (holder.level >= 2)//Admin Candidate********************************************************************
 			verbs += /client/proc/cmd_admin_add_random_ai_law
@@ -417,6 +422,8 @@
 	verbs -= /client/proc/toggle_hear_deadcast
 	verbs -= /client/proc/toggle_hear_radio
 	verbs -= /client/proc/tension_report
+	verbs -= /client/proc/toggle_gravity_on
+	verbs -= /client/proc/toggle_gravity_off
 	verbs -= /client/proc/cmd_admin_change_custom_event
 	verbs -= /client/proc/admin_invis
 	verbs -= /client/proc/callprocgen
@@ -427,6 +434,7 @@
 	verbs -= /client/proc/radioalert
 	verbs -= /client/proc/rnd_check_designs
 	verbs -= /client/proc/make_tajaran
+	verbs -= /client/proc/CarbonCopy
 
 	return
 
@@ -891,3 +899,26 @@
 		var/obj/item/device/radio/intercom/a = new /obj/item/device/radio/intercom(null)
 		a.autosay(message,from)
 		del(a)
+
+/client/proc/CarbonCopy(atom/movable/O as mob|obj in world)
+	set category = "Admin"
+	var/atom/movable/NewObj = new O.type(usr.loc)
+	for(var/V in O.vars)
+		if (issaved(O.vars[V]))
+			if(V == "contents")
+				for(var/atom/movable/C in O.contents)
+					C.CarbonCopy2(NewObj)
+			else
+				NewObj.vars[V] = O.vars[V]
+	return NewObj
+
+/atom/proc/CarbonCopy2(atom/movable/O as mob|obj in world)
+	var/atom/movable/NewObj = new type(O)
+	for(var/V in vars)
+		if (issaved(vars[V]))
+			if(V == "contents")
+				for(var/atom/movable/C in contents)
+					C.CarbonCopy2(NewObj)
+			else
+				NewObj.vars[V] = vars[V]
+	return NewObj

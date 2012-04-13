@@ -13,6 +13,9 @@
 		verbs += /obj/machinery/sink/proc/mode_pour
 
 	attack_hand(mob/M as mob)
+		if(isrobot(M) || isAI(M))
+			return
+
 		if(busy)
 			M << "\red Someone's already washing something here."
 			return
@@ -129,7 +132,8 @@
 
 	shower
 		name = "Shower"
-		desc = "This is dumb."
+		desc = "This is a shower. Useful for cleaning."
+		icon_state = "shower"
 
 	kitchen
 		name = "Kitchen Sink"

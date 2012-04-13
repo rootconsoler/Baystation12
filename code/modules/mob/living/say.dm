@@ -71,7 +71,7 @@
 	var/message_range = null
 	var/message_mode = null
 
-	if (brainloss >= 60 && prob(50))
+	if (getBrainLoss() >= 60 && prob(50))
 		if (ishuman(src))
 			message_mode = "headset"
 	// Special message handling
@@ -160,7 +160,7 @@
 	message = capitalize(message) //capitalize the first letter of what they actually say
 
 	// :downs:
-	if (brainloss >= 60)
+	if (getBrainLoss() >= 60)
 		message = dd_replacetext(message, " am ", " ")
 		message = dd_replacetext(message, " is ", " ")
 		message = dd_replacetext(message, " are ", " ")
@@ -347,11 +347,12 @@
 
 	for (var/mob/M in W)
 		W |= M.contents
-		if(ishuman(M))
-			var/mob/living/carbon/human/G = M
-			for(var/name in G.organs)
-				var/datum/organ/external/F = G.organs[name]
-				W |= F.implant
+		if(hasorgans(M))
+			var/mob/living/carbon/G = M
+			for(var/name in G:organs)
+				var/datum/organ/external/F = G:organs[name]
+				for(var/obj/item/weapon/implant/I in F.implant)
+					W |= I
 
 	for (var/obj/item/device/pda/M in W)
 		W |= M.contents

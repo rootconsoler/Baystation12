@@ -83,6 +83,10 @@ emp_act
 	for(var/obj/O in src)
 		if(!O)	continue
 		O.emp_act(severity)
+	for(var/named in organs)
+		var/datum/organ/external/O = organs[named]
+		if(O.destroyed)	continue
+		O.emp_act(severity)
 	..()
 
 
@@ -90,9 +94,13 @@ emp_act
 	if(!I || !user)	return 0
 
 	var/datum/organ/external/affecting = get_organ(ran_zone(user.zone_sel.selecting))
-	var/hit_area = parse_zone(affecting.name)
+	var/hit_area = affecting.display_name
 
-	visible_message("\red <B>[src] has been attacked in the [hit_area] with [I.name] by [user]!</B>")
+	if(!affecting.destroyed)
+		visible_message("\red <B>[src] has been attacked in the [hit_area] with [I.name] by [user]!</B>")
+	else
+		user << "What [affecting]?"
+		return
 
 	if((user != src) && check_shields(I.force, "the [I.name]"))
 		return 0

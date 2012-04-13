@@ -96,16 +96,16 @@ datum
 
 
 		blood
-			data = new/list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=null,"resistances"=null,"trace_chem"=null,"virus2"=null,"antibodies"=0)
+			data = list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=null,"resistances"=null,"trace_chem"=null,"virus2"=null,"antibodies"=0)
 			name = "Blood"
 			id = "blood"
 			reagent_state = LIQUID
 			color = "#C80000" // rgb: 200, 0, 0
 			on_mob_life(var/mob/living/M)
 				if(istype(M, /mob/living/carbon/human) && blood_incompatible(data["blood_type"],M.dna.b_type))
-					M.adjustToxLoss(rand(1.5,3))
-					M.adjustOxyLoss(rand(1.5,3))
-				..()
+					M.adjustToxLoss(rand(0.5,1.5))
+					M.adjustOxyLoss(rand(1,1.5))
+					..()
 				return
 
 			reaction_mob(var/mob/M, var/method=TOUCH, var/volume)
@@ -437,7 +437,7 @@ datum
 						M:drowsyness  = max(M:drowsyness, 20)
 					if(25 to INFINITY)
 						M.sleeping = 1
-						M.oxyloss = 0
+						M.adjustOxyLoss(-M.getOxyLoss())
 						M.SetWeakened(0)
 						M.SetStunned(0)
 						M.SetParalysis(0)
@@ -1338,8 +1338,9 @@ datum
 				if(M:getBruteLoss() && prob(40)) M:heal_organ_damage(1,0)
 				if(M:getFireLoss() && prob(40)) M:heal_organ_damage(0,1)
 				if(M:getToxLoss() && prob(40)) M:adjustToxLoss(-1)
-				if(volume > REAGENTS_OVERDOSE)
-					M:adjustToxLoss(1)
+//				if(volume > REAGENTS_OVERDOSE)
+//					M:adjustToxLoss(1)
+//As hilarious as it was watching Asanadas projectile vomit everywhere from some overzealous medibots, and some antitoxin making 170 units, it was waaay bad.
 				..()
 				return
 
@@ -1352,7 +1353,7 @@ datum
 
 			on_mob_life(var/mob/living/M as mob)
 				if(!M) M = holder.my_atom ///This can even heal dead people.
-				M.cloneloss = 0
+				M.setCloneLoss(0)
 				M.setOxyLoss(0)
 				M.radiation = 0
 				M.heal_organ_damage(5,5)
@@ -1379,7 +1380,7 @@ datum
 					holder.remove_reagent("carpotoxin", 5)
 				if(holder.has_reagent("zombiepowder"))
 					holder.remove_reagent("zombiepowder", 5)
-				M.brainloss = 0
+				M.setBrainLoss(0)
 				M.disabilities = 0
 				M.eye_blurry = 0
 				M.eye_blind = 0
@@ -1751,27 +1752,6 @@ datum
 			description = "A highly addictive stimulant extracted from the tobacco plant."
 			reagent_state = LIQUID
 			color = "#181818" // rgb: 24, 24, 24
-
-		ethanol
-			name = "Ethanol"
-			id = "ethanol"
-			description = "A well-known alcohol with a variety of applications."
-			reagent_state = LIQUID
-			color = "#404030" // rgb: 64, 64, 48
-
-			on_mob_life(var/mob/living/M as mob)
-				if(!data) data = 1
-				data++
-				M.make_dizzy(5)
-				M:jitteriness = max(M:jitteriness-5,0)
-				if(data >= 25)
-					if (!M:slurring) M:slurring = 1
-					M:slurring += 4
-				if(data >= 40 && prob(33))
-					if (!M:confused) M:confused = 1
-					M:confused += 3
-				..()
-				return
 
 		ammonia
 			name = "Ammonia"
@@ -2557,32 +2537,6 @@ datum
 				..()
 				return
 
-		thirteenloko
-			name = "Thirteen Loko"
-			id = "thirteenloko"
-			description = "A potent mixture of caffeine and alcohol."
-			reagent_state = LIQUID
-			color = "#102000" // rgb: 16, 32, 0
-
-			on_mob_life(var/mob/living/M as mob)
-				M:drowsyness = max(0,M:drowsyness-7)
-				if(!M:sleeping_willingly)
-					M:sleeping = 0
-				if (M.bodytemperature > 310)
-					M.bodytemperature = max(310, M.bodytemperature-5)
-				M.make_jittery(1)
-				M:nutrition += 1
-				if(!data) data = 1
-				data++
-				M.dizziness +=4
-				if(data >= 45 && data <115)
-					if (!M.slurring) M.slurring = 1
-					M.slurring += 3
-				else if(data >= 125 && prob(33))
-					M.confused = max(M:confused+2,0)
-				..()
-				return
-
 		dr_gibb
 			name = "Dr. Gibb"
 			id = "dr_gibb"
@@ -2651,18 +2605,20 @@ datum
 
 
 //ALCOHOL WOO
-		alcohol	//Parent class for all alcoholic reagents.
-			name = "Alcohol"
-			id = "alcohol"
+		ethanol
+			name = "Ethanol" //Parent class for all alcoholic reagents.
+			id = "ethanol"
+			description = "A well-known alcohol with a variety of applications."
 			reagent_state = LIQUID
+			color = "#404030" // rgb: 64, 64, 48
 			var
 				dizzy_adj = 3
 				slurr_adj = 3
 				confused_adj = 2
-				slur_start = 45			//amount absorbed after which mob starts slurring
-				confused_start = 125	//amount absorbed after which mob starts confusing directions
-				blur_start = 245	//amount absorbed after which mob starts getting blurred vision
-				pass_out = 290	//amount absorbed after which mob starts passing out
+				slur_start = 65			//amount absorbed after which mob starts slurring
+				confused_start = 130	//amount absorbed after which mob starts confusing directions
+				blur_start = 260	//amount absorbed after which mob starts getting blurred vision
+				pass_out = 325	//amount absorbed after which mob starts passing out
 
 			on_mob_life(var/mob/living/M as mob)
 				if(!src.data) data = 1
@@ -2671,7 +2627,7 @@ datum
 				var/d = data
 
 				// make all the beverages work together
-				for(var/datum/reagent/alcohol/A in holder.reagent_list)
+				for(var/datum/reagent/ethanol/A in holder.reagent_list)
 					if(A.data) d += A.data
 
 				M.dizziness +=dizzy_adj.
@@ -2692,14 +2648,13 @@ datum
 				..()
 				return
 
-			beer	//It's really much more stronger than other drinks
+			beer	//It's really much more stronger than other drinks.
 				name = "Beer"
 				id = "beer"
 				description = "An alcoholic beverage made from malted grains, hops, yeast, and water."
 				color = "#664300" // rgb: 102, 67, 0
-				slur_start = 25			//amount absorbed after which mob starts slurring
-				confused_start = 40		//amount absorbed after which mob starts confusing directions
-
+//				slur_start = 25			//amount absorbed after which mob starts slurring
+//				confused_start = 40		//amount absorbed after which mob starts confusing directions //This is quite silly - Erthilo
 				on_mob_life(var/mob/living/M as mob)
 					..()
 					M:jitteriness = max(M:jitteriness-3,0)
@@ -2783,6 +2738,23 @@ datum
 				id = "ale"
 				description = "A dark alchoholic beverage made by malted barley and yeast."
 				color = "#664300" // rgb: 102, 67, 0
+
+			thirteenloko
+				name = "Thirteen Loko"
+				id = "thirteenloko"
+				description = "A potent mixture of caffeine and alcohol."
+				reagent_state = LIQUID
+				color = "#102000" // rgb: 16, 32, 0
+
+				on_mob_life(var/mob/living/M as mob)
+					M:drowsyness = max(0,M:drowsyness-7)
+					if(!M:sleeping_willingly)
+						M:sleeping = 0
+					if (M.bodytemperature > 310)
+						M.bodytemperature = max(310, M.bodytemperature-5)
+					M.make_jittery(1)
+					M:nutrition += 1
+					return
 
 
 /////////////////////////////////////////////////////////////////cocktail entities//////////////////////////////////////////////

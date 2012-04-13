@@ -66,7 +66,7 @@
 		L[tmpname] = R
 
 	for (var/obj/item/weapon/implant/tracking/I in world)
-		if (!I.implanted || !ismob(I.loc))
+		if (!I.implanted || !(istype(I.loc,/datum/organ/external) || ismob(loc)))
 			continue
 		else
 			var/mob/M = I.loc
@@ -83,7 +83,7 @@
 				areaindex[tmpname] = 1
 			L[tmpname] = I
 
-	var/desc = input("Please select a location to lock in.", "Locking Computer") in L|null
+	var/desc = input("Please select a location to lock in.", "Locking Computer") as null|anything in L
 	if(desc)
 		src.locked = L[desc]
 		for(var/mob/O in hearers(src, null))

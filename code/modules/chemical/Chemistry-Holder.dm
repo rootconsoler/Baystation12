@@ -317,6 +317,10 @@ datum
 
 				for(var/A in reagent_list)
 					var/datum/reagent/R = A
+					if(R.id == "blood" && reagent == R.id)
+						if(R.data && data)
+							if(R.data["donor"] != data["donor"])
+								continue
 					if (R.id == reagent)
 						R.volume += amount
 						update_total()
@@ -393,12 +397,12 @@ datum
 				return 0
 
 			get_reagent_amount(var/reagent)
+				var/total = 0
 				for(var/A in reagent_list)
 					var/datum/reagent/R = A
 					if (R.id == reagent)
-						return R.volume
-
-				return 0
+						total += R.volume
+				return total
 
 			get_reagents()
 				var/res = ""

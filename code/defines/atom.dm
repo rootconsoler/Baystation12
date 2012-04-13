@@ -2,6 +2,7 @@
 	layer = 2
 	var/level = 2
 	var/flags = FPRINT
+	var/flags_inv //This flag is used to determine when items in someone's inventory cover others. IE helmets making it so you can't see glasses, etc.
 	var/list/fingerprints
 	var/list/fingerprintshidden
 	var/fingerprintslast = null
@@ -27,7 +28,11 @@
 		return null
 
 	proc/return_air()
-		return null
+		if(loc)
+			return loc.return_air()
+		else
+			return null
+
 
 
 // Convenience proc to see if a container is open for chemistry handling

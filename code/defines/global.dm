@@ -64,6 +64,7 @@ var
 	///////////////
 
 	diary = null
+	diaryofmeanpeople = null
 	station_name = null
 	game_version = "Baystation 12"
 
@@ -174,6 +175,10 @@ var
 	list/BorgWireColorToIndex
 	list/ScrambledFrequencies = list( ) //These are used for electrical storms, and anything else that jams radios.
 	list/UnscrambledFrequencies = list( )
+	list/AAlarmWireColorToFlag = RandomAAlarmWires() // Air Alarm hacking wires.
+	list/AAlarmIndexToFlag
+	list/AAlarmIndexToWireColor
+	list/AAlarmWireColorToIndex
 
 	const/SPEED_OF_LIGHT = 3e8 //not exact but hey!
 	const/SPEED_OF_LIGHT_SQ = 9e+16
