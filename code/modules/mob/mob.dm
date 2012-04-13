@@ -290,9 +290,9 @@
 
 //Attemps to remove an object on a mob.  Will not move it to another area or such, just removes from the mob.
 /mob/proc/remove_from_mob(var/obj/O)
-	src.u_equip(O)
-	if (src.client)
-		src.client.screen -= O
+	u_equip(O)
+	if (client)
+		client.screen -= O
 	O.layer = initial(O.layer)
 	O.screen_loc = null
 	return 1
@@ -389,16 +389,19 @@
 		memory()
 
 /mob/proc/update_flavor_text()
+	set src in usr
+	if(usr != src)
+		usr << "No."
 	var/msg = input(usr,"Set the flavor text in your 'examine' verb. Don't metagame!","Flavor Text",html_decode(flavor_text)) as message|null
 
 	if(msg != null)
 		msg = copytext(msg, 1, MAX_MESSAGE_LEN)
 		msg = html_encode(msg)
 
-		src.flavor_text = msg
+		flavor_text = msg
 
 /mob/proc/warn_flavor_changed()
-	if(src.flavor_text && src.flavor_text != "") // don't spam people that don't use it!
+	if(flavor_text && flavor_text != "") // don't spam people that don't use it!
 		src << "<h2 class='alert'>OOC Warning:</h2>"
 		src << "<span class='alert'>Your flavor text is likely out of date! <a href='byond://?src=\ref[src];flavor_change=1'>Change</a></span>"
 
@@ -406,9 +409,9 @@
 	if (flavor_text && flavor_text != "")
 		var/msg = dd_replacetext(flavor_text, "\n", " ")
 		if(lentext(msg) <= 40)
-			usr << "\blue [msg]"
+			return "\blue [msg]"
 		else
-			usr << "\blue [copytext(msg, 1, 37)]... <a href='byond://?src=\ref[src];flavor_more=1'>More...</a>"
+			return "\blue [copytext(msg, 1, 37)]... <a href='byond://?src=\ref[src];flavor_more=1'>More...</a>"
 
 
 /*
@@ -607,7 +610,7 @@
 		src << browse(null, t1)
 
 	if(href_list["teleto"])
-		src.client.jumptoturf(locate(href_list["teleto"]))
+		client.jumptoturf(locate(href_list["teleto"]))
 
 	if(href_list["priv_msg"])
 		var/mob/M = locate(href_list["priv_msg"])
@@ -646,8 +649,8 @@
 					if(K.client && K.client.holder && K.key != usr.key && K.key != M.key)
 						K << "<b><font color='blue'>PM: [key_name(usr, K)]->[key_name(M, K)]:</b> \blue [t]</font>"
 	if(href_list["flavor_more"])
-		usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", src.name, dd_replacetext(src.flavor_text, "\n", "<BR>")), text("window=[];size=500x200", src.name))
-		onclose(usr, "[src.name]")
+		usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, dd_replacetext(flavor_text, "\n", "<BR>")), text("window=[];size=500x200", name))
+		onclose(usr, "[name]")
 	if(href_list["flavor_change"])
 		update_flavor_text()
 	..()
@@ -657,9 +660,9 @@
 	return health
 
 /mob/proc/UpdateLuminosity()
-	if(src.total_luminosity == src.last_luminosity)	return 0//nothing to do here
-	src.last_luminosity = src.total_luminosity
-	sd_SetLuminosity(min(src.total_luminosity,7))//Current hardcode max at 7, should likely be a const somewhere else
+	if(total_luminosity == last_luminosity)	return 0//nothing to do here
+	last_luminosity = total_luminosity
+	sd_SetLuminosity(min(total_luminosity,7))//Current hardcode max at 7, should likely be a const somewhere else
 	return 1
 
 /mob/MouseDrop(mob/M as mob)
@@ -709,7 +712,7 @@
 	if (isbanned)
 		log_access("Failed Login: [src] - Banned")
 		message_admins("\blue Failed Login: [src] - Banned")
-		alert(src,"You have been banned.\nReason : [isbanned]","Ban","Ok")
+		alert(src,"You have been banned.\nReason : [isbanned][config.appeal_address ? "\nYou may appeal this at [config.appeal_address]" : ""]","Ban","Ok")
 		del(src)
 
 /*
@@ -720,7 +723,7 @@
 		del(src)
 */
 
-	if(IsGuestKey(src.key))
+	if(IsGuestKey(key))
 		alert(src,"Baystation12 doesn't allow guest accounts to play. Please go to http://www.byond.com/ and register for a key.","Guest","OK")
 		del(src)
 
@@ -776,7 +779,7 @@
 
 //This is the proc for gibbing a mob. Cannot gib ghosts. Removed the medal reference,
 //added different sort of gibs and animations. N
-/mob/proc/gib()
+/mob/proc/gib(var/ex_act = 0)
 
 	if (istype(src, /mob/dead/observer))
 		gibs(loc, viruses)
@@ -835,8 +838,10 @@ Currently doesn't work, but should be useful later or at least as a template
 			else
 				gibs(loc, viruses, dna)
 		sleep(15)
-		for(var/obj/item/I in src.contents)
+		for(var/obj/item/I in contents)
 			I.loc = get_turf(src)
+			if(ex_act)
+				I.ex_act(ex_act)
 		del(src)
 
 /*
@@ -872,7 +877,7 @@ Dusting robots does not eject the MMI, so it's a bit more powerful than gib() /N
 	sleep(15)
 	if(isrobot(src)&&src:mmi)//Is a robot and it has an mmi.
 		del(src:mmi)//Delete the MMI first so that it won't go popping out.
-	for(var/obj/item/I in src.contents)
+	for(var/obj/item/I in contents)
 		I.loc = get_turf(src)
 	del(src)
 
@@ -971,85 +976,43 @@ note dizziness decrements automatically in the mob's Life() proc.
 					statpanel("Spells","[S.charge_counter]/[S.charge_max]",S)
 				if("holdervar")
 					statpanel("Spells","[S.holder_var_type] [S.holder_var_amount]",S)
-#if 1
-/client/proc/station_explosion_cinematic(var/derp)
-	if(mob)
-		var/mob/M = mob
-		M.loc = null // HACK, but whatever, this works
 
-		if (M.client&&M.hud_used)//They may some times not have a hud, apparently.
-			var/obj/screen/boom = M.hud_used.station_explosion
-			M.client.screen += boom
-			if(ticker)
-				switch(ticker.mode.name)
-					if("nuclear emergency")
-						flick("start_nuke", boom)
-					if("AI malfunction")
-						flick("start_malf", boom)
-					else
-						boom.icon_state = "start"
-			sleep(40)
-			M << sound('explosionfar.ogg')
-			boom.icon_state = "end"
-			if(!derp) flick("explode", boom)
-			else flick("explode2", boom)
-			sleep(40)
-			if(ticker)
-				switch(ticker.mode.name)
-					if("nuclear emergency")
-						if (!derp) boom.icon_state = "loss_nuke"
-						else boom.icon_state = "loss_nuke2"
-					if("malfunction")
-						boom.icon_state = "loss_malf"
-					if("blob")
-						return//Nothin here yet and the general one does not fit.
-					else
-						boom.icon_state = "loss_general"
-#elif
-/client/proc/station_explosion_cinematic(var/derp)
-	if(!src.mob)
-		return
 
-	var/mob/M = src.mob
-	M.loc = null // HACK, but whatever, this works
+/client/proc/station_explosion_cinematic(var/station_missed)
+	if(!mob || !ticker)	return
+	if(!mob.client || !mob.hud_used || !ticker.mode)	return
+//	M.loc = null this might make it act weird but fuck putting them in nullspace, it causes issues.
+	var/obj/screen/boom = mob.hud_used.station_explosion
+	if(!istype(boom))	return
 
-	if(!M.hud_used)
-		return
+	mob.client.screen += boom
 
-	var/obj/screen/boom = M.hud_used.station_explosion
-	src.screen += boom
-	if(ticker)
-		switch(ticker.mode.name)
-			if("nuclear emergency")
-				flick("start_nuke", boom)
-			if("AI malfunction")
-				flick("start_malf", boom)
-			else
-				boom.icon_state = "start"
+	switch(ticker.mode.name)
+		if("nuclear emergency")
+			flick("start_nuke", boom)
+		if("AI malfunction")
+			flick("start_malf", boom)
+		else
+			boom.icon_state = "start"
+
 	sleep(40)
-	M << sound('explosionfar.ogg')
+	mob << sound('explosionfar.ogg')
 	boom.icon_state = "end"
-	if(!derp)
-		flick("explode", boom)
-	else
-		flick("explode2", boom)
+	if(!station_missed) flick("explode", boom)
+	else flick("explode2", boom)
 	sleep(40)
-	if(ticker)
-		switch(ticker.mode.name)
-			if("nuclear emergency")
-				if (!derp)
-					boom.icon_state = "loss_nuke"
-				else
-					boom.icon_state = "loss_nuke2"
-			if("AI malfunction")
-				boom.icon_state = "loss_malf"
-			else
-				boom.icon_state = "loss_general"
-#endif
 
-
-
-
+	switch(ticker.mode.name)
+		if("nuclear emergency")
+			if(!station_missed) boom.icon_state = "loss_nuke"
+			else boom.icon_state = "loss_nuke2"
+		if("malfunction")
+			boom.icon_state = "loss_malf"
+		if("blob")
+			return//Nothin here yet and the general one does not fit.
+		else
+			boom.icon_state = "loss_general"
+	return
 
 
 // facing verbs
@@ -1099,28 +1062,39 @@ note dizziness decrements automatically in the mob's Life() proc.
 /mob/proc/IsAdvancedToolUser()//This might need a rename but it should replace the can this mob use things check
 	return 0
 
+
 /mob/proc/Stun(amount)
-	stunned = max(max(stunned,amount),0) //can't go below 0, getting a low amount of stun doesn't lower your current stun
+	if(canstun)
+		stunned = max(max(stunned,amount),0) //can't go below 0, getting a low amount of stun doesn't lower your current stun
+	else
+		if(istype(src, /mob/living/carbon/alien))	// add some movement delay
+			var/mob/living/carbon/alien/Alien = src
+			Alien.move_delay_add = min(Alien.move_delay_add + round(amount / 5), 10) // a maximum delay of 10
 	return
 
 /mob/proc/SetStunned(amount) //if you REALLY need to set stun to a set amount without the whole "can't go below current stunned"
-	stunned = max(amount,0)
+	if(canstun)
+		stunned = max(amount,0)
 	return
 
 /mob/proc/AdjustStunned(amount)
-	stunned = max(stunned + amount,0)
+	if(canstun)
+		stunned = max(stunned + amount,0)
 	return
 
 /mob/proc/Weaken(amount)
-	weakened = max(max(weakened,amount),0)
+	if(canweaken)
+		weakened = max(max(weakened,amount),0)
 	return
 
 /mob/proc/SetWeakened(amount)
-	weakened = max(amount,0)
+	if(canweaken)
+		weakened = max(amount,0)
 	return
 
 /mob/proc/AdjustWeakened(amount)
-	weakened = max(weakened + amount,0)
+	if(canweaken)
+		weakened = max(weakened + amount,0)
 	return
 
 /mob/proc/Paralyse(amount)

@@ -258,15 +258,34 @@ THERMAL GLASSES
 		src.up = !src.up
 		src.see_face = !src.see_face
 		src.flags |= HEADCOVERSEYES
+		flags_inv |= HIDEMASK|HIDEEARS|HIDEEYES
 		icon_state = "welding"
 		usr << "You flip the mask down to protect your eyes."
 	else
 		src.up = !src.up
 		src.see_face = !src.see_face
 		src.flags &= ~HEADCOVERSEYES
+		flags_inv &= ~(HIDEMASK|HIDEEARS|HIDEEYES)
 		icon_state = "weldingup"
 		usr << "You push the mask up out of your face."
 	usr.update_clothing()
+
+/obj/item/clothing/head/cargosoft/dropped()
+	src.icon_state = "cargosoft"
+	src.flipped=0
+	..()
+
+/obj/item/clothing/head/cargosoft/verb/flip()
+	set category = "Object"
+	set name = "Flip cap"
+	src.flipped = !src.flipped
+	if(src.flipped)
+		icon_state = "cargosoft_flipped"
+		usr << "You flip the hat backwards."
+	else
+		icon_state = "cargosoft"
+		usr << "You flip the hat back in normal position."
+
 
 /obj/item/clothing/shoes/magboots/verb/toggle()
 	set name = "Toggle Magboots"
@@ -417,3 +436,24 @@ THERMAL GLASSES
 		icon_state = "engspace_helmet_clear"
 		usr << "You toggle the reflective tint off."
 	usr.update_clothing()
+
+/obj/item/clothing/head/helmet/space/rig/cespace_helmet/attack_self()
+	toggle()
+
+/obj/item/clothing/head/helmet/space/rig/cespace_helmet/verb/toggle()
+	set category = "Object"
+	set name = "Toggle Helmet Visor"
+	if(src.up)
+		src.up = !src.up
+		src.see_face = !src.see_face
+		src.flags |= HEADCOVERSEYES
+		icon_state = "cespace_helmet"
+		usr << "You toggle the reflective tint on."
+	else
+		src.up = !src.up
+		src.see_face = !src.see_face
+		src.flags &= ~HEADCOVERSEYES
+		icon_state = "cespace_helmet_clear"
+		usr << "You toggle the reflective tint off."
+	usr.update_clothing()
+

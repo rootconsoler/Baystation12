@@ -15,16 +15,16 @@
 
 	var
 		fire_sound = 'Gunshot.ogg'
-		obj/item/projectile/in_chamber = null
+		tmp/obj/item/projectile/in_chamber = null
 		caliber = ""
 		silenced = 0
 		recoil = 0
 		tmp/list/mob/living/target //List of who yer targeting.
 		tmp/lock_time = -100
-		mouthshoot = 0 ///To stop people from suiciding twice... >.>
+		tmp/mouthshoot = 0 ///To stop people from suiciding twice... >.>
 		automatic = 0 //Used to determine if you can target multiple people.
-		mob/living/last_moved_mob //Used to fire faster at more than one person.
-		told_cant_shoot = 0 //So that it doesn't spam them with the fact they cannot hit them.
+		tmp/mob/living/last_moved_mob //Used to fire faster at more than one person.
+		tmp/told_cant_shoot = 0 //So that it doesn't spam them with the fact they cannot hit them.
 
 	proc/load_into_chamber()
 		return 0
@@ -98,7 +98,7 @@
 				playsound(user, fire_sound, 10, 1)
 			else
 				playsound(user, fire_sound, 50, 1)
-			M.apply_damage(30+in_chamber.damage, BRUTE, used_weapon = "Point Blank Shot") //So we'll put him an inch from death.
+			M.apply_damage(30+in_chamber.damage, BRUTE, user.zone_sel.selecting, used_weapon = "Point Blank Shot") //So we'll put him an inch from death.
 			M.attack_log += text("\[[]\] <b>[]/[]</b> shot <b>[]/[]</b> point blank with a <b>[]</b>", time_stamp(), user, user.ckey, M, M.ckey, src)
 			user.attack_log += text("\[[]\] <b>[]/[]</b> shot <b>[]/[]</b> point blank with a <b>[]</b>", time_stamp(), user, user.ckey, M, M.ckey, src)
 			log_admin("ATTACK: [user] ([user.ckey]) shot [M] ([M.ckey]) point blank with [src].")
@@ -392,7 +392,6 @@ mob/proc
 						m_intent = "walk"
 						hud_used.move_intent.icon_state = "walking"
 				while(targeted_by && T.client)
-					sleep(1)
 					if(last_move_intent > I.lock_time + 10 && !T.client.target_can_move) //If the target moved while targeted
 						I.TargetActed(src)
 						if(I.last_moved_mob == src) //If they were the last ones to move, give them more of a grace period, so that an automatic weapon can hold down a room better.
@@ -411,6 +410,7 @@ mob/proc
 							I.lock_time = world.time + 5
 						I.lock_time = world.time + 5
 						I.last_moved_mob = src
+					sleep(1)
 
 	NotTargeted(var/obj/item/weapon/gun/I)
 		if(!I.silenced)
@@ -464,7 +464,7 @@ mob/proc
 	target_locked
 		icon = 'icons/effects/Targeted.dmi'
 		icon_state = "locked"
-		layer = 99
+		layer = 17.9
 //	captured
 //		icon = 'Captured.dmi'
 //		layer = 99

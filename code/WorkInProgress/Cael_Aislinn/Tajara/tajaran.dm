@@ -2,12 +2,14 @@
 	name = "tajaran"
 	real_name = "tajaran"
 	voice_name = "tajaran"
-	icon = 'tajaran.dmi'
+	icon = 'mob.dmi'
+	icon_state = "m-none"
 	var/list/tajspeak_letters
 	//
 	universal_speak = 1 //hacky fix until someone can figure out how to make them only understand humans
 	taj_talk_understand = 1
 	voice_message = "mrowls"
+	examine_text = "one of the cat-like Tajarans."
 
 /mob/living/carbon/human/tajaran/New()
 	tajspeak_letters = new/list("~","*","-")
@@ -329,8 +331,10 @@
 			overlays += image("icon" = stain_icon, "layer" = MOB_LAYER)
 		head.screen_loc = ui_head
 	else
+		var/datum/organ/external/head = organs["head"]
+		if(!head.destroyed)
 		//if not wearing anything on the head, show the ears
-		overlays += image("icon" = icon('tajaran.dmi', "ears_[gender==FEMALE ? "f" : "m"]_[lying ? "l" : "s"]"), "layer" = MOB_LAYER)
+			overlays += image("icon" = icon('tajaran.dmi', "ears_[gender==FEMALE ? "f" : "m"]_[lying ? "l" : "s"]"), "layer" = MOB_LAYER)
 
 	// Belt
 	if (belt)
@@ -458,8 +462,6 @@
 	last_b_state = stat
 
 /mob/living/carbon/human/tajaran/update_body()
-	return
-
 	if(stand_icon)
 		del(stand_icon)
 	if(lying_icon)
@@ -474,8 +476,8 @@
 	else if (gender == FEMALE)
 		g = "f"
 
-	stand_icon = new /icon('tajaran.dmi', "torso_s")
-	lying_icon = new /icon('tajaran.dmi', "torso_l")
+	stand_icon = new /icon('tajaran.dmi', "torso_[g]_s")
+	lying_icon = new /icon('tajaran.dmi', "torso_[g]_l")
 
 	var/husk = (mutations & HUSK)
 	//var/obese = (mutations & FAT)
@@ -494,8 +496,12 @@
 			&& !istype(part, /datum/organ/external/chest) \
 			&& !istype(part, /datum/organ/external/head) \
 			&& !part.destroyed)
-			stand_icon.Blend(new /icon('tajaran.dmi', "[part.icon_name]_s"), ICON_OVERLAY)
-			lying_icon.Blend(new /icon('tajaran.dmi', "[part.icon_name]_l"), ICON_OVERLAY)
+			var/icon/temp = new /icon('tajaran.dmi', "[part.icon_name]_s")
+			if(part.robot) temp.MapColors(rgb(77,77,77), rgb(150,150,150), rgb(28,28,28), rgb(0,0,0))
+			stand_icon.Blend(temp, ICON_OVERLAY)
+			temp = new /icon('tajaran.dmi', "[part.icon_name]_l")
+			if(part.robot) temp.MapColors(rgb(77,77,77), rgb(150,150,150), rgb(28,28,28), rgb(0,0,0))
+			lying_icon.Blend(temp , ICON_OVERLAY)
 
 	stand_icon.Blend(new /icon('tajaran.dmi', "groin_[g]_s"), ICON_OVERLAY)
 	lying_icon.Blend(new /icon('tajaran.dmi', "groin_[g]_l"), ICON_OVERLAY)

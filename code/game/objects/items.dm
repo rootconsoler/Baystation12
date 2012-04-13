@@ -145,10 +145,15 @@
 					if(W.loc == my_target) break
 					sleep(2)
 
-		if(istype(usr.loc, /turf/space)|| (user.flags & NOGRAV))
+		if((istype(usr.loc, /turf/space)) || (usr.lastarea.has_gravity == 0))
 			user.inertia_dir = get_dir(target, user)
 			step(user, user.inertia_dir)
 
+	/*
+		if(istype(usr.loc, /turf/space)|| (user.flags & NOGRAV))
+			user.inertia_dir = get_dir(target, user)
+			step(user, user.inertia_dir)
+	*/
 	else
 		return ..()
 	return
@@ -474,7 +479,8 @@
 		istype(W, /obj/item/weapon/kitchen/utensil/knife)         || \
 		istype(W, /obj/item/weapon/shard)                         || \
 		istype(W, /obj/item/weapon/reagent_containers/syringe)    || \
-		istype(W, /obj/item/weapon/kitchen/utensil/fork) && W.icon_state != "forkloaded" \
+		istype(W, /obj/item/weapon/kitchen/utensil/fork) && W.icon_state != "forkloaded" || \
+		istype(W,/obj/item/projectile)\
 	)
 
 /proc/is_cut(obj/item/W as obj)
@@ -488,7 +494,8 @@
 		istype(W, /obj/item/weapon/butch)						  || \
 		istype(W, /obj/item/weapon/scalpel)                       || \
 		istype(W, /obj/item/weapon/kitchen/utensil/knife)         || \
-		istype(W, /obj/item/weapon/shard)	\
+		istype(W, /obj/item/weapon/shard)	|| \
+		istype(W,/obj/item/projectile)	\
 	)
 
 /proc/is_burn(obj/item/W as obj)
@@ -496,7 +503,8 @@
 		istype(W, /obj/item/weapon/weldingtool)      && W:welding || \
 		istype(W, /obj/item/weapon/zippo)            && W:lit     || \
 		istype(W, /obj/item/weapon/match)            && W:lit     || \
-		istype(W, /obj/item/clothing/mask/cigarette) && W:lit	\
+		istype(W, /obj/item/clothing/mask/cigarette) && W:lit	|| \
+		istype(W,/obj/item/projectile/beam)\
 	)
 
 /obj/item/weapon/paper/temperature_expose(datum/gas_mixture/air, exposed_temperature, exposed_volume)

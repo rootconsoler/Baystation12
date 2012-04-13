@@ -16,8 +16,47 @@ CIRCULAR SAW
 	if(!istype(M))
 		return
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
+
+	if(((user.zone_sel.selecting == "l_arm") || (user.zone_sel.selecting == "r_arm") || (user.zone_sel.selecting == "l_leg") || (user.zone_sel.selecting == "r_leg")) & (istype(M, /mob/living/carbon/human)))
+		var/mob/living/carbon/human/H = M
+		var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+		if(S.destroyed)
+			if(S.bleeding)
+				user << "\red There's too much blood here!"
+				return 0
+			if(!S.cutaway)
+				user << "\red The flesh hasn't been cleanly cut!"
+				return 0
+			if(M != user)
+				M.visible_message( \
+					"\red [user] is beginning reposition flesh and nerve endings where [H]'s [S.display_name] used to be with [src].", \
+					"\red [user] begins to reposition flesh and nerve endings where [S.display_name] used to be with [src]!")
+			else
+				M.visible_message( \
+					"\red [user] begins to reposition flesh and nerve endings where \his [S.display_name]  used to be with [src]!", \
+					"\red You begin to reposition flesh and nerve endings where your [S.display_name] used to be with [src]!")
+
+			if(do_mob(user, H, 100))
+				if(M != user)
+					M.visible_message( \
+						"\red [user] finishes repositioning flesh and nerve endings where [H]'s [S.display_name] used to be with [src]!", \
+						"\red [user] finishes repositioning flesh and nerve endings where your [S.display_name] used to be with [src]!")
+				else
+					M.visible_message( \
+						"\red [user] finishes repositioning flesh and nerve endings where \his [S.display_name] used to be with [src]!", \
+						"\red You finish repositioning flesh and nerve endings where your [S.display_name] used to be with [src]!")
+
+				if(H == user && prob(25))
+					user << "\red You mess up!"
+					S.take_damage(15)
+
+				S.open = 3
+				M.updatehealth()
+				M.UpdateDamageIcon()
+
+				return 1
 
 	if(user.zone_sel.selecting == "chest")
 		if(istype(M, /mob/living/carbon/human))
@@ -27,7 +66,7 @@ CIRCULAR SAW
 						for(var/mob/O in (viewers(M) - user - M))
 							O.show_message("\red [user] retracts the flap in [M]'s cut open torso with [src].", 1)
 						M << "\red [user] begins to retracts the flap in your chest with [src]!"
-						user << "\red You clamp retracts the flap in [M]'s torso with [src]!"
+						user << "\red You retract the flap in [M]'s torso with [src]!"
 						M:embryo_op_stage = 3.0
 						return
 				if(4.0)
@@ -205,7 +244,12 @@ CIRCULAR SAW
 		return 0
 
 	if(S.destroyed)
-		user << "What [S.display_name]?"
+		return ..()
+
+	if(S.robot)
+		user << "Medical equipment for a robot arm?  How would that do any good..."
+		return
+
 	if(!S.open)
 		user << "\red There is skin in the way!"
 		return 0
@@ -251,8 +295,47 @@ CIRCULAR SAW
 	if(!istype(M))
 		return
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && M.lying && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
+
+	if(((user.zone_sel.selecting == "l_arm") || (user.zone_sel.selecting == "r_arm") || (user.zone_sel.selecting == "l_leg") || (user.zone_sel.selecting == "r_leg")) & (istype(M, /mob/living/carbon/human)))
+		var/mob/living/carbon/human/H = M
+		var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+		if(S.destroyed)
+			if(!S.bleeding)
+				user << "\red There is nothing bleeding here!"
+				return 0
+			if(!S.cutaway)
+				user << "\red The flesh hasn't been cleanly cut!"
+				return 0
+			if(M != user)
+				M.visible_message( \
+					"\red [user] is beginning to clamp bleeders in the stump where [H]'s [S.display_name] used to be with [src].", \
+					"\red [user] begins to clamp bleeders in the stump where [S.display_name] used to be with [src]!")
+			else
+				M.visible_message( \
+					"\red [user] begins to clamp bleeders in the stump where \his [S.display_name]  used to be with [src]!", \
+					"\red You begin to clamp bleeders in the stump where your [S.display_name] used to be with [src]!")
+
+			if(do_mob(user, H, 100))
+				if(M != user)
+					M.visible_message( \
+						"\red [user] finishes clamping bleeders in the stump where [H]'s [S.display_name] used to be with [src]!", \
+						"\red [user] finishes clamping bleeders in the stump where your [S.display_name] used to be with [src]!")
+				else
+					M.visible_message( \
+						"\red [user] finishes clamping bleeders in the stump where \his [S.display_name] used to be with [src]!", \
+						"\red You finish clamping bleeders in the stump where your [S.display_name] used to be with [src]!")
+
+				if(H == user && prob(25))
+					user << "\red You mess up!"
+					S.take_damage(15)
+
+				S.bleeding = 0
+				M.updatehealth()
+				M.UpdateDamageIcon()
+
+			return 1
 
 	if(user.zone_sel.selecting == "chest")
 		if(istype(M, /mob/living/carbon/human))
@@ -470,14 +553,21 @@ CIRCULAR SAW
 	if(!istype(H))
 		return 0
 	var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+
 	if(!S || !istype(S))
 		return 0
 
 	if(S.destroyed)
-		user << "What [S.display_name]?"
+		return ..()
+
+	if(S.robot)
+		user << "Medical equipment for a robot arm?  How would that do any good..."
+		return
+
 	if(!S.open)
 		user << "\red There is skin in the way!"
 		return 0
+
 	if(!S.bleeding)
 		user << "\red [H] is not bleeding in \his [S.display_name]!"
 		return 0
@@ -664,7 +754,7 @@ CIRCULAR SAW
 	if(!istype(M))
 		return
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && M.lying && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
 
 	if(target_name != M.name)
@@ -682,6 +772,9 @@ CIRCULAR SAW
 	if(!S.open)
 		usr << "<b>You have to cut the limb open first!</b>"
 		return
+	if(S.robot)
+		user << "Medical equipment for a robot arm?  How would that do any good..."
+		return
 	for(var/mob/O in viewers(M))
 		O.show_message("\red [user.name] scans the wounds on [M.name]'s [S.display_name] with \the [src.name]", 1)
 
@@ -697,8 +790,52 @@ CIRCULAR SAW
 	if(!istype(M))
 		return
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && M.lying && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
+
+	if(((user.zone_sel.selecting == "l_arm") || (user.zone_sel.selecting == "r_arm") || (user.zone_sel.selecting == "l_leg") || (user.zone_sel.selecting == "r_leg")) & (istype(M, /mob/living/carbon/human)))
+		var/mob/living/carbon/human/H = M
+		var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+		if(S.destroyed)
+			if(S.bleeding)
+				user << "\red There's too much blood here!"
+				return 0
+			if(!S.cutaway)
+				user << "\red The flesh hasn't been cleanly cut!"
+				return 0
+			if(S.open != 3)
+				user << "\red The wound hasn't been prepared yet!"
+				return 0
+			if(M != user)
+				M.visible_message( \
+					"\red [user] is adjusting the area around [H]'s [S.display_name] for reattachment with [src].", \
+					"\red [user] is adjusting the area around your [S.display_name] for reattachment with [src]!")
+			else
+				M.visible_message( \
+					"\red [user] begins adjusting the area around \his [S.display_name] for reattachment with [src]!", \
+					"\red You begin adjusting the area around your [S.display_name] for reattachment with [src]!")
+
+			if(do_mob(user, H, 100))
+				if(M != user)
+					M.visible_message( \
+						"\red [user] finishes adjusting the area around [H]'s [S.display_name]!", \
+						"\red [user] finishes adjusting the area around your [S.display_name]!")
+				else
+					M.visible_message( \
+						"\red [user] finishes adjusting the area around \his [S.display_name]!", \
+						"\red You finish adjusting the area around your [S.display_name]!")
+
+				if(H == user && prob(25))
+					user << "\red You mess up!"
+					S.take_damage(15)
+
+				S.open = 0
+				S.stage = 0
+				S.attachable = 1
+				M.updatehealth()
+				M.UpdateDamageIcon()
+
+			return 1
 
 	if(user.zone_sel.selecting == "chest")
 		if(istype(M, /mob/living/carbon/human))
@@ -851,6 +988,10 @@ CIRCULAR SAW
 
 	if(S.destroyed)
 		user << "What [S.display_name]?"
+
+	if(S.robot)
+		user << "Medical equipment for a robot arm?  How would that do any good..."
+		return
 	if(!S.open)
 		user << "\red There is no wound to close up!"
 		return 0
@@ -905,10 +1046,57 @@ CIRCULAR SAW
 		M = user
 		return eyestab(M,user)
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && M.lying && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
 
 	src.add_fingerprint(user)
+
+	if(((user.zone_sel.selecting == "l_arm") || (user.zone_sel.selecting == "r_arm") || (user.zone_sel.selecting == "l_leg") || (user.zone_sel.selecting == "r_leg")) & (istype(M, /mob/living/carbon/human)))
+		var/mob/living/carbon/human/H = M
+		var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+		if(S.destroyed)
+			if(M != user)
+				M.visible_message( \
+					"\red [user] is beginning to cut away at the flesh where [H]'s [S.display_name] used to be with [src].", \
+					"\red [user] begins to cut away at the flesh where [S.display_name] used to be with [src]!")
+			else
+				M.visible_message( \
+					"\red [user] begins to cut away at the flesh where \his [S.display_name]  used to be with [src]!", \
+					"\red You begin to cut away at the flesh where your [S.display_name] used to be with [src]!")
+
+			if(do_mob(user, H, 100))
+				if(M != user)
+					M.visible_message( \
+						"\red [user] finishes cutting where [H]'s [S.display_name] used to be with [src]!", \
+						"\red [user] finishes cutting where your [S.display_name] used to be with [src]!")
+				else
+					M.visible_message( \
+						"\red [user] finishes cutting where \his [S.display_name] used to be with [src]!", \
+						"\red You finish cutting where your [S.display_name] used to be with [src]!")
+
+				S.cutaway = 1
+				S.bleeding = 1
+				M.updatehealth()
+				M.UpdateDamageIcon()
+			else
+				var/a = pick(1,2,3)
+				var/msg
+				if(a == 1)
+					msg = "\red [user]'s move slices open [H]'s wound, causing massive bleeding"
+					S.brute_dam += 35
+					S.createwound(rand(1,3))
+				else if(a == 2)
+					msg = "\red [user]'s move slices open [H]'s wound, and causes \him to accidentally stab himself"
+					S.brute_dam += 35
+					var/datum/organ/external/userorgan = user:organs["chest"]
+					if(userorgan)
+						userorgan.brute_dam += 35
+					else
+						user.take_organ_damage(35)
+				else if(a == 3)
+					msg = "\red [user] quickly stops the surgery"
+				for(var/mob/O in viewers(H))
+					O.show_message(msg, 1)
 
 	if(user.zone_sel.selecting == "chest")
 		if(istype(M, /mob/living/carbon/human))
@@ -1186,11 +1374,17 @@ CIRCULAR SAW
 	if(!istype(H))
 		return 0
 	var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+
 	if(!S || !istype(S))
 		return 0
 
 	if(S.destroyed)
-		user << "What [S.display_name]?"
+		return ..()
+
+	if(S.robot)
+		user << "Medical equipment for a robot arm?  How would that do any good..."
+		return
+
 	if(S.open)
 		user << "\red The wound is already open!"
 		return 0
@@ -1224,7 +1418,6 @@ CIRCULAR SAW
 			H:embryo_op_stage = 1.0
 		if(S.display_name == "groin")
 			H:appendix_op_stage = 1.0
-
 		H.updatehealth()
 		H.UpdateDamageIcon()
 	else
@@ -1249,6 +1442,7 @@ CIRCULAR SAW
 
 	return 1
 
+
 ////////////////
 //CIRCULAR SAW//
 ////////////////
@@ -1261,7 +1455,7 @@ CIRCULAR SAW
 		M = user
 		return eyestab(M,user)
 
-	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/table/, M.loc) && M.lying && prob(50))))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
 
 	src.add_fingerprint(user)
@@ -1286,22 +1480,22 @@ CIRCULAR SAW
 
 		switch(M:brain_op_stage)
 			if(0)
-				if(!istype(H))
+				if(!hasorgans(M))
 					return ..()
-				var/datum/organ/external/S = H.organs["head"]
+				var/datum/organ/external/S = M:organs["head"]
 				if(S.destroyed)
 					return
-				for(var/mob/O in viewers(H, null))
-					O.show_message(text("\red [H] gets \his [S.display_name] sawed at with [src] by [user].... It looks like [user] is trying to cut it off!"), 1)
+				for(var/mob/O in viewers(M, null))
+					O.show_message(text("\red [M] gets \his [S.display_name] sawed at with [src] by [user].... It looks like [user] is trying to cut it off!"), 1)
 				if(!do_after(user,rand(50,70)))
-					for(var/mob/O in viewers(H, null))
-						O.show_message(text("\red [user] tried to cut [H]'s [S.display_name] off with [src], but failed."), 1)
+					for(var/mob/O in viewers(M, null))
+						O.show_message(text("\red [user] tried to cut [M]'s [S.display_name] off with [src], but failed."), 1)
 					return
-				for(var/mob/O in viewers(H, null))
-					O.show_message(text("\red [H] gets \his [S.display_name] sawed off with [src] by [user]."), 1)
+				for(var/mob/O in viewers(M, null))
+					O.show_message(text("\red [M] gets \his [S.display_name] sawed off with [src] by [user]."), 1)
 				S.destroyed = 1
 				S.droplimb()
-				H.update_body()
+				M:update_body()
 			if(1.0)
 				if(istype(M, /mob/living/carbon/metroid))
 					return
@@ -1379,11 +1573,19 @@ CIRCULAR SAW
 				..()
 		return
 
-	else if(user.zone_sel.selecting != "chest" && istype(M, /mob/living/carbon/human))
-		var/mob/living/carbon/human/H = M
-		var/datum/organ/external/S = H.organs[user.zone_sel.selecting]
+	else if(user.zone_sel.selecting != "chest" && hasorgans(M))
+		var/mob/living/carbon/H = M
+		var/datum/organ/external/S = H:organs[user.zone_sel.selecting]
 		if(S.destroyed)
 			return
+
+		if(S.robot)
+			var/datum/effect/effect/system/spark_spread/spark_system = new /datum/effect/effect/system/spark_spread()
+			spark_system.set_up(5, 0, M)
+			spark_system.attach(M)
+			spark_system.start()
+			spawn(10)
+				del(spark_system)
 		for(var/mob/O in viewers(H, null))
 			O.show_message(text("\red [H] gets \his [S.display_name] sawed at with [src] by [user]... It looks like [user] is trying to cut it off!"), 1)
 		if(!do_after(user, rand(20,80)))
@@ -1392,9 +1594,8 @@ CIRCULAR SAW
 			return
 		for(var/mob/O in viewers(H, null))
 			O.show_message(text("\red [H] gets \his [S.display_name] sawed off with [src] by [user]."), 1)
-		S.destroyed = 1
-		S.droplimb()
-		H.update_body()
+		S.droplimb(1)
+		H:update_body()
 	else
 		return ..()
 /*
@@ -1436,13 +1637,16 @@ CIRCULAR SAW
 
 	src.add_fingerprint(user)
 
-	if(!(locate(/obj/machinery/optable, M.loc) && M.resting))
+	if(!((locate(/obj/machinery/optable, M.loc) && M.resting) || (locate(/obj/structure/stool/bed/roller, M.loc) && (M.buckled || M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat)) && prob(75) || (locate(/obj/structure/table/, M.loc) && (M.lying || M.weakened || M.stunned || M.paralysis || M.sleeping || M.stat) && prob(66))))
 		return ..()
 
 	var/zone = user.zone_sel.selecting
 	if (istype(M.organs[zone], /datum/organ/external))
 		var/datum/organ/external/temp = M.organs[zone]
 		var/msg
+
+		if(temp.destroyed)
+			return ..()
 
         // quickly convert embryo removal to bone surgery
 		if(zone == "chest" && M.embryo_op_stage == 3)
@@ -1565,7 +1769,6 @@ CIRCULAR SAW
 			e.brute_dam = 0.0
 			e.burn_dam = 0.0
 			e.bandaged = 0.0
-			e.wound_size = 0.0
 			e.max_damage = initial(e.max_damage)
 			e.bleeding = 0
 			e.open = 0

@@ -194,6 +194,10 @@ Airlock index -> wire color are { 9, 4, 6, 7, 5, 8, 1, 2, 3 }.
 			doortype = 17
 			glass = 1
 
+		glass_research
+			name = "Research Airlock"
+			icon = 'doorsciglass.dmi'
+			doortype = 20
 
 	centcom
 		name = "Airlock"
@@ -237,6 +241,23 @@ Airlock index -> wire color are { 9, 4, 6, 7, 5, 8, 1, 2, 3 }.
 		opacity = 1
 		doortype = 13
 
+
+	mining
+		name = "Mining Airlock"
+		icon = 'Doormining.dmi'
+		doortype = 18
+
+
+	atmos
+		name = "Atmospherics Airlock"
+		icon = 'Dooratmo.dmi'
+		doortype = 19
+
+
+	research
+		name = "Research Airlock"
+		icon = 'doorsci.dmi'
+		doortype = 21
 
 	New()
 		..()

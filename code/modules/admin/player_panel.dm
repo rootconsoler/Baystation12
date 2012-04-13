@@ -5,7 +5,7 @@
 	dat += "<body><table border=1 cellspacing=5><B><tr><th>Name/Real Name</th><th>Type</th><th>Assigned Job</th><th>Info</th><th>Options</th><th>Traitor?</th></tr></B>"
 	//add <th>IP:</th> to this if wanting to add back in IP checking
 	//add <td>(IP: [M.lastKnownIP])</td> if you want to know their ip to the lists below
-	var/list/mobs = sortmobs()
+	var/list/mobs = get_sorted_mobs()
 	var/i = 1
 
 	for(var/mob/M in mobs)
@@ -45,7 +45,7 @@
 			else if(istype(M,/mob/new_player))
 				dat += "<td>New Player</td>"
 			else
-				dat += "<td>ERROR</td>"
+				dat += "<td>\red ERROR</td>\black"
 
 			if(M.mind && M.mind.assigned_role && istype(M, /mob/living/carbon/human))	// Adds a column to Player Panel that shows their current job.
 				var/mob/living/carbon/human/H = M
@@ -65,8 +65,11 @@
 						dat += "<td>[M.mind.assigned_role] (No ID)</td>"
 
 					else if(isnull(id.assignment))		// Preventing runtime errors blocking the player panel
-						usr << "<font color=red>ERROR:</font> Inform the coders that an [id.name] was checked for its assignment variable, and it was null."
-						dat += "<td><font color=red>ERROR</font></td>"
+						if(istype(id, /obj/item/weapon/card/id/syndicate))
+							dat += "<td><font color=purple>Antagonist</font></td>"
+						else
+							usr << "<font color=red>ERROR:</font> Inform the coders that an [id.name] was checked for its assignment variable, and it was null."
+							dat += "<td><font color=red>ERROR</font></td>"
 
 					else
 						if(M.mind.assigned_role == id.assignment)			// Polymorph
@@ -117,7 +120,7 @@
 	dat += "<body><table border=1 cellspacing=5><B><tr><th>Name</th><th>Real Name</th><th>Assigned Job</th><th>Key</th><th>Options</th><th>PM</th><th>Traitor?</th></tr></B>"
 	//add <th>IP:</th> to this if wanting to add back in IP checking
 	//add <td>(IP: [M.lastKnownIP])</td> if you want to know their ip to the lists below
-	var/list/mobs = sortmobs()
+	var/list/mobs = get_sorted_mobs()
 
 	for(var/mob/M in mobs)
 		if(!M.ckey)	continue

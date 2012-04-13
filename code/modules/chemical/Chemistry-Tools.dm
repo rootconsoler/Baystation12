@@ -400,6 +400,7 @@
 		usr << "\blue [grenades] / [max_grenades] Grenades."
 
 	attackby(obj/item/I as obj, mob/user as mob)
+
 		if((istype(I, /obj/item/weapon/chem_grenade)) || (istype(I, /obj/item/weapon/flashbang)) || (istype(I, /obj/item/weapon/smokebomb)) || (istype(I, /obj/item/weapon/mustardbomb)) || (istype(I, /obj/item/weapon/empgrenade)))
 			if(grenades.len < max_grenades)
 				user.drop_item()
@@ -411,7 +412,15 @@
 				usr << "\red The grenade launcher cannot hold more grenades."
 
 	afterattack(obj/target, mob/user , flag)
-		if(target == user) return
+
+		if (istype(target, /obj/item/weapon/storage/backpack ))
+			return
+
+		else if (locate (/obj/structure/table, src.loc))
+			return
+
+		else if(target == user)
+			return
 
 		if(grenades.len)
 			spawn(0) fire_grenade(target,user)
@@ -420,7 +429,60 @@
 
 	proc
 		fire_grenade(atom/target, mob/user)
-			if (locate (/obj/structure/table, src.loc))
+			for(var/mob/O in viewers(world.view, user))
+				O.show_message(text("\red [] fired a grenade!", user), 1)
+			user << "\red You fire the grenade launcher!"
+			if (istype(grenades[1], /obj/item/weapon/chem_grenade))
+				var/obj/item/weapon/chem_grenade/F = grenades[1]
+				grenades -= F
+				F.loc = user.loc
+				F.throw_at(target, 30, 2)
+				message_admins("[key_name_admin(user)] fired a chemistry grenade from a grenade launcher ([src.name]).")
+				log_game("[key_name_admin(user)] used a chemistry grenade ([src.name]).")
+				F.state = 1
+				F.icon_state = initial(icon_state)+"_armed"
+				playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
+				spawn(15)
+					F.explode()
+			else if (istype(grenades[1], /obj/item/weapon/flashbang))
+				var/obj/item/weapon/flashbang/F = grenades[1]
+				grenades -= F
+				F.loc = user.loc
+				F.throw_at(target, 30, 2)
+				F.active = 1
+				F.icon_state = "flashbang1"
+				playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
+				spawn(15)
+					F.prime()
+			else if (istype(grenades[1], /obj/item/weapon/smokebomb))
+				var/obj/item/weapon/smokebomb/F = grenades[1]
+				grenades -= F
+				F.loc = user.loc
+				F.throw_at(target, 30, 2)
+				F.icon_state = "flashbang1"
+				playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
+				spawn(15)
+					F.prime()
+			else if (istype(grenades[1], /obj/item/weapon/mustardbomb))
+				var/obj/item/weapon/mustardbomb/F = grenades[1]
+				grenades -= F
+				F.loc = user.loc
+				F.throw_at(target, 30, 2)
+				F.icon_state = "flashbang1"
+				playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
+				spawn(15)
+					F.prime()
+			else if (istype(grenades[1], /obj/item/weapon/empgrenade))
+				var/obj/item/weapon/empgrenade/F = grenades[1]
+				grenades -= F
+				F.loc = user.loc
+				F.throw_at(target, 30, 2)
+				F.active = 1
+				F.icon_state = "empar"
+				playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
+				spawn(15)
+					F.prime()
+			if (locate (/obj/structure/table, src.loc) || locate (/obj/item/weapon/storage, src.loc))
 				return
 			else
 				for(var/mob/O in viewers(world.view, user))
@@ -433,7 +495,7 @@
 					F.throw_at(target, 30, 2)
 					message_admins("[key_name_admin(user)] fired a chemistry grenade from a grenade launcher ([src.name]).")
 					log_game("[key_name_admin(user)] used a chemistry grenade ([src.name]).")
-					F.path = 1
+					F.state = 1
 					F.icon_state = initial(icon_state)+"_armed"
 					playsound(user.loc, 'armbomb.ogg', 75, 1, -3)
 					spawn(15)
@@ -480,6 +542,7 @@
 
 /obj/item/weapon/gun/syringe
 	name = "syringe gun"
+	desc = "A spring loaded rifle designed to fit syringes, designed to incapacitate unruly patients from a distance."
 	icon = 'gun.dmi'
 	icon_state = "syringegun"
 	item_state = "syringegun"
@@ -495,19 +558,19 @@
 		set src in view()
 		..()
 		if (!(usr in view(2)) && usr!=src.loc) return
-		usr << "\icon [src] Syringe gun:"
-		usr << "\blue [syringes] / [max_syringes] Syringes."
+		usr << "\blue [syringes.len] / [max_syringes] syringes."
 
 	attackby(obj/item/I as obj, mob/user as mob)
+
 		if(istype(I, /obj/item/weapon/reagent_containers/syringe))
 			if(syringes.len < max_syringes)
 				user.drop_item()
 				I.loc = src
 				syringes += I
-				user << "\blue You put the syringe in the syringe gun."
-				user << "\blue [syringes.len] / [max_syringes] Syringes."
+				user << "\blue You put the syringe in [src]."
+				user << "\blue [syringes.len] / [max_syringes] syringes."
 			else
-				usr << "\red The syringe gun cannot hold more syringes."
+				usr << "\red [src] cannot hold more syringes."
 
 	afterattack(obj/target, mob/user , flag)
 		if(!isturf(target.loc) || target == user) return
@@ -515,7 +578,7 @@
 		if(syringes.len)
 			spawn(0) fire_syringe(target,user)
 		else
-			usr << "\red The syringe gun is empty."
+			usr << "\red [src] is empty."
 
 	proc
 		fire_syringe(atom/target, mob/user)
@@ -558,84 +621,11 @@
 
 				return
 
-/obj/item/weapon/gun/rapidsyringe
+/obj/item/weapon/gun/syringe/rapidsyringe
 	name = "rapid syringe gun"
-	icon = 'gun.dmi'
+	desc = "A modification of the syringe gun design, using a rotating cylinder to store up to four syringes."
 	icon_state = "rapidsyringegun"
-	item_state = "rapidsyringegun"
-	w_class = 3.0
-	throw_speed = 4
-	throw_range = 10
-	force = 8.0
-	var/list/syringes = new/list()
-	var/max_syringes = 40
-
-	examine()
-		set src in view()
-		..()
-		if (!(usr in view(2)) && usr!=src.loc) return
-		usr << "\icon [src] Rapid Syringe gun:"
-		usr << "\blue [syringes] / [max_syringes] Syringes."
-
-	attackby(obj/item/I as obj, mob/user as mob)
-		if(istype(I, /obj/item/weapon/reagent_containers/syringe))
-			if(syringes.len < max_syringes)
-				user.drop_item()
-				I.loc = src
-				syringes += I
-				user << "\blue You put the syringe in the rapid syringe gun."
-				user << "\blue [syringes.len] / [max_syringes] Syringes."
-			else
-				usr << "\red The rapid syringe gun cannot hold more syringes."
-
-	afterattack(obj/target, mob/user , flag)
-		if(!isturf(target.loc) || target == user) return
-
-		if(syringes.len)
-			spawn(0) fire_syringe(target,user)
-		else
-			usr << "\red rapid The syringe gun is empty."
-
-	proc
-		fire_syringe(atom/target, mob/user)
-			if (locate (/obj/structure/table, src.loc))
-				return
-			else
-				var/turf/trg = get_turf(target)
-				var/obj/effect/syringe_gun_dummy/D = new/obj/effect/syringe_gun_dummy(get_turf(src))
-				var/obj/item/weapon/reagent_containers/syringe/S = syringes[1]
-				S.reagents.trans_to(D, S.reagents.total_volume)
-				syringes -= S
-				del(S)
-				D.icon_state = "syringeproj"
-				D.name = "syringe"
-				playsound(user.loc, 'syringeproj.ogg', 50, 1)
-
-				for(var/i=0, i<6, i++)
-					if(!D) break
-					if(D.loc == trg) break
-					step_towards(D,trg)
-
-					for(var/mob/living/carbon/M in D.loc)
-						if(!istype(M,/mob/living/carbon)) continue
-						if(M == user) continue
-						D.reagents.trans_to(M, 15)
-						M.take_organ_damage(5)
-						for(var/mob/O in viewers(world.view, D))
-							O.show_message(text("\red [] was hit by the syringe!", M), 1)
-
-						del(D)
-					if(D)
-						for(var/atom/A in D.loc)
-							if(A == user) continue
-							if(A.density) del(D)
-
-					sleep(1)
-
-				if (D) spawn(10) del(D)
-
-				return
-
+	max_syringes = 4
 
 /obj/structure/reagent_dispensers
 	name = "Dispenser"
@@ -731,9 +721,15 @@
 		reagents = R
 		R.my_atom = src
 
+	attackby(obj/item/weapon/W as obj, mob/user as mob)
+
+		return
 	attack_self(mob/user as mob)
 		return
 	attack(mob/M as mob, mob/user as mob, def_zone)
+		return
+	attackby(obj/item/I as obj, mob/user as mob)
+
 		return
 	afterattack(obj/target, mob/user , flag)
 		return
@@ -943,6 +939,7 @@
 		return attack_hand()
 
 	attackby(obj/item/I as obj, mob/user as mob)
+
 		return
 
 	afterattack(obj/target, mob/user , flag)
@@ -969,7 +966,7 @@
 						if(!T.dna)
 							usr << "You are unable to locate any blood. (To be specific, your target seems to be missing their DNA datum)"
 							return
-						if(T.mutations & HUSK) //target done been et, no more blood in him
+						if(T.mutations2 & NOCLONE) //target done been et, no more blood in him
 							user << "\red You are unable to locate any blood."
 							return
 						B.holder = src
@@ -1068,7 +1065,17 @@
 				if(ismob(target) && target == user)
 					src.reagents.reaction(target, INGEST)
 				spawn(5)
-					var/trans = src.reagents.trans_to(target, amount_per_transfer_from_this)
+					var/datum/reagent/blood/B
+					for(var/datum/reagent/blood/d in src.reagents.reagent_list)
+						B = d
+						break
+					var/trans
+					if(B && ishuman(target))
+						var/mob/living/carbon/human/H = target
+						H.vessel.add_reagent("blood",(B.volume > 5? 5 : B.volume),B.data)
+						src.reagents.remove_reagent("blood",(B.volume > 5? 5 : B.volume))
+					else
+						trans = src.reagents.trans_to(target, amount_per_transfer_from_this)
 					user << "\blue You inject [trans] units of the solution. The syringe now contains [src.reagents.total_volume] units."
 					if (reagents.total_volume <= 0 && mode==SYRINGE_INJECT)
 						mode = SYRINGE_DRAW
@@ -1078,21 +1085,50 @@
 
 	update_icon()
 		var/rounded_vol = round(reagents.total_volume,5)
+		overlays = null
 		has_blood = 0
 		for(var/datum/reagent/blood/B in reagents.reagent_list)
 			has_blood = 1
 			break
 		if(ismob(loc))
-			var/mode_t
+			var/injoverlay
 			switch(mode)
 				if (SYRINGE_DRAW)
-					mode_t = "d"
+					injoverlay = "draw"
 				if (SYRINGE_INJECT)
-					mode_t = "i"
-			icon_state = "[mode_t][(has_blood?"b":"")][rounded_vol]"
-		else
-			icon_state = "[(has_blood?"b":"")][rounded_vol]"
+					injoverlay = "inject"
+			overlays += injoverlay
+		icon_state = "[rounded_vol]"
 		item_state = "syringe_[rounded_vol]"
+		if(reagents.total_volume)
+			var/obj/effect/overlay = new/obj
+			overlay.icon = 'syringefilling.dmi'
+			switch(rounded_vol)
+				if(5)	overlay.icon_state = "5"
+				if(10)	overlay.icon_state = "10"
+				if(15)	overlay.icon_state = "15"
+
+			var/list/rgbcolor = list(0,0,0)
+			var/finalcolor
+			for(var/datum/reagent/re in reagents.reagent_list) // natural color mixing bullshit/algorithm
+				if(!finalcolor)
+					rgbcolor = GetColors(re.color)
+					finalcolor = re.color
+				else
+					var/newcolor[3]
+					var/prergbcolor[3]
+					prergbcolor = rgbcolor
+					newcolor = GetColors(re.color)
+
+					rgbcolor[1] = (prergbcolor[1]+newcolor[1])/2
+					rgbcolor[2] = (prergbcolor[2]+newcolor[2])/2
+					rgbcolor[3] = (prergbcolor[3]+newcolor[3])/2
+
+					finalcolor = rgb(rgbcolor[1], rgbcolor[2], rgbcolor[3])
+
+			overlay.icon += finalcolor
+			if(!istype(src.loc, /turf))	overlay.layer = 30
+			overlays += overlay
 
 
 /obj/item/weapon/reagent_containers/ld50_syringe
@@ -1134,6 +1170,10 @@
 
 	attack_paw()
 		return attack_hand()
+
+	attackby(obj/item/I as obj, mob/user as mob)
+
+		return
 
 	afterattack(obj/target, mob/user , flag)
 		if(!target.reagents) return
@@ -1252,6 +1292,9 @@
 		user.attack_log += text("\[[time_stamp()]\] <font color='red'>Used the [src.name] to inject [M.name] ([M.ckey])</font>")
 		log_admin("ATTACK: [user] ([user.ckey]) injected [M] ([M.ckey]) with [src].")
 		message_admins("ATTACK: [user] ([user.ckey]) injected [M] ([M.ckey]) with [src].")
+//		log_attack("<font color='red'>[user.name] ([user.ckey]) injected [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+
+
 		src.reagents.reaction(M, INGEST)
 		if(M.reagents)
 			var/trans = reagents.trans_to(M, amount_per_transfer_from_this)
@@ -1340,6 +1383,7 @@
 		return
 
 	attackby(obj/item/weapon/W as obj, mob/user as mob)
+
 		return
 	attack_self(mob/user as mob)
 		return
@@ -1379,6 +1423,8 @@
 					user.attack_log += text("\[[time_stamp()]\] <font color='red'>Fed [M.name] by [M.name] ([M.ckey]) Reagents: \ref[reagents]</font>")
 					log_admin("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 					message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
+
+//					log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 					for(var/mob/O in viewers(world.view, user))
 						O.show_message("\red [user] feeds [M] [src].", 1)
@@ -1472,6 +1518,7 @@
 		return 0
 
 	attackby(obj/item/I as obj, mob/user as mob)
+
 		return
 	afterattack(obj/target, mob/user , flag)
 		return
@@ -1494,6 +1541,7 @@
 	var/slices_num
 
 	attackby(obj/item/weapon/W as obj, mob/user as mob)
+
 		if((slices_num <= 0 || !slices_num) || !slice_path)
 			return 1
 		var/inaccurate = 0
@@ -1606,6 +1654,8 @@
 			log_admin("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
+//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+
 
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)
@@ -1697,6 +1747,9 @@
 		if(!icon_state)
 			icon_state = "pill[rand(1,20)]"
 
+	attackby(obj/item/weapon/W as obj, mob/user as mob)
+
+		return
 	attack_self(mob/user as mob)
 		return
 	attack(mob/M as mob, mob/user as mob, def_zone)
@@ -1727,6 +1780,8 @@
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
 
+//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)
 				spawn(5)
@@ -1738,6 +1793,10 @@
 			return 1
 
 		return 0
+
+	attackby(obj/item/I as obj, mob/user as mob)
+
+		return
 
 	afterattack(obj/target, mob/user , flag)
 
@@ -2355,6 +2414,7 @@
 	volume = 50
 
 	attackby(obj/item/weapon/W as obj, mob/user as mob)
+
 		return
 	attack_self(mob/user as mob)
 		return
@@ -2388,6 +2448,8 @@
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
 
+//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)
 				spawn(5)
@@ -2398,6 +2460,7 @@
 		return 0
 
 	attackby(obj/item/I as obj, mob/user as mob)
+
 		return
 
 	afterattack(obj/target, mob/user , flag)
@@ -2448,7 +2511,7 @@
 					icon_state = "soysauce"
 				if("frostoil")
 					name = "Coldsauce"
-					desc = "Leaves the tongue numb in it's passage."
+					desc = "Leaves the tongue numb in its passage."
 					icon_state = "coldsauce"
 				if("sodiumchloride")
 					name = "Salt Shaker"
@@ -2551,7 +2614,7 @@
 
 /obj/item/weapon/reagent_containers/food/drinks/tea
 	name = "Duke Purple Tea"
-	desc = "An insult to Duke Purple is an insult to the Space Queen! Any proper gentleman will fight you, if you sully this tea."
+	desc = "A refreshingly quaint drink, served piping hot."
 	icon_state = "tea"
 	New()
 		..()
@@ -2572,7 +2635,7 @@
 /obj/item/weapon/reagent_containers/food/drinks/h_chocolate
 	name = "Dutch Hot Coco"
 	desc = "Made in Space South America."
-	icon_state = "tea"
+	icon_state = "hotchocolate"
 	New()
 		..()
 		reagents.add_reagent("hot_coco", 30)
@@ -2761,7 +2824,7 @@
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/holywater
 	name = "Flask of Holy Water"
-	desc = "A flask of the chaplains holy water."
+	desc = "A flask of the chaplain's holy water."
 	icon_state = "holyflask"
 	New()
 		..()
@@ -2969,6 +3032,25 @@
 		..()
 		reagents.add_reagent("fuel",1000)
 
+
+	bullet_act(var/obj/item/projectile/Proj)
+		if(istype(Proj ,/obj/item/projectile/beam)||istype(Proj,/obj/item/projectile/bullet))
+			explosion(src.loc,-1,0,2)
+			if(src)
+				del(src)
+
+
+
+	blob_act()
+		explosion(src.loc,0,1,5,7,10)
+		if(src)
+			del(src)
+
+	ex_act()
+		explosion(src.loc,-1,0,2)
+		if(src)
+			del(src)
+
 /obj/structure/reagent_dispensers/peppertank
 	name = "Pepper Spray Refiller"
 	desc = "Refill pepper spray canisters."
@@ -2976,27 +3058,11 @@
 	icon_state = "peppertank"
 	anchored = 1
 	density = 0
-	amount_per_transfer_from_this = 30
+	amount_per_transfer_from_this = 45
 	New()
 		..()
 		reagents.add_reagent("condensedcapsaicin",1000)
 
-/obj/structure/reagent_dispensers/fueltank/blob_act()
-	explosion(src.loc,0,1,5,7,10)
-	if(src)
-		del(src)
-
-/obj/structure/reagent_dispensers/fueltank/ex_act()
-	explosion(src.loc,-1,0,2)
-	if(src)
-		del(src)
-
-/obj/structure/reagent_dispensers/fueltank/temperature_expose(datum/gas_mixture/air, temperature, volume)
-	if(temperature > T0C+500)
-		explosion(src.loc,-1,0,2)
-		if(src)
-			del(src)
-	return ..()
 
 /obj/structure/reagent_dispensers/water_cooler
 	name = "Water-Cooler"
@@ -3513,3 +3579,126 @@
 			name = "empty jar"
 			desc = "A jar. You're not sure what it's supposed to hold."
 			return
+
+//////////////////
+//STYROFOAM CUPS//
+//////////////////
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcup
+	name = "styrofoam cup"
+	desc = "Cups for drinking."
+	icon_state = "styrocup-empty"
+	amount_per_transfer_from_this = 10
+	volume = 50
+
+	on_reagent_change()
+		if (reagents.reagent_list.len > 0)
+			switch(reagents.get_master_reagent_id())
+				if("water")
+					icon_state = "styrocup-clear"
+				else
+					icon_state ="styrocup-brown"
+		else
+			icon_state = "styrocup-empty"
+			return
+
+/*/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile
+	name = "Styrofoam Cup Pile"
+	//desc = "A pile of styrofoam cups."
+	icon_state = "styrocup-stack6"
+	item_state = "styrocup-stack6"
+	w_class = 1
+	throwforce = 1
+	var/cupcount = 6
+	flags = TABLEPASS
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/update_icon()
+	src.icon_state = text("styrocup-stack[]", src.cupcount)
+	src.desc = text("There are [] cups left!", src.cupcount)
+	return
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if (istype(W, /obj/item/weapon/reagent_containers/food/drinks/styrofoamcup) && (cupcount < 6))
+		user.drop_item()
+		W.loc = src
+		usr << "You place a cup back onto the pile."
+		if (src.cupcount < 6)
+			src.cupcount++
+	src.update()
+	return
+
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/proc/update()
+	src.icon_state = text("styrocup-stack[]", src.cupcount)
+	return
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/MouseDrop(mob/user as mob)
+	if ((user == usr && (!( usr.restrained() ) && (!( usr.stat ) && (usr.contents.Find(src) || in_range(src, usr))))))
+		if(ishuman(user))
+			if (usr.hand)
+				if (!( usr.l_hand ))
+					spawn( 0 )
+						src.attack_hand(usr, 1, 1)
+						return
+			else
+				if (!( usr.r_hand ))
+					spawn( 0 )
+						src.attack_hand(usr, 0, 1)
+						return
+	return
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/attack_paw(mob/user as mob)
+	return src.attack_hand(user)
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/attack_hand(mob/user as mob, unused, flag)
+	if (flag)
+		return ..()
+	src.add_fingerprint(user)
+	if (locate(/obj/item/weapon/reagent_containers/food/drinks/styrofoamcup, src))
+		for(var/obj/item/weapon/reagent_containers/food/drinks/styrofoamcup/P in src)
+			if (!usr.l_hand)
+				P.loc = usr
+				P.layer = 20
+				usr.l_hand = P
+				usr.update_clothing()
+				usr << "You take a cup from the pile."
+				break
+			else if (!usr.r_hand)
+				P.loc = usr
+				P.layer = 20
+				usr.r_hand = P
+				usr.update_clothing()
+				usr << "You take a cup from the pile."
+				break
+	else
+		if (src.cupcount >= 1)
+			src.cupcount--
+			var/obj/item/weapon/reagent_containers/food/drinks/styrofoamcup/D = new /obj/item/weapon/reagent_containers/food/drinks/styrofoamcup
+			D.loc = usr.loc
+			if(ishuman(usr))
+				if(!usr.get_active_hand())
+					usr.put_in_hand(D)
+					usr << "You take a cup from the pile."
+			else
+				D.loc = get_turf_loc(src)
+				usr << "You take a cup from the pile."
+
+	src.update()
+	return
+
+/obj/item/weapon/reagent_containers/food/drinks/styrofoamcuppile/examine()
+	set src in oview(1)
+
+	src.cupcount = round(src.cupcount)
+	var/n = src.cupcount
+	for(var/obj/item/weapon/reagent_containers/food/drinks/styrofoamcup/P in src)
+		n++
+	if (n <= 0)
+		n = 0
+		usr << "There are no cups left on this pile."
+	else
+		if (n == 1)
+			usr << "There is one cup left on this pile."
+		else
+			usr << text("There are [] cups on this pile.", n)
+	return
+*/

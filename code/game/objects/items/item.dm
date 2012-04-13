@@ -108,6 +108,17 @@
 
 /obj/item/attack_hand(mob/user as mob)
 	if (!user) return
+	if (user.hand)
+		if(ishuman(user))
+			var/datum/organ/external/temp = user:organs["l_hand"]
+			if(temp.destroyed)
+				user << "\blue Yo- wait a minute."
+				return
+	else
+		if(ishuman(user))
+			var/datum/organ/external/temp = user:organs["r_hand"]
+			if(temp.destroyed)
+				user << "\blue Yo- wait a minute."
 	if (istype(src.loc, /obj/item/weapon/storage))
 		for(var/mob/M in range(1, src.loc))
 			if (M.s_active == src.loc)
@@ -174,6 +185,18 @@
 		if(!A.has_fine_manipulation || w_class <= 4)
 			user << "Your claws aren't capable of such fine manipulation."
 			return
+
+	if (user.hand)
+		if(ismonkey(user))
+			var/datum/organ/external/temp = user:organs["l_hand"]
+			if(temp.destroyed)
+				user << "\blue Yo- wait a minute."
+				return
+	else
+		if(ismonkey(user))
+			var/datum/organ/external/temp = user:organs["r_hand"]
+			if(temp.destroyed)
+				user << "\blue Yo- wait a minute."
 
 	if (istype(src.loc, /obj/item/weapon/storage))
 		for(var/mob/M in range(1, src.loc))
@@ -274,7 +297,7 @@ mob/proc/flash_weak_pain()
 		spawn
 			unmoved = do_after(user, 4)
 		sleep(4)
-		if( (!unmoved && !prob(70)) || get_dist(user, M) != 1)
+		if( (!unmoved && !prob(70)) || (get_dist(user, M) != 1 && user != M))
 			user.visible_message("\red [user.name] misses with \the [src]!")
 			return
 

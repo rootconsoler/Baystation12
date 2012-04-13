@@ -562,9 +562,37 @@
 	contains = list("/obj/item/weapon/book/manual/ripley_build_and_repair",
 					"/obj/item/weapon/circuitboard/mecha/ripley/main", //TEMPORARY due to lack of circuitboard printer
 					"/obj/item/weapon/circuitboard/mecha/ripley/peripherals") //TEMPORARY due to lack of circuitboard printer
-	cost = 40
+	cost = 30
 	containertype = "/obj/structure/closet/crate/secure"
 	containername = "APLU \"Ripley\" Circuit Crate"
+	access = access_robotics
+	group = "Robotics"
+	
+/datum/supply_packs/surgery
+	name = "Surgery crate"
+	contains = list("/obj/item/weapon/cautery",
+					"/obj/item/weapon/surgicaldrill",
+					"/obj/item/weapon/hemostat",
+					"/obj/item/weapon/scalpel",
+					"/obj/item/weapon/surgical_tool/bonegel",
+					"/obj/item/weapon/retractor",
+					"/obj/item/weapon/surgical_tool/bonesetter",
+					"/obj/item/weapon/circular_saw")
+	cost = 20
+	containertype = "/obj/structure/closet/crate/secure"
+	containername = "Surgery crate"
+	access = access_medical
+	group = "Medical / Science"
+
+/datum/supply_packs/mecha_odysseus
+	name = "Circuit Crate (\"Odysseus\")"
+	contains = list(
+						"/obj/item/weapon/circuitboard/mecha/odysseus/peripherals", //TEMPORARY due to lack of circuitboard printer
+						"/obj/item/weapon/circuitboard/mecha/odysseus/main" //TEMPORARY due to lack of circuitboard printer
+						)
+	cost = 25
+	containertype = "/obj/structure/closet/crate/secure"
+	containername = "\"Odysseus\" Circuit Crate"
 	access = access_robotics
 	group = "Robotics"
 

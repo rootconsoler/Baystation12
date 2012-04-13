@@ -1,8 +1,6 @@
 var/global/list/uneatable = list(
 	/turf/space,
-	/obj/effect,
 	/obj/effect/overlay,
-	/obj/effect/rune,
 	/mob/aiEye
 	)
 
@@ -399,7 +397,7 @@ var/global/list/uneatable = list(
 
 		toxmob()
 			var/toxrange = 10
-			var/toxdamage = 4 // changed the name to toxdamage from toxloss to prevent further conflicts
+			var/toxdamage = 4
 			var/radiation = 5
 			if (src.energy>200)
 				toxdamage = round(((src.energy-150)/50)*4,1)

@@ -108,8 +108,8 @@
 	var/list/old_list = shufflelist.Copy()
 	while(old_list.len)
 		var/item = pick(old_list)
-		new_list += item
-		old_list -= item
+		new_list.Add(item)
+		old_list.Remove(item)
 	return new_list
 
 /proc/uniquelist(var/list/L)
@@ -210,9 +210,18 @@
 	var/list/result = new()
 	while(Li <= L.len && Ri <= R.len)
 		if(sorttext(L[Li], R[Ri]) < 1)
-			result += R[Ri++]
+			var/item = R[Ri++]
+			if(istext(item) && !isnull(R[item]))
+				result[item] = R[item]
+			else
+				result += item
+
 		else
-			result += L[Li++]
+			var/item = L[Li++]
+			if(istext(item) && !isnull(L[item]))
+				result[item] = L[item]
+			else
+				result += item
 
 	if(Li <= L.len)
 		return (result + L.Copy(Li, 0))
@@ -655,7 +664,7 @@ Turf and target are seperate in case you want to teleport some distance from a t
 
 	total = rand(1, total)
 	for (item in L)
-		total -=L [item]
+		total -= L[item]
 		if (total <= 0)
 			return item
 
@@ -784,6 +793,35 @@ Turf and target are seperate in case you want to teleport some distance from a t
 		select = input("AI signals detected:", "AI selection") in ais
 		return ais[select]
 
+/proc/get_sorted_mobs()
+	var/list/old_list = getmobs()
+	var/list/AI_list = list()
+	var/list/Dead_list = list()
+	var/list/keyclient_list = list()
+	var/list/key_list = list()
+	var/list/logged_list = list()
+	for(var/named in old_list)
+		var/mob/M = old_list[named]
+		if(issilicon(M))
+			AI_list |= M
+		else if(isobserver(M) || M.stat == 2)
+			Dead_list |= M
+		else if(M.key && M.client)
+			keyclient_list |= M
+		else if(M.key)
+			key_list |= M
+		else
+			logged_list |= M
+		old_list.Remove(named)
+	var/list/new_list = list()
+	new_list += AI_list
+	new_list += keyclient_list
+	new_list += key_list
+	new_list += logged_list
+	new_list += Dead_list
+	return new_list
+
+
 /proc/getmobs()
 
 	var/list/mobs = sortmobs()
@@ -791,6 +829,9 @@ Turf and target are seperate in case you want to teleport some distance from a t
 	var/list/creatures = list()
 	var/list/namecounts = list()
 	for(var/mob/M in mobs)
+		/*if((!M.name || !M.real_name) && !istype(M, /mob/new_player))
+			var/turf/T = get_turf(M)
+			message_admins("Alert!  The mob with the key [M.key ? M.key : "NO KEY"] at ([T.x], [T.y], [T.z]) has no name!")*/
 		var/name = M.name
 		if (name in names)
 			namecounts[name]++
@@ -799,7 +840,7 @@ Turf and target are seperate in case you want to teleport some distance from a t
 			names.Add(name)
 			namecounts[name] = 1
 		if (M.real_name && M.real_name != M.name)
-			name += " \[[M.real_name]\]"
+			name += " \[[M.original_name? M.original_name : M.real_name]\]"
 		if (M.stat == 2)
 			if(istype(M, /mob/dead/observer/))
 				name += " \[ghost\]"
@@ -811,32 +852,34 @@ Turf and target are seperate in case you want to teleport some distance from a t
 
 /proc/sortmobs()
 
-	var/list/mob_list = list()
+	var/list/temp_list = list()
 	for(var/mob/living/silicon/ai/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/silicon/pai/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/silicon/robot/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/carbon/human/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/carbon/brain/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/carbon/alien/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/dead/observer/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/new_player/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/carbon/monkey/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
 	for(var/mob/living/carbon/metroid/M in world)
-		mob_list.Add(M)
+		temp_list.Add(M)
+	for(var/mob/living/simple_animal/M in world)
+		temp_list.Add(M)
 //	for(var/mob/living/silicon/hivebot/M in world)
 //		mob_list.Add(M)
 //	for(var/mob/living/silicon/hive_mainframe/M in world)
 //		mob_list.Add(M)
-	return mob_list
+	return temp_list
 
 /proc/convert2energy(var/M)
 	var/E = M*(SPEED_OF_LIGHT_SQ)
@@ -1441,8 +1484,6 @@ proc/listclearnulls(list/list)
 				air_master.groups_to_rebuild += T1.parent
 			else
 				air_master.tiles_to_update += T1
-			if(T1.zone)
-				T1.zone.space_tiles.len = 0
 
 	if(fromupdate.len)
 		for(var/turf/simulated/T2 in fromupdate)
@@ -1452,8 +1493,6 @@ proc/listclearnulls(list/list)
 				air_master.groups_to_rebuild += T2.parent
 			else
 				air_master.tiles_to_update += T2
-			if(T2.zone)
-				T2.zone.space_tiles.len = 0
 
 	for(var/obj/O in doors)
 		O:update_nearby_tiles(1)

@@ -156,8 +156,8 @@ will suffer from an increased appetite.</B><BR>
 <b>Function:</b> Contains a small capsule that can contain various chemicals. Upon receiving a specially encoded signal<BR>
 the implant releases the chemicals directly into the blood stream.<BR>
 <b>Special Features:</b>
-<i>Micro-Capsule</i>- Can be loaded with any sort of chemical agent via the common syringe and can hold 25 units.<BR>
-Can only be loaded while still in it's original case.<BR>
+<i>Micro-Capsule</i>- Can be loaded with any sort of chemical agent via the common syringe and can hold 15 units.<BR>
+Can only be loaded while still in its original case.<BR>
 <b>Integrity:</b> Implant will last so long as the subject is alive. However, if the subject suffers from malnutrition,<BR>
 the implant may become unstable and either pre-maturely inject the subject or simply break."}
 		return dat
@@ -211,6 +211,7 @@ the implant may become unstable and either pre-maturely inject the subject or si
 		if(!istype(M, /mob/living/carbon/human))	return
 		var/mob/living/carbon/human/H = M
 		if(H.mind in ticker.mode.head_revolutionaries)
+			visible_message("\red [M] seems to resist the implant.", 1)
 			for(var/mob/O in (viewers(M) -  M))
 				O.show_message("\red [M] seems to resist the implant.", 1)
 				M << "\red You resist the implant."
@@ -219,7 +220,6 @@ the implant may become unstable and either pre-maturely inject the subject or si
 			ticker.mode:remove_revolutionary(H.mind)
 		H << "\blue You feel a surge of loyalty towards NanoTrasen."
 		return
-
 
 //BS12 Explosive
 /obj/item/weapon/implant/explosive
@@ -246,18 +246,22 @@ the implant may become unstable and either pre-maturely inject the subject or si
 		return
 
 	hear(var/msg)
+		var/list/replacechars = list("'" = "","\"" = "",">" = "","<" = "","(" = "",")" = "")
+		msg = sanitize_simple(msg, replacechars)
 		if(findtext(msg,phrase))
-			if(istype(loc, /mob/))
-				var/mob/T = loc
+			if(istype(imp_in, /mob/))
+				var/mob/T = imp_in
 				T.gib()
-			explosion(find_loc(src), 1, 3, 4, 6, 3)
-			var/turf/t = find_loc(src)
+			explosion(find_loc(imp_in), 1, 3, 4, 6, 3)
+			var/turf/t = find_loc(imp_in)
 			if(t)
 				t.hotspot_expose(3500,125)
 			del(src)
 
 	implanted(mob/source as mob)
 		phrase = input("Choose activation phrase:") as text
+		var/list/replacechars = list("'" = "","\"" = "",">" = "","<" = "","(" = "",")" = "")
+		phrase = sanitize_simple(phrase, replacechars)
 		usr.mind.store_memory("Explosive implant in [source] can be activated by saying something containing the phrase ''[src.phrase]'', <B>say [src.phrase]</B> to attempt to activate.", 0, 0)
 		usr << "The implanted explosive implant in [source] can be activated by saying something containing the phrase ''[src.phrase]'', <B>say [src.phrase]</B> to attempt to activate."
 
@@ -280,11 +284,17 @@ the implant may become unstable and either pre-maturely inject the subject or si
 		return dat
 
 	process()
-		var/mob/M = src.loc
-		if(M.stat == 2)
-			var/turf/t = get_turf(M)
+		var/mob/M = imp_in
+
+		if(isnull(M)) // If the mob got gibbed
 			var/obj/item/device/radio/headset/a = new /obj/item/device/radio/headset(null)
-			a.autosay("states, \"[mobname] has died in [t.loc.name]!\"", "[mobname]'s Death Alarm")
+			a.autosay("states, \"[mobname] has died-zzzzt in-in-in...\"", "[mobname]'s Death Alarm")
+			del(a)
+			processing_objects.Remove(src)
+		else if(M.stat == 2)
+			var/area/t = get_area(M)
+			var/obj/item/device/radio/headset/a = new /obj/item/device/radio/headset(null)
+			a.autosay("states, \"[mobname] has died in [t.name]!\"", "[mobname]'s Death Alarm")
 			del(a)
 			processing_objects.Remove(src)
 
