@@ -266,7 +266,7 @@ var/global/BSACooldown = 0
 				feedback_inc("ban_job",1)
 				M << "\red<BIG><B>You have been jobbanned by [usr.client.ckey] from [job].</B></BIG>"
 				M << "\red <B>The reason is: [reason]</B>"
-				M << "\red Jooban can be lifted only on demand."
+				M << "\red Jobban can be lifted only on demand."
 				message_admins("\blue [key_name_admin(usr)] banned [key_name_admin(M)] from [job]", 1)
 				jobban_fullban(M, job, reason)
 				href_list["jobban2"] = 1 // lets it fall through and refresh
@@ -560,6 +560,20 @@ var/global/BSACooldown = 0
 				N.monkeyize()
 			if(istype(M, /mob/living/silicon))
 				alert("The AI can't be monkeyized!", null, null, null, null, null)
+				return
+
+	if (href_list["corgione"])
+		if ((src.rank in list( "Admin Candidate", "Trial Admin", "Badmin", "Game Admin", "Game Master"  )))
+			var/mob/M = locate(href_list["corgione"])
+			if(!ismob(M))
+				return
+			if(istype(M, /mob/living/carbon/human))
+				var/mob/living/carbon/human/N = M
+				log_admin("[key_name(usr)] attempting to corgize [key_name(M)]")
+				message_admins("\blue [key_name_admin(usr)] attempting to corgize [key_name_admin(M)]", 1)
+				N.corgize()
+			if(istype(M, /mob/living/silicon))
+				alert("The AI can't be corgized!", null, null, null, null, null)
 				return
 
 	if (href_list["forcespeech"])
@@ -1287,6 +1301,13 @@ var/global/BSACooldown = 0
 						spawn(0)
 							H.monkeyize()
 					ok = 1
+				if("corgi")
+					feedback_inc("admin_secrets_fun_used",1)
+					feedback_add_details("admin_secrets_fun_used","M")
+					for(var/mob/living/carbon/human/H in world)
+						spawn(0)
+							H.corgize()
+					ok = 1
 				if("power")
 					log_admin("[key_name(usr)] made all areas powered", 1)
 					message_admins("\blue [key_name_admin(usr)] made all areas powered", 1)
@@ -1927,6 +1948,10 @@ var/global/BSACooldown = 0
 				foo += text("<A HREF='?src=\ref[src];monkeyone=\ref[M]'>Monkeyize</A> | ")
 			else
 				foo += text("<B>Monkeyized</B> | ")
+			if(!iscorgi(M))
+				foo += text("<A HREF='?src=\ref[src];corgione=\ref[M]'>Corgize</A> | ")
+			else
+				foo += text("<B>Corgized</B> | ")
 			if(isAI(M))
 				foo += text("<B>Is an AI</B> | ")
 			else if(ishuman(M))
