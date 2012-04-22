@@ -106,6 +106,7 @@
 			if (sprite == "Non-Humanoid")
 				src.icon_state = "surgeon"
 			modtype = "Med"
+			nopush = 1
 			channels = list("Medical" = 1)
 
 		if("Security")
@@ -213,7 +214,7 @@
 	flick("flash", flash)
 /*
 	if (stat == 2 && client)
-		gib(1)
+		gib()
 		return
 
 	else if (stat == 2 && !client)
@@ -225,7 +226,7 @@
 			if (stat != 2)
 				adjustBruteLoss(100)
 				adjustFireLoss(100)
-				gib(1)
+				gib()
 				return
 		if(2.0)
 			if (stat != 2)
@@ -262,16 +263,18 @@
 		if ((!( yes ) || now_pushing))
 			return
 		now_pushing = 1
-		/*if(ismob(AM))
+		if(ismob(AM))
 			var/mob/tmob = AM
+/*
 			if(istype(tmob, /mob/living/carbon/human) && tmob.mutations & FAT)
 				if(prob(20))
-					for(var/mob/M in viewers(src, null))
-						if(M.client)
-							M << M << "\red <B>[src] fails to push [tmob]'s fat ass out of the way.</B>"
+					usr << "\red <B>You fail to push [tmob]'s fat ass out of the way.</B>"
 					now_pushing = 0
-					//unlock_medal("That's No Moon, That's A Gourmand!", 1)
-					return*/
+					return
+*/
+			if(tmob.nopush)
+				now_pushing = 0
+				return
 		now_pushing = 0
 		..()
 		if (istype(AM, /obj/machinery/recharge_station))
@@ -794,8 +797,8 @@
 			contents += O
 			if(istype(module_state_1,/obj/item/borg/sight))
 				sight_mode |= module_state_1:sight_mode
-			else if(istype(module_state_1,/obj/item/weapon/zippo))
-				var/obj/item/weapon/zippo/Z = module_state_1
+			else if(istype(module_state_1,/obj/item/weapon/lighter/zippo))
+				var/obj/item/weapon/lighter/zippo/Z = module_state_1
 				Z.lit = 1
 				Z.icon_state = "zippoon"
 				Z.item_state = "zippoon"
@@ -806,8 +809,8 @@
 			contents += O
 			if(istype(module_state_2,/obj/item/borg/sight))
 				sight_mode |= module_state_2:sight_mode
-			else if(istype(module_state_2,/obj/item/weapon/zippo))
-				var/obj/item/weapon/zippo/Z = module_state_2
+			else if(istype(module_state_2,/obj/item/weapon/lighter/zippo))
+				var/obj/item/weapon/lighter/zippo/Z = module_state_2
 				Z.lit = 1
 				Z.icon_state = "zippoon"
 				Z.item_state = "zippoon"
@@ -818,8 +821,8 @@
 			contents += O
 			if(istype(module_state_3,/obj/item/borg/sight))
 				sight_mode |= module_state_3:sight_mode
-			else if(istype(module_state_3,/obj/item/weapon/zippo))
-				var/obj/item/weapon/zippo/Z = module_state_3
+			else if(istype(module_state_3,/obj/item/weapon/lighter/zippo))
+				var/obj/item/weapon/lighter/zippo/Z = module_state_3
 				Z.lit = 1
 				Z.icon_state = "zippoon"
 				Z.item_state = "zippoon"
@@ -832,8 +835,8 @@
 		var/obj/item/O = locate(href_list["deact"])
 		if(activated(O))
 			if(module_state_1 == O)
-				if(istype(module_state_1, /obj/item/weapon/zippo))
-					var/obj/item/weapon/zippo/Z = module_state_1
+				if(istype(module_state_1, /obj/item/weapon/lighter/zippo))
+					var/obj/item/weapon/lighter/zippo/Z = module_state_1
 					Z.lit = 0
 					Z.icon_state = "zippo"
 					Z.item_state = "zippo"
@@ -841,8 +844,8 @@
 				module_state_1 = null
 				contents -= O
 			else if(module_state_2 == O)
-				if(istype(module_state_2, /obj/item/weapon/zippo))
-					var/obj/item/weapon/zippo/Z = module_state_2
+				if(istype(module_state_2, /obj/item/weapon/lighter/zippo))
+					var/obj/item/weapon/lighter/zippo/Z = module_state_2
 					Z.lit = 0
 					Z.icon_state = "zippo"
 					Z.item_state = "zippo"
@@ -850,8 +853,8 @@
 				module_state_2= null
 				contents -= O
 			else if(module_state_3 == O)
-				if(istype(module_state_3, /obj/item/weapon/zippo))
-					var/obj/item/weapon/zippo/Z = module_state_3
+				if(istype(module_state_3, /obj/item/weapon/lighter/zippo))
+					var/obj/item/weapon/lighter/zippo/Z = module_state_3
 					Z.lit = 0
 					Z.icon_state = "zippo"
 					Z.item_state = "zippo"

@@ -401,7 +401,7 @@ datum
 				if(!M) M = holder.my_atom
 				if(!data) data = 1
 				switch(data)
-					if(1 to 15)
+					if(10 to 15)
 						M.eye_blurry = max(M.eye_blurry, 10)
 					if(15 to 25)
 						M:drowsyness  = max(M:drowsyness, 20)
@@ -768,10 +768,10 @@ datum
 
 			on_mob_life(var/mob/living/M as mob)
 				if(!M) M = holder.my_atom
-				M:adjustToxLoss(0.2)
-				M.take_organ_damage(0, 1)
+				M:adjustToxLoss(1)
 				..()
 				return
+
 			reaction_mob(var/mob/living/M, var/method=TOUCH, var/volume)
 				if(!istype(M, /mob/living))
 					return //wooo more runtime fixin
@@ -782,17 +782,21 @@ datum
 							M << "\red Your mask melts away!"
 							return
 						if(M:head)
-							del (M:head)
-							M << "\red Your helmet melts into uselessness!"
+							if(prob(15))
+								del(M:head)
+								M << "\red Your helmet melts from the acid!"
+							else
+								M << "\red Your helmet protects you from the acid!"
 							return
 						var/datum/organ/external/head/affecting = M:get_organ("head")
-						affecting.disfigured = 1
-						affecting.take_damage(35, 0)
+						affecting.take_damage(15, 0)
 						M:UpdateDamageIcon()
 						M:emote("scream")
-						M << "\red Your face has become disfigured!"
-						M.real_name = "Unknown"
-						M.warn_flavor_changed()
+						if(prob(15))
+							M << "\red Your face has become disfigured!"
+							M.real_name = "Unknown"
+							M.warn_flavor_changed()
+							affecting.disfigured = 1
 					else
 						if(istype(M, /mob/living/carbon/monkey) && M:wear_mask)
 							del (M:wear_mask)
@@ -802,13 +806,14 @@ datum
 				else
 					if(istype(M, /mob/living/carbon/human))
 						var/datum/organ/external/head/affecting = M:get_organ("head")
-						affecting.disfigured = 1
-						affecting.take_damage(30, 0)
+						affecting.take_damage(15, 0)
 						M:UpdateDamageIcon()
 						M:emote("scream")
-						M << "\red Your face has become disfigured!"
-						M.real_name = "Unknown"
-						M.warn_flavor_changed()
+						if(prob(15))
+							M << "\red Your face has become disfigured!"
+							M.real_name = "Unknown"
+							M.warn_flavor_changed()
+							affecting.disfigured = 1
 					else
 						M.take_organ_damage(min(15, volume * 4))
 
@@ -1910,30 +1915,50 @@ datum
 					return
 				if(method == TOUCH)
 					if(istype(M, /mob/living/carbon/human))
-						if(M:wear_mask)
-							M << "\red Your mask protects you from the pepperspray!"
+						var/mob/living/carbon/human/victim = M
+						var/mouth_covered = 0
+						var/eyes_covered = 0
+						var/obj/item/safe_thing = null
+						if( victim.wear_mask )
+							if ( victim.wear_mask.flags & MASKCOVERSEYES )
+								eyes_covered = 1
+								safe_thing = victim.wear_mask
+							if ( victim.wear_mask.flags & MASKCOVERSMOUTH )
+								mouth_covered = 1
+								safe_thing = victim.wear_mask
+						if( victim.head )
+							if ( victim.head.flags & MASKCOVERSEYES )
+								eyes_covered = 1
+								safe_thing = victim.head
+							if ( victim.head.flags & MASKCOVERSMOUTH )
+								mouth_covered = 1
+								safe_thing = victim.head
+						if(victim.glasses)
+							eyes_covered = 1
+							if ( !safe_thing )
+								safe_thing = victim.glasses
+						if ( eyes_covered && mouth_covered )
+							victim << "\red Your [safe_thing] protects you from the pepperspray!"
 							return
-						if(M:glasses)
-							if(M.job in security_positions)
-								M:emote("me",1,"glares at you as the pepperspray drips off the lenses!")
-								M << "\red Your glasses protect you from most of the pepperspray, and your training takes care of the rest!"
-								M.eye_blurry = max(M.eye_blurry, 10)
-							M << "\red Your glasses protect you from most of the pepperspray!"
-							M:emote("scream")
-							M.eye_blurry = max(M.eye_blurry, 20)
-							M.eye_blind = max(M.eye_blind, 4)
+						else if ( mouth_covered )	// Reduced effects if partially protected
+							victim << "\red Your [safe_thing] protect you from most of the pepperspray!"
+							victim.eye_blurry = max(M.eye_blurry, 3)
+							victim.eye_blind = max(M.eye_blind, 1)
+							victim.Paralyse(1)
+							victim.drop_item()
 							return
-						if(M.job in security_positions)
-							M:emote("me",1,"shakes off most of the pepper spray's effects, at least they were trained!")
-							M << "\red Your training protects you from most of the pepperspray!"
-							M.eye_blurry = max(M.eye_blurry, 20)
-							M.eye_blind = max(M.eye_blind, 4)
-						M:emote("scream")
-						M << "\red You're sprayed directly in the eyes with pepperspray!"
-						M.eye_blurry = max(M.eye_blurry, 5)
-						M.eye_blind = max(M.eye_blind, 2)
-						M.Paralyse(1)
-						M.drop_item()
+						else if ( eyes_covered ) // Eye cover is better than mouth cover
+							victim << "\red Your [safe_thing] protects your eyes from the pepperspray!"
+							victim.emote("scream")
+							victim.eye_blurry = max(M.eye_blurry, 1)
+							return
+						else // Oh dear :D
+							victim.emote("scream")
+							victim << "\red You're sprayed directly in the eyes with pepperspray!"
+							victim.eye_blurry = max(M.eye_blurry, 5)
+							victim.eye_blind = max(M.eye_blind, 2)
+							victim.Paralyse(1)
+							victim.drop_item()
 
 		frostoil
 			name = "Frost Oil"

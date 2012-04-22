@@ -26,7 +26,7 @@
 	var/obj/item/weapon/circuitboard/circuit = null
 	var/list/allowed_containers = list("/obj/item/weapon/reagent_containers/glass/beaker", "/obj/item/weapon/reagent_containers/glass/dispenser", "/obj/item/weapon/reagent_containers/glass/bottle")
 	var/affected_area = 3
-
+	var/mob/attacher = "Unknown"
 
 	attackby(var/obj/item/weapon/W, var/mob/user)
 		if(path || !active)
@@ -65,6 +65,10 @@
 						W.loc = src
 						user << "\blue You attach the [W] to the grenade controls!"
 						W.master = src
+						bombers += "[key_name(user)] attached a [W] to a grenade casing."
+						message_admins("[key_name_admin(user)] attached a [W] to a grenade casing.")
+						log_game("[key_name_admin(user)] attached a [W] to a grenade casing.")
+						attacher = key_name(user)
 
 					else if(istype(W, /obj/item/weapon/screwdriver))
 						if(beaker_one && beaker_two && attached_device)
@@ -266,6 +270,12 @@
 				beaker_two.reagents.maximum_volume += beaker_one.reagents.maximum_volume // make sure everything can mix
 				beaker_one.reagents.update_total()
 				beaker_one.reagents.trans_to(beaker_two, beaker_one.reagents.total_volume)
+				var/turf/bombturf = get_turf(src)
+				var/bombarea = bombturf.loc.name
+				var/log_str = "Grenade detonated in [bombarea] with device attacher: [attacher]. Last touched by: [src.fingerprintslast]"
+				bombers += log_str
+				message_admins(log_str)
+				log_game(log_str)
 				if(beaker_one.reagents.total_volume) //The possible reactions didnt use up all reagents.
 					var/datum/effect/effect/system/steam_spread/steam = new /datum/effect/effect/system/steam_spread()
 					steam.set_up(10, 0, get_turf(src))
@@ -962,13 +972,17 @@
 					if(istype(target, /mob/living/carbon))//maybe just add a blood reagent to all mobs. Then you can suck them dry...With hundreds of syringes. Jolly good idea.
 						var/amount = src.reagents.maximum_volume - src.reagents.total_volume
 						var/mob/living/carbon/T = target
-						var/datum/reagent/B = new /datum/reagent/blood
 						if(!T.dna)
 							usr << "You are unable to locate any blood. (To be specific, your target seems to be missing their DNA datum)"
 							return
 						if(T.mutations2 & NOCLONE) //target done been et, no more blood in him
 							user << "\red You are unable to locate any blood."
 							return
+						if(ishuman(T))
+							if(T:vessel.get_reagent_amount("blood") < amount)
+								return
+
+						var/datum/reagent/B = new /datum/reagent/blood
 						B.holder = src
 						B.volume = amount
 						//set reagent data
@@ -1006,11 +1020,15 @@
 						//for(var/D in B.data)
 						//	world << "Data [D] = [B.data[D]]"
 						//debug
+						if(ishuman(T))
+							T:vessel.remove_reagent("blood",amount) // Removes blood if human
 
 						src.reagents.reagent_list += B
 						src.reagents.update_total()
 						src.on_reagent_change()
 						src.reagents.handle_reactions()
+//						T:vessel.trans_to(src, amount) // Virus2 and antibodies aren't in blood in the first place.
+
 						user << "\blue You take a blood sample from [target]"
 						for(var/mob/O in viewers(4, user))
 							O.show_message("\red [user] takes a blood sample from [target].", 1)
@@ -1292,7 +1310,7 @@
 		user.attack_log += text("\[[time_stamp()]\] <font color='red'>Used the [src.name] to inject [M.name] ([M.ckey])</font>")
 		log_admin("ATTACK: [user] ([user.ckey]) injected [M] ([M.ckey]) with [src].")
 		message_admins("ATTACK: [user] ([user.ckey]) injected [M] ([M.ckey]) with [src].")
-//		log_attack("<font color='red'>[user.name] ([user.ckey]) injected [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+		log_attack("<font color='red'>[user.name] ([user.ckey]) injected [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 
 		src.reagents.reaction(M, INGEST)
@@ -1424,7 +1442,7 @@
 					log_admin("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 					message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
-//					log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+					log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 					for(var/mob/O in viewers(world.view, user))
 						O.show_message("\red [user] feeds [M] [src].", 1)
@@ -1654,7 +1672,7 @@
 			log_admin("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
-//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 
 			if(reagents.total_volume)
@@ -1780,7 +1798,7 @@
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
 
-//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)
@@ -2448,7 +2466,7 @@
 			message_admins("ATTACK: [user] ([user.ckey]) fed [M] ([M.ckey]) with [src].")
 
 
-//			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
 
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)

@@ -128,7 +128,7 @@
 	return t
 
 /proc/strip_html_simple(var/t,var/limit=MAX_MESSAGE_LEN)
-	var/list/strip_chars = list("<",">")
+	var/list/strip_chars = list("<",">","&","'")
 	t = copytext(t,1,limit)
 	for(var/char in strip_chars)
 		var/index = findtext(t, char)
@@ -1600,3 +1600,22 @@ proc/get_opposite(var/checkdir)
 		if(a == character)
 			count++
 	return count
+
+/proc/reverse_direction(var/dir)
+	switch(dir)
+		if(NORTH)
+			return SOUTH
+		if(NORTHEAST)
+			return SOUTHWEST
+		if(EAST)
+			return WEST
+		if(SOUTHEAST)
+			return NORTHWEST
+		if(SOUTH)
+			return NORTH
+		if(SOUTHWEST)
+			return NORTHEAST
+		if(WEST)
+			return EAST
+		if(NORTHWEST)
+			return SOUTHEAST

@@ -525,6 +525,7 @@ datum
 			build_path = "/obj/item/weapon/aiModule/tyrant"
 
 
+
 ///////////////////////////////////
 /////Subspace Telecomms////////////
 ///////////////////////////////////
@@ -794,13 +795,13 @@ datum
 			req_tech = list("magnets" = 3, "programming" = 3, "engineering" = 3)
 			build_path = "/obj/item/mecha_parts/mecha_equipment/repair_droid"
 
-		mech_generator
+		mech_plasma_generator
 			name = "Exosuit Module Design (Plasma Converter Module)"
 			desc = "Exosuit-mounted plasma converter."
 			id = "mech_plasma_generator"
 			build_type = MECHFAB
 			req_tech = list("plasmatech" = 2, "powerstorage"= 2, "engineering" = 2)
-			build_path = "/obj/item/mecha_parts/mecha_equipment/generator"
+			build_path = "/obj/item/mecha_parts/mecha_equipment/plasma_generator"
 
 		mech_energy_relay
 			name = "Exosuit Module Design (Tesla Energy Relay)"
@@ -1048,7 +1049,7 @@ datum
 		subspace_treatment
 			name = "Subspace Treatment Disk"
 			desc = "A compact micro-machine capable of stretching out hyper-compressed radio waves."
-			id = "s-amplifier"
+			id = "s-treatment"
 			req_tech = list("programming" = 3, "magnets" = 2, "materials" = 4, "bluespace" = 2)
 			build_type = PROTOLATHE
 			materials = list("$metal" = 10, "$silver" = 20)
@@ -1057,7 +1058,7 @@ datum
 		subspace_analyzer
 			name = "Subspace Treatment Disk"
 			desc = "A sophisticated analyzer capable of analyzing cryptic subspace wavelengths."
-			id = "s-amplifier"
+			id = "s-analyzer"
 			req_tech = list("programming" = 3, "magnets" = 4, "materials" = 4, "bluespace" = 2)
 			build_type = PROTOLATHE
 			materials = list("$metal" = 10, "$gold" = 15)
@@ -1066,7 +1067,7 @@ datum
 		subspace_crystal
 			name = "Ansible Crystal"
 			desc = "A sophisticated analyzer capable of analyzing cryptic subspace wavelengths."
-			id = "s-amplifier"
+			id = "s-crystal"
 			req_tech = list("magnets" = 4, "materials" = 4, "bluespace" = 2)
 			build_type = PROTOLATHE
 			materials = list("$glass" = 1000, "$silver" = 20, "$gold" = 20)
@@ -1075,7 +1076,7 @@ datum
 		subspace_transmitter
 			name = "Subspace Transmitter"
 			desc = "A large piece of equipment used to open a window into the subspace dimension."
-			id = "s-amplifier"
+			id = "s-transmitter"
 			req_tech = list("magnets" = 5, "materials" = 5, "bluespace" = 3)
 			build_type = PROTOLATHE
 			materials = list("$glass" = 100, "$silver" = 10, "$uranium" = 15)
@@ -1332,7 +1333,7 @@ datum
 			req_tech = list("combat" = 3, "materials" = 3, "engineering" = 3, "biotech" = 2)
 			build_type = PROTOLATHE
 			materials = list("$metal" = 5000, "$glass" = 1000)
-			build_path = "/obj/item/weapon/gun/rapidsyringe"
+			build_path = "/obj/item/weapon/gun/syringe/rapidsyringe"
 
 		largecrossbow
 			name = "Energy Crossbow"
