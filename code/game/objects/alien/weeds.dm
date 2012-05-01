@@ -77,4 +77,4 @@
 	return 1
 */
 
-#undef NODRANGE
+#undef NODERANGE //NODRANGE ?
