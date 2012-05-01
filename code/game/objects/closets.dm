@@ -80,6 +80,9 @@
 	density = 1
 	return 1
 
+/obj/structure/closet/proc/slice()
+	open()
+	del(src)
 /obj/structure/closet/proc/toggle()
 	if(src.opened)
 		return src.close()
