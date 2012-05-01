@@ -281,16 +281,25 @@
 		return
 	else if((istype(W,/obj/item/weapon/weldingtool) && locked))
 		var/obj/item/weapon/weldingtool/A = W
-		var/m = src.hl
-		src.hl -= A.get_fuel()
-		A.remove_fuel(m,user)
-		user << "You began destruct crate"
-		sleep(m * 10) //One second - 1 fuel.
-		if(hl <= 0)
-			user << "You slice crate"
-			open()
-			del(src)
-			return
+		var/slice_time = hl
+		var/turf/T = get_turf(user)
+		var/holding = user.equipped()
+		user << "You began slice a crate"
+		A.eye_check(user)
+		for(var/i=0, i<slice_time)
+			if(user.loc == T && user.equipped() == holding && !(user.stat))
+				if(A.get_fuel() > 0)
+					hl--
+					A.reagents.remove_reagent("fuel",1)
+				else
+					user << "Need more fuel"
+					return
+			else
+				return
+			if(hl <= 0)
+				slice()
+				user << "You slice crate"
+			sleep(10)
 	return ..()
 
 /obj/structure/closet/crate/attack_paw(mob/user as mob)
