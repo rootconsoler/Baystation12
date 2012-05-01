@@ -9,6 +9,7 @@
 	req_access = null
 	opened = 0
 	flags = FPRINT
+	var/hl = 0
 //	mouse_drag_pointer = MOUSE_ACTIVE_POINTER	//???
 
 /obj/structure/closet/crate/internals
@@ -91,6 +92,7 @@
 	icon = 'storage.dmi'
 	icon_state = "weaponcrate"
 	density = 1
+	hl = 200
 	icon_opened = "weaponcrateopen"
 	icon_closed = "weaponcrate"
 
@@ -100,6 +102,7 @@
 	icon = 'storage.dmi'
 	icon_state = "plasmacrate"
 	density = 1
+	hl = 150
 	icon_opened = "plasmacrateopen"
 	icon_closed = "plasmacrate"
 
@@ -109,6 +112,7 @@
 	icon = 'storage.dmi'
 	icon_state = "secgearcrate"
 	density = 1
+	hl = 150
 	icon_opened = "secgearcrateopen"
 	icon_closed = "secgearcrate"
 
@@ -122,6 +126,7 @@
 	greenlight = "largebing"
 	sparks = "largebinsparks"
 	emag = "largebinemag"
+	hl = 100
 
 /obj/structure/closet/crate/secure
 	desc = "A secure crate."
@@ -135,6 +140,7 @@
 	var/emag = "securecrateemag"
 	var/broken = 0
 	var/locked = 1
+	hl = 50
 
 /obj/structure/closet/crate/hydroponics
 	name = "Hydroponics crate"
@@ -273,7 +279,18 @@
 		src.broken = 1
 		user << "\blue You unlock the [src]."
 		return
-
+	else if((istype(W,/obj/item/weapon/weldingtool) && locked))
+		var/obj/item/weapon/weldingtool/A = W
+		var/m = src.hl
+		src.hl -= A.get_fuel()
+		A.remove_fuel(m,user)
+		user << "You began destruct crate"
+		sleep(hl * 10) //One second - 1 fuel.
+		if(hl <= 0)
+			user << "You slice crate"
+			open()
+			del(src)
+			return
 	return ..()
 
 /obj/structure/closet/crate/attack_paw(mob/user as mob)
