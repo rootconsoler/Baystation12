@@ -6,9 +6,9 @@
 		del(src)
 		return
 	if(icon_state == "weeds")icon_state = pick("weeds", "weeds1", "weeds2")
-	spawn(rand(150,300))
+	spawn(rand(300,450)) //2x time.
 		if(src)
-			Life()
+			extend()
 	return
 
 /obj/effect/alien/weeds/node/New()
@@ -16,45 +16,20 @@
 	sd_SetLuminosity(NODERANGE)
 	return
 
-/obj/effect/alien/weeds/proc/Life()
-	set background = 1
-	var/turf/U = get_turf(src)
-/*
-	if (locate(/obj/movable, U))
-		U = locate(/obj/movable, U)
-		if(U.density == 1)
-			del(src)
-			return
-
-Alien plants should do something if theres a lot of poison
-	if(U.poison> 200000)
-		health -= round(U.poison/200000)
-		update()
-		return
-*/
-	if (istype(U, /turf/space))
-		del(src)
-		return
-
-	direction_loop:
-		for(var/dirn in cardinal)
-			var/turf/T = get_step(src, dirn)
-
-			if (!istype(T) || T.density || locate(/obj/effect/alien/weeds) in T || istype(T.loc, /area/arrival) || istype(T, /turf/space))
-				continue
-
-			if(!(locate(/obj/effect/alien/weeds/node) in view(NODERANGE,T)))
-				continue
-
-	//		if (locate(/obj/movable, T)) // don't propogate into movables
-	//			continue
-
-			for(var/obj/O in T)
-				if(O.density)
-					continue direction_loop
-
+/obj/effect/alien/weeds/proc/extend()
+	for(var/dirn in cardinal)
+		var/turf/T = get_step(src, dirn)
+		var/extendeble = 1
+		if(!T || T.density || locate(/obj/effect/alien/weeds) in T || istype(T.loc, /area/arrival) || istype(T, /turf/space))
+			continue
+		if(!(locate(/obj/effect/alien/weeds/node) in view(NODERANGE, T)))
+			continue
+		for(var/obj/A in T)
+			if(A.density)
+				extendeble = 0
+				break
+		if(extendeble)
 			new /obj/effect/alien/weeds(T)
-
 
 /obj/effect/alien/weeds/ex_act(severity)
 	switch(severity)
