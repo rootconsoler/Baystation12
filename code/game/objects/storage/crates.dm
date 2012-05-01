@@ -285,7 +285,7 @@
 		var/turf/T = get_turf(user)
 		var/holding = user.equipped()
 		user << "You began slice a crate"
-		A.eye_check(user)
+		A.eyecheck(user)
 		for(var/i=0, i<slice_time)
 			if(user.loc == T && user.equipped() == holding && !(user.stat))
 				if(A.get_fuel() > 0)
