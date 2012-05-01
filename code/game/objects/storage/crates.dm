@@ -285,7 +285,7 @@
 		src.hl -= A.get_fuel()
 		A.remove_fuel(m,user)
 		user << "You began destruct crate"
-		sleep(hl * 10) //One second - 1 fuel.
+		sleep(m * 10) //One second - 1 fuel.
 		if(hl <= 0)
 			user << "You slice crate"
 			open()
