@@ -284,23 +284,33 @@
 		var/slice_time = hl
 		var/turf/T = get_turf(user)
 		var/holding = user.equipped()
-		user << "You began slice a crate"
-		A.eyecheck(user)
-		for(var/i=0, i<slice_time)
-			if(user.loc == T && user.equipped() == holding && !(user.stat))
-				if(A.get_fuel() > 0)
-					hl--
-					A.reagents.remove_reagent("fuel",1)
+		var/slicing = 0
+		if(!slicing)
+			slicing = 1
+			user << "You began slice a crate"
+			A.eyecheck(user)
+			for(var/mob/V in viewers(7,src))
+				V << "[user] slice [src.name]!"
+			for(var/i=0, i<slice_time)
+				if(user.loc == T && user.equipped() == holding && !(user.stat))
+					if(A.get_fuel() > 0)
+						hl--
+						A.reagents.remove_reagent("fuel",1)
+					else
+						user << "Need more fuel"
+						slicing = 0
+						return
 				else
-					user << "Need more fuel"
 					return
-			else
-				return
-			if(hl <= 0)
-				slice()
-				user << "You slice crate"
-			sleep(10)
+				if(hl <= 0)
+					new /obj/item/stack/sheet/metal(src.loc)
+					slice()
+					user << "You slice crate"
+				sleep(10)
+		else
+			user << "You already slice a crate"
 	return ..()
+
 
 /obj/structure/closet/crate/attack_paw(mob/user as mob)
 	return attack_hand(user)
