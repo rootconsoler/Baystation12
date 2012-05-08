@@ -244,9 +244,6 @@
 			O.emp_act(severity)
 	..()
 
-/obj/screen/storage/attackby(W, mob/user as mob)
-	src.master.attackby(W, user)
-	return
 // BubbleWrap - A box can be folded up to make card
 /obj/item/weapon/storage/attack_self(mob/user as mob)
 	if ( contents.len )
@@ -291,7 +288,7 @@
 	..()
 	contents = list()
 	sleep(1)
-	new /obj/item/clothing/mask/medical( src )
+	new /obj/item/clothing/mask/breath/medical( src )
 	new /obj/item/weapon/tank/emergency_oxygen/anesthetic( src )
 	new /obj/item/weapon/tank/emergency_oxygen/anesthetic( src )
 	new /obj/item/weapon/tank/emergency_oxygen/anesthetic( src )
@@ -392,6 +389,18 @@
 			src.show_to(usr)
 			return
 	return   ///////////////////////////////////////////////////////Alright, that should do it. *MARKER* for any possible runtimes
+
+
+/obj/item/weapon/storage/pill_bottle/verb/toggle_mode()
+	set name = "Switch Pill Bottle Method"
+	set category = "Object"
+
+	mode = !mode
+	switch (mode)
+		if(1)
+			usr << "The pill bottle now picks up all pills in a tile at once."
+		if(0)
+			usr << "The pill bottle now picks up one pill at a time."
 
 /obj/item/weapon/storage/pillbottlebox/New()
 	new /obj/item/weapon/storage/pill_bottle( src )

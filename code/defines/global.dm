@@ -12,7 +12,7 @@ var/global
 
 	defer_powernet_rebuild = 0		// true if net rebuild will be called manually after an event
 
-//	list/global_map = null
+	//list/global_map = null //Borked, do not touch. DMTG
 	//list/global_map = list(list(1,5),list(4,3))//an array of map Z levels.
 	//Resulting sector map looks like
 	//|_1_|_4_|
@@ -151,9 +151,7 @@ var
 	shuttlecoming = 0
 
 	join_motd = null
-	auth_motd = null
 	rules = null
-	no_auth_motd = null
 	forceblob = 0
 
 	custom_event_msg = null

@@ -13,6 +13,7 @@
 	var/access_clown = 0
 	var/access_mime = 0
 	var/access_janitor = 0
+//	var/access_flora = 0
 	var/access_reagent_scanner = 0
 	var/access_remote_door = 0 //Control some blast doors remotely!!
 	var/remote_door_id = ""
@@ -73,6 +74,12 @@
 		icon_state = "cart-mi"
 		access_mime = 1
 		var/mime_charges = 5
+/*
+	botanist
+		name = "Green Thumb v4.20"
+		icon_state = "cart-b"
+		access_flora = 1
+*/
 
 	signal
 		name = "generic signaler cartridge"
@@ -519,7 +526,7 @@ Code:
 							if (ml.z != cl.z)
 								continue
 
-						ldat += "Mop - <b>\[[ml.x],[ml.y]\]</b> - [M.reagents.total_volume ? "Wet" : "Dry"]<br>"
+							ldat += "Mop - <b>\[[ml.x],[ml.y]\]</b> - [M.reagents.total_volume ? "Wet" : "Dry"]<br>"
 
 					if (!ldat)
 						menu += "None"
@@ -532,10 +539,11 @@ Code:
 					for (var/obj/structure/mopbucket/B in world)
 						var/turf/bl = get_turf(B)
 
-						if (bl.z != cl.z)
-							continue
+						if(bl)
+							if (bl.z != cl.z)
+								continue
 
-						ldat += "Bucket - <b>\[[bl.x],[bl.y]\]</b> - Water level: [B.reagents.total_volume]/100<br>"
+							ldat += "Bucket - <b>\[[bl.x],[bl.y]\]</b> - Water level: [B.reagents.total_volume]/100<br>"
 
 					if (!ldat)
 						menu += "None"
@@ -548,10 +556,11 @@ Code:
 					for (var/obj/machinery/bot/cleanbot/B in world)
 						var/turf/bl = get_turf(B)
 
-						if (bl.z != cl.z)
-							continue
+						if(bl)
+							if (bl.z != cl.z)
+								continue
 
-						ldat += "Cleanbot - <b>\[[bl.x],[bl.y]\]</b> - [B.on ? "Online" : "Offline"]<br>"
+							ldat += "Cleanbot - <b>\[[bl.x],[bl.y]\]</b> - [B.on ? "Online" : "Offline"]<br>"
 
 					if (!ldat)
 						menu += "None"
@@ -564,7 +573,7 @@ Code:
 /obj/item/weapon/cartridge/Topic(href, href_list)
 	..()
 
-	if (usr.stat || usr.restrained() || !in_range(loc, usr))
+	if (!usr.canmove || usr.stat || usr.restrained() || !in_range(loc, usr))
 		usr.machine = null
 		usr << browse(null, "window=pda")
 		return

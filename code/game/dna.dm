@@ -166,16 +166,17 @@
 /////////////////////////// DNA HELPER-PROCS
 /proc/getleftblocks(input,blocknumber,blocksize)
 	var/string
-	string = copytext(input,1,((blocksize*blocknumber)-(blocksize-1)))
+
 	if (blocknumber > 1)
+		string = copytext(input,1,((blocksize*blocknumber)-(blocksize-1)))
 		return string
 	else
 		return null
 
 /proc/getrightblocks(input,blocknumber,blocksize)
 	var/string
-	string = copytext(input,blocksize*blocknumber+1)
 	if (blocknumber < (length(input)/blocksize))
+		string = copytext(input,blocksize*blocknumber+1,length(input)+1)
 		return string
 	else
 		return null
@@ -220,9 +221,17 @@
 	if (!output) output = "5"
 	return output
 
-/proc/isblockon(hnumber, bnumber)
+/proc/isblockon(hnumber, bnumber , var/UI = 0)
+
 	var/temp2
 	temp2 = hex2num(hnumber)
+
+	if(UI)
+		if(temp2 >= 2050)
+			return 1
+		else
+			return 0
+
 	if (bnumber == HULKBLOCK || bnumber == TELEBLOCK)
 		if (temp2 >= 3500 + BLOCKADD)
 			return 1
@@ -312,7 +321,7 @@
 		H.g_eyes = hex2num(getblock(structure,9,3))
 		H.b_eyes = hex2num(getblock(structure,10,3))
 
-		if (isblockon(getblock(structure, 11,3),11))
+		if (isblockon(getblock(structure, 11,3),11 , 1))
 			H.gender = FEMALE
 		else
 			H.gender = MALE
@@ -360,28 +369,28 @@
 	if (!M) return
 	//mutations
 	/*
-	TK				=(1<<0)
-	COLD_RESISTANCE	=(1<<1)
-	XRAY			=(1<<2)
-	HULK			=(1<<3)
-	CLUMSY			=(1<<4)
-	//FAT				=(1<<5)
-	HUSK			=(1<<6)
-	LASER			=(1<<7)
-	HEAL			=(1<<8)
-	mNobreath		=(1<<9)
-	mRemote			=(1<<10)
-	mRegen			=(1<<11)
-	mRun			=(1<<12)
-	mRemotetalk		=(1<<13)
-	mMorph			=(1<<14)
-	mBlend			=(1<<15)
+	TK				=(1<<0)	1
+	COLD_RESISTANCE	=(1<<1)	2
+	XRAY			=(1<<2)	4
+	HULK			=(1<<3)	8
+	CLUMSY			=(1<<4)	16
+	//FAT				=(1<<5) 32
+	HUSK			=(1<<6)	64
+	LASER			=(1<<7)	128
+	HEAL			=(1<<8)	256
+	mNobreath		=(1<<9)	512
+	mRemote			=(1<<10)	1024
+	mRegen			=(1<<11)	2048
+	mRun			=(1<<12)	4096
+	mRemotetalk		=(1<<13)	8192
+	mMorph			=(1<<14)	16384
+	mBlend			=(1<<15)	32768
 
 	mutations2:
-	mHallucination	=(1<<0)
-	mFingerprints	=(1<<1)
-	mShock			=(1<<2)
-	mSmallsize		=(1<<3)
+	mHallucination	=(1<<0) 1
+	mFingerprints	=(1<<1) 2
+	mShock			=(1<<2) 4
+	mSmallsize		=(1<<3)	8
 	*/
 
 	//disabilities
@@ -841,14 +850,16 @@
 			src.icon_state = "c_unpowered"
 			stat |= NOPOWER
 
-/obj/machinery/scan_consolenew/New()
+/obj/machinery/computer/scan_consolenew/New()
 	..()
-	spawn( 5 )
+	spawn(5)
 		src.connected = locate(/obj/machinery/dna_scannernew, get_step(src, WEST))
+		spawn(250)
+			src.injectorready = 1
 		return
 	return
 
-/obj/machinery/scan_consolenew/attackby(obj/item/W as obj, mob/user as mob)
+/obj/machinery/computer/scan_consolenew/attackby(obj/item/W as obj, mob/user as mob)
 	if ((istype(W, /obj/item/weapon/disk/data)) && (!src.diskette))
 		user.drop_item()
 		W.loc = src
@@ -856,7 +867,7 @@
 		user << "You insert [W]."
 		src.updateUsrDialog()
 
-/obj/machinery/scan_consolenew/process() //not really used right now
+/obj/machinery/computer/scan_consolenew/process() //not really used right now
 	processing_objects.Remove(src) //Lets not have it waste CPU
 	if(stat & (NOPOWER|BROKEN))
 		return
@@ -864,13 +875,13 @@
 		return
 	return
 
-/obj/machinery/scan_consolenew/attack_paw(user as mob)
+/obj/machinery/computer/scan_consolenew/attack_paw(user as mob)
 	return src.attack_hand(user)
 
-/obj/machinery/scan_consolenew/attack_ai(user as mob)
+/obj/machinery/computer/scan_consolenew/attack_ai(user as mob)
 	return src.attack_hand(user)
 
-/obj/machinery/scan_consolenew/attack_hand(user as mob)
+/obj/machinery/computer/scan_consolenew/attack_hand(user as mob)
 	if(..())
 		return
 	if(!(user in message))
@@ -931,7 +942,7 @@
 	onclose(user, "scannernew")
 	return
 
-/obj/machinery/scan_consolenew/Topic(href, href_list)
+/obj/machinery/computer/scan_consolenew/Topic(href, href_list)
 	if(..())
 		return
 	if(!istype(usr.loc, /turf))

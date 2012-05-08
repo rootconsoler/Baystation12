@@ -117,9 +117,18 @@ var/datum/roundinfo/roundinfo = new()
 	spawn() supply_ticker() // Added to kick-off the supply shuttle regenerating points -- TLE
 
 	spawn(0)
-		while(1)
-			sleep(5000+rand(6000,10000))
-			SpawnEvent()
+		while (1)
+			var/potential_sleep_time = 10000 + rand(10000, 20000)
+			for (var/mob/living/M in world)
+				if(!M.client) continue
+				if(M.client.inactivity > 10 * 60 * 10) continue
+				if(M.stat == 2) continue
+
+				if (potential_sleep_time > 10000)
+					potential_sleep_time -= 600
+
+				sleep(potential_sleep_time)
+				SpawnEvent()
 
 	//Start master_controller.process()
 	spawn master_controller.process()
@@ -129,6 +138,107 @@ var/datum/roundinfo/roundinfo = new()
 	return 1
 
 /datum/controller/gameticker
+	//station_explosion used to be a variable for every mob's hud. Which was a waste!
+	//Now we have a general cinematic centrally held within the gameticker....far more efficient!
+	var/obj/screen/cinematic = null
+
+	//Plus it provides an easy way to make cinematics for other events. Just use this as a template :)
+	proc/station_explosion_cinematic(var/station_missed=0, var/override = null)
+		if( cinematic )	return	//already a cinematic in progress!
+
+		//initialise our cinematic screen object
+		cinematic = new(src)
+		cinematic.icon = 'station_explosion.dmi'
+		cinematic.icon_state = "start"
+		cinematic.layer = 20
+		cinematic.mouse_opacity = 0
+		cinematic.screen_loc = "1,3"	//TODO resize them
+
+		var/obj/structure/stool/bed/temp_buckle = new(src)
+		//Incredibly hackish. It creates a bed within the gameticker (lol) to stop mobs running around
+		if(station_missed)
+			for(var/mob/M in world)
+				M.buckled = temp_buckle				//buckles the mob so it can't do anything
+				if(M.client)
+					M.client.screen += cinematic	//show every client the cinematic
+		else	//nuke kills everyone on z-level 1 to prevent "hurr-durr I survived"
+			for(var/mob/M in world)
+				M.buckled = temp_buckle
+				if(M.client)
+					M.client.screen += cinematic
+				switch(M.z)
+					if(0)	//inside a crate or something
+						var/turf/T = get_turf(M)
+						if(T && T.z==1)				//we don't use M.death(0) because it calls a for(/mob) loop and
+							M.health = 0
+							M.stat = DEAD
+					if(1)	//on a z-level 1 turf.
+						M.health = 0
+						M.stat = DEAD
+
+		//Now animate the cinematic
+		switch(station_missed)
+			if(2)	//nuke was nowhere nearby	//TODO: a really distant explosion animation
+				sleep(50)
+				world << sound('explosionfar.ogg')
+
+			if(1)	//nuke was nearby but (mostly) missed
+				if( mode && !override )
+					override = mode.name
+				switch( override )
+					if("nuclear emergency")
+						flick("start_nuke",cinematic)
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						flick("explode2",cinematic)
+						cinematic.icon_state = "loss_nuke2"
+					else
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						flick("explode2",cinematic)
+
+			else	//station was destroyed
+				if( mode && !override )
+					override = mode.name
+				switch( override )
+					if("nuclear emergency")
+						flick("start_nuke",cinematic)
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						cinematic.icon_state = "end"
+						flick("explode",cinematic)
+						cinematic.icon_state = "loss_nuke"
+
+					if("AI malfunction")
+						flick("start_malf",cinematic)
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						cinematic.icon_state = "end"
+						flick("explode",cinematic)
+						cinematic.icon_state = "loss_malf"
+
+					if("blob")
+						flick("start_blob",cinematic)			//TODO: make a blob one
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						cinematic.icon_state = "end"
+						flick("explode",cinematic)
+						cinematic.icon_state = "loss_blob"		//TODO: make a blob one
+
+					else
+						//default station-destroyed ending
+						sleep(50)
+						world << sound('explosionfar.ogg')
+						cinematic.icon_state = "end"
+						flick("explode",cinematic)
+						cinematic.icon_state = "loss_general"
+		sleep(100)
+
+		//Tidy-up time!
+		if(cinematic)	del(cinematic)		//end the cinematic
+		if(temp_buckle)	del(temp_buckle)	//release everybody
+		return
+
 
 	proc/create_characters()
 		for(var/mob/new_player/player in world)
@@ -177,14 +287,13 @@ var/datum/roundinfo/roundinfo = new()
 
 			spawn(50)
 				if (mode.station_was_nuked)
-					feedback_set_details("end_proper","nuke")
+					//feedback_set_details("end_proper","nuke")
 					world << "\blue <B>Rebooting due to destruction of station in [restart_timeout/10] seconds</B>"
 				else
-					feedback_set_details("end_proper","proper completion")
+					//feedback_set_details("end_proper","proper completion")
 					world << "\blue <B>Restarting in [restart_timeout/10] seconds</B>"
-			//	send2irc(world.url,"Server Rebooting!")
 
-				feedback_set_details("round_end","[time2text(world.realtime)]")
+
 				if(blackbox)
 					blackbox.save_all_data_to_sql()
 
@@ -199,23 +308,23 @@ var/datum/roundinfo/roundinfo = new()
 
 	for (var/mob/living/silicon/ai/aiPlayer in world)
 		if (aiPlayer.stat != 2)
-			world << "<b>[aiPlayer.name]'s laws at the end of the game were:</b>"
+			world << "<b>[aiPlayer.name] (Played by: [aiPlayer.key])'s laws at the end of the game were:</b>"
 		else
-			world << "<b>[aiPlayer.name]'s laws when it was deactivated were:</b>"
+			world << "<b>[aiPlayer.name] (Played by: [aiPlayer.key])'s laws when it was deactivated were:</b>"
 		aiPlayer.show_laws(1)
 
 		if (aiPlayer.connected_robots.len)
 			var/robolist = "<b>The AI's loyal minions were:</b> "
 			for(var/mob/living/silicon/robot/robo in aiPlayer.connected_robots)
-				robolist += "[robo.name][robo.stat?" (Deactivated), ":", "]"
+				robolist += "[robo.name][robo.stat?" (Deactivated)  (Played by: [robo.key]), ":",  (Played by: [robo.key])"]"
 			world << "[robolist]"
 
 	for (var/mob/living/silicon/robot/robo in world)
 		if (!robo.connected_ai)
 			if (robo.stat != 2)
-				world << "<b>[robo.name] survived as an AI-less borg! Its laws were:</b>"
+				world << "<b>[robo.name] (Played by: [robo.key]) survived as an AI-less borg! Its laws were:</b>"
 			else
-				world << "<b>[robo.name] was unable to survive the rigors of being a cyborg without an AI. Its laws were:</b>"
+				world << "<b>[robo.name] (Played by: [robo.key]) was unable to survive the rigors of being a cyborg without an AI. Its laws were:</b>"
 			robo.laws.show_laws(world)
 
 	mode.declare_completion()//To declare normal completion.

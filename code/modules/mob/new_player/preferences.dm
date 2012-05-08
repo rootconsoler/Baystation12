@@ -129,6 +129,10 @@ datum/preferences
 		skill_specialization = null
 		list/skills = list() // skills can range from 0 to 3
 
+		// OOC Metadata:
+		metadata = ""
+
+
 	New()
 		hair_style = new/datum/sprite_accessory/hair/short
 		facial_hair_style = new/datum/sprite_accessory/facial_hair/shaved
@@ -172,7 +176,7 @@ datum/preferences
 		switch(points)
 			if(0)
 				return "Unconfigured"
-			if(1 to 2)
+			if(1 to 3)
 				return "Terrifying"
 			if(4 to 6)
 				return "Below Average"
@@ -243,6 +247,10 @@ datum/preferences
 		dat += "<b>UI Style:</b> <a href=\"byond://?src=\ref[user];preferences=1;UI=input\"><b>[UI == UI_NEW ? "New" : "Old"]</b></a><br>"
 		dat += "<b>Play admin midis:</b> <a href=\"byond://?src=\ref[user];preferences=1;midis=input\"><b>[midis == 1 ? "Yes" : "No"]</b></a><br>"
 		dat += "<b>Ghost ears:</b> <a href=\"byond://?src=\ref[user];preferences=1;ghost_ears=input\"><b>[ghost_ears == 0 ? "Nearest Creatures" : "All Speech"]</b></a><br>"
+		dat += "<b>Ghost sight:</b> <a href=\"byond://?src=\ref[user];preferences=1;ghost_sight=input\"><b>[ghost_sight == 0 ? "Nearest Creatures" : "All Emotes"]</b></a><br>"
+
+		if(config.allow_Metadata)
+			dat += "<b>OOC Notes:</b> <a href='byond://?src=\ref[user];preferences=1;OOC=input'> Edit </a><br>"
 
 		if((user.client) && (user.client.holder) && (user.client.holder.rank) && (user.client.holder.rank == "Game Master"))
 			dat += "<hr><b>OOC</b><br>"
@@ -300,15 +308,21 @@ datum/preferences
 			dat += "[copytext(flavor_text, 1, 37)]..."
 
 		dat += "<hr>"
-		if(!jobban_isbanned(user, "Syndicate"))
+		if(jobban_isbanned(user, "Syndicate"))
+			dat += "<b>You are banned from antagonist roles.</b>"
+			src.be_special = 0
+		else
 			var/n = 0
 			for (var/i in special_roles)
 				if(special_roles[i]) //if mode is available on the server
-					dat += "<b>Be [i]:</b> <a href=\"byond://?src=\ref[user];preferences=1;be_special=[n]\"><b>[src.be_special&(1<<n) ? "Yes" : "No"]</b></a><br>"
+					if(jobban_isbanned(user, i))
+						dat += "<b>Be [i]:</b> <font color=red><b> \[BANNED]</b></font><br>"
+					else if(i == "pai candidate")
+						if(jobban_isbanned(user, "pAI"))
+							dat += "<b>Be [i]:</b> <font color=red><b> \[BANNED]</b></font><br>"
+					else
+						dat += "<b>Be [i]:</b> <a href=\"byond://?src=\ref[user];preferences=1;be_special=[n]\"><b>[src.be_special&(1<<n) ? "Yes" : "No"]</b></a><br>"
 				n++
-		else
-			dat += "<b>You are banned from being Syndicate.</b>"
-			src.be_special = 0
 		dat += "<hr>"
 
 		// slot options
@@ -533,6 +547,8 @@ datum/preferences
 
 
 	proc/process_link(mob/user, list/link_tags)
+		if(!usr)
+			return
 		if(link_tags["occ"])
 			if(link_tags["cancel"])
 				user << browse(null, "window=\ref[user]occupation")
@@ -599,12 +615,23 @@ datum/preferences
 			switch(link_tags["real_name"])
 				if("input")
 					new_name = input(user, "Please select a name:", "Character Generation")  as text
-					var/list/bad_characters = list("_", "'", "\"", "<", ">", ";", "[", "]", "{", "}", "|", "\\")
+					var/list/bad_characters = list("_", "'", "\"", "<", ">", ";", "\[", "\]", "{", "}", "|", "\\","0","1","2","3","4","5","6","7","8","9")
 					for(var/c in bad_characters)
 						new_name = dd_replacetext(new_name, c, "")
 					if(!new_name || (new_name == "Unknown") || (new_name == "floor") || (new_name == "wall") || (new_name == "r-wall"))
-						alert("Don't do this")
+						alert("Invalid name. Don't do that!")
 						return
+					if(length(new_name) >= 26)
+						alert("That name is too long.")
+						return
+
+					//Carn: To fix BYOND text-parsing errors caused by people using dumb capitalisation in their names.
+					var/tempname
+					for(var/N in dd_text2list(new_name, " "))
+						if(N && tempname) //if both aren't null strings
+							tempname += " "
+						tempname += capitalize(lowertext(N))
+					new_name = tempname
 
 				if("random")
 					randomize_name()
@@ -617,11 +644,29 @@ datum/preferences
 		if(link_tags["age"])
 			switch(link_tags["age"])
 				if("input")
-					var/new_age = input(user, "Please select type in age: 20-45", "Character Generation")  as num
+					var/new_age = input(user, "Please enter an age ([minimum_age]-[maximum_age])", "Character Generation")  as num
 					if(new_age)
-						age = max(min(round(text2num(new_age)), 45), 20)
+						age = max(min(round(text2num(new_age)), maximum_age), minimum_age)
 				if("random")
-					age = rand (20, 45)
+					age = rand (minimum_age, maximum_age)
+
+		if(link_tags["OOC"])
+			var/tempnote = ""
+			tempnote = input(user, "Please enter your OOC Notes!:", "OOC notes" , metadata)  as text
+			var/list/bad_characters = list("_", "\"", "<", ">", ";", "\[", "\]", "{", "}", "|", "\\","0","1","2","3","4","5","6","7","8","9")
+
+			for(var/c in bad_characters)
+				tempnote = dd_replacetext(tempnote, c, "")
+
+			if(length(tempnote) >= 255)
+				alert("That name is too long. (255 character max, please)")
+				return
+
+			metadata = tempnote
+			return
+
+
+
 
 		if(link_tags["b_type"])
 			switch(link_tags["b_type"])
@@ -761,9 +806,13 @@ datum/preferences
 				UI = UI_OLD
 
 		if(link_tags["midis"])
-			midis = (midis+1)%2
+			midis = !midis
+
 		if(link_tags["ghost_ears"])
 			ghost_ears = !ghost_ears
+
+		if(link_tags["ghost_sight"])
+			ghost_sight = !ghost_sight
 
 		if(link_tags["underwear"])
 			switch(link_tags["underwear"])
@@ -947,8 +996,6 @@ datum/preferences
 			backbag = 1 //Same as above
 		character.backbag = backbag
 
-		character.underwear = underwear == 1 ? pick(1,2,3,4,5) : 0
-
 		character.used_skillpoints = used_skillpoints
 		character.skill_specialization = skill_specialization
 		character.skills = skills
@@ -959,11 +1006,23 @@ datum/preferences
 		if(!safety)//To prevent run-time errors due to null datum when using randomize_appearance_for()
 			spawn(10)
 				if(character&&character.client)
-					character.client.midis = midis
-					character.client.ooccolor = ooccolor
-					character.client.be_alien = be_special&BE_ALIEN
-					character.client.be_pai = be_special&BE_PAI
-					character.client.be_syndicate = be_special
+					setup_client(character.client)
+
+	proc/copy_to_observer(mob/dead/observer/character)
+		spawn(10)
+			if(character && character.client)
+				setup_client(character.client)
+
+	proc/setup_client(var/client/C)
+		if(C)
+			C.midis = src.midis
+			C.ooccolor = src.ooccolor
+			C.be_alien = be_special & BE_ALIEN
+			C.be_pai = be_special & BE_PAI
+			C.be_syndicate = be_special
+			if(isnull(src.ghost_ears)) src.ghost_ears = 1 //There were problems where the default was null before someone saved their profile.
+			C.ghost_ears = src.ghost_ears
+			C.ghost_sight = src.ghost_sight
 
 	proc/copydisabilities(mob/living/carbon/human/character)
 		if(disabilities & 1)

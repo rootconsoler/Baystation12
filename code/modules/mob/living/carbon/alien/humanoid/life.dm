@@ -14,7 +14,11 @@
 	if (src.monkeyizing)
 		return
 
+	..()
+
 	if (src.stat != 2) //still breathing
+
+
 
 		//First, resolve location and get a breath
 
@@ -376,7 +380,7 @@
 				src.drowsyness--
 				src.eye_blurry = max(2, src.eye_blurry)
 				if (prob(5))
-					src.sleeping = 1
+					src.sleeping += 1
 					src.Paralyse(5)
 
 			confused = max(0, confused - 1)
@@ -564,15 +568,6 @@
 				for(var/datum/disease/D in viruses)
 					D.cure()
 			return
-
-		check_if_buckled()
-			if (src.buckled)
-				src.lying = (istype(src.buckled, /obj/structure/stool/bed) ? 1 : 0)
-				if(src.lying)
-					src.drop_item()
-				src.density = 1
-			else
-				src.density = !src.lying
 
 		handle_stomach()
 			spawn(0)

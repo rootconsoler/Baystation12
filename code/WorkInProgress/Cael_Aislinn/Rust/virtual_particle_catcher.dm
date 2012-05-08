@@ -6,6 +6,7 @@
 	icon = 'effects.dmi'
 	icon_state = "energynet"
 	density = 0
+	anchored = 1
 	var/obj/machinery/rust/em_field/parent
 	var/mysize = 0
 
@@ -26,13 +27,6 @@
 			return 1
 		return 0
 
-	proc/AddEnergy(var/energy, var/mega_energy)
-		if(parent && parent.size >= mysize)
-			parent.energy += energy
-			parent.mega_energy += mega_energy
-			return 1
-		return 0
-
 	proc/UpdateSize()
 		if(parent.size >= mysize)
 			density = 1
@@ -44,8 +38,9 @@
 			//invisibility = 101
 
 	bullet_act(var/obj/item/projectile/Proj)
-		if(Proj.flag != "bullet")
-			AddEnergy(0, Proj.damage / 600)
+		if(Proj.flag != "bullet" && parent)
+			var/obj/item/projectile/beam/laserbeam = Proj
+			parent.AddEnergy(0, laserbeam.damage / 5000, laserbeam.frequency)
 		return 0
 
 	process()

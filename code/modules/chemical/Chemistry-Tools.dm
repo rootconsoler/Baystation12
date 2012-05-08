@@ -368,8 +368,8 @@
 			var/obj/item/weapon/reagent_containers/glass/beaker/B1 = new(src)
 			var/obj/item/weapon/reagent_containers/glass/beaker/B2 = new(src)
 
-			B1.reagents.add_reagent("fluorosurfactant", 30)
-			B2.reagents.add_reagent("water", 10)
+			B1.reagents.add_reagent("fluorosurfactant", 40)
+			B2.reagents.add_reagent("water", 40)
 			B2.reagents.add_reagent("cleaner", 10)
 
 			beaker_two = B1
@@ -598,6 +598,8 @@
 				var/turf/trg = get_turf(target)
 				var/obj/effect/syringe_gun_dummy/D = new/obj/effect/syringe_gun_dummy(get_turf(src))
 				var/obj/item/weapon/reagent_containers/syringe/S = syringes[1]
+				if((!S) || (!S.reagents))	//ho boy! wot runtimes!
+					return
 				S.reagents.trans_to(D, S.reagents.total_volume)
 				syringes -= S
 				del(S)
@@ -1766,7 +1768,23 @@
 			icon_state = "pill[rand(1,20)]"
 
 	attackby(obj/item/weapon/W as obj, mob/user as mob)
-
+		if (istype(W, /obj/item/weapon/storage/pill_bottle))
+			var/obj/item/weapon/storage/pill_bottle/P = W
+			if (P.mode == 1)
+				for (var/obj/item/weapon/reagent_containers/pill/O in locate(src.x,src.y,src.z))
+					if(P.contents.len < P.storage_slots)
+						O.loc = P
+						P.orient2hud(user)
+					else
+						user << "\blue The pill bottle is full."
+						return
+				user << "\blue You pick up all the pills."
+			else
+				if (P.contents.len < P.storage_slots)
+					loc = P
+					P.orient2hud(user)
+				else
+					user << "\blue The pill bottle is full."
 		return
 	attack_self(mob/user as mob)
 		return
@@ -1868,6 +1886,17 @@
 			user << "You add the sensor to the bucket"
 			del(D)
 			del(src)
+
+/obj/item/weapon/reagent_containers/glass/bucket/wateringcan
+	name = "watering can"
+	desc = "A watering can, for all your watering needs."
+	icon = 'hydroponics.dmi'
+	icon_state = "watercan"
+	item_state = "bucket"
+
+	attackby(var/obj/D, mob/user as mob)
+		if(isprox(D))
+			return
 
 /obj/item/weapon/reagent_containers/glass/cantister
 	desc = "It's a canister. Mainly used for transporting fuel."
@@ -2051,7 +2080,7 @@
 	amount_per_transfer_from_this = 10
 	possible_transfer_amounts = list(5,10,15,25,30)
 	flags = FPRINT | TABLEPASS | OPENCONTAINER
-	volume = 30
+	volume = 50
 
 	New()
 		..()
@@ -2258,6 +2287,25 @@
 		var/datum/disease/F = new /datum/disease/wizarditis(0)
 		var/list/data = list("viruses"= list(F))
 		reagents.add_reagent("blood", 20, data)
+
+/obj/item/weapon/reagent_containers/glass/bottle/pacid
+	name = "Polytrinic Acid Bottle"
+	desc = "A small bottle. Contains a small amount of Polytronic Acid"
+	icon = 'chemical.dmi'
+	icon_state = "bottle17"
+	New()
+		..()
+		reagents.add_reagent("pacid", 30)
+
+/obj/item/weapon/reagent_containers/glass/bottle/adminordrazine
+	name = "Adminordrazine Bottle"
+	desc = "A small bottle. Contains the liquid essence of the gods."
+	icon = 'drinks.dmi'
+	icon_state = "holyflask"
+	New()
+		..()
+		reagents.add_reagent("adminordrazine", 30)
+
 
 /obj/item/weapon/reagent_containers/glass/bottle/ert
 	name = "emergency medicine bottle"
@@ -3310,14 +3358,6 @@
 					icon_state = "manlydorfglass"
 					name = "The Manly Dorf"
 					desc = "A manly concotion made from Ale and Beer. Intended for true men only."
-				if("irishcream")
-					icon_state = "irishcreamglass"
-					name = "Irish Cream"
-					desc = "It's cream, mixed with whiskey. What else would you expect from the Irish?"
-				if("cubalibre")
-					icon_state = "cubalibreglass"
-					name = "Cuba Libre"
-					desc = "A classic mix of rum and cola."
 				if("irishcream")
 					icon_state = "irishcreamglass"
 					name = "Irish Cream"

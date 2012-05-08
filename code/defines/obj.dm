@@ -383,7 +383,6 @@
 	opacity = 0
 	density = 0
 
-
 /obj/hud
 	name = "hud"
 	unacidable = 1
@@ -400,9 +399,8 @@
 	var/obj/screen/g_dither = null
 	var/obj/screen/blurry = null
 	var/list/darkMask = null
-	var/obj/screen/station_explosion = null
 
-	var/h_type = /obj/screen
+	var/h_type = /obj/screen		//this is like...the most pointless thing ever. Use a god damn define!
 
 /obj/item
 	name = "item"
@@ -418,10 +416,6 @@
 	var/burning = null
 	var/hitsound = null
 	var/w_class = 3.0
-	var/wielded = 0 // 1 if item is two handed and grabbed with two hands
-	var/twohanded = 0 // Two handed and wielded off by default, nyoro~n -Agouri
-	var/force_unwielded = 0
-	var/force_wielded = 0
 	var/protective_temperature = 0 // Placing this here to avoid runtime errors, due to tiny items being allowed on ears and being queried for this variable
 	flags = FPRINT | TABLEPASS
 	pass_flags = PASSTABLE
@@ -640,6 +634,10 @@
 	color="blue"
 	icon = 'power_cond_blue.dmi'
 
+/obj/structure/cable/pink
+	color="pink"
+	icon = 'power_cond_pink.dmi'
+
 /obj/effect/manifest
 	name = "manifest"
 	icon = 'screen1.dmi'
@@ -759,7 +757,6 @@
 	desc = "Apply butt."
 	icon = 'objects.dmi'
 	icon_state = "stool"
-	anchored = 1.0
 	flags = FPRINT
 	pressure_resistance = 3*ONE_ATMOSPHERE
 
@@ -768,6 +765,7 @@
 	desc = "This is used to lie in, sleep in or strap on."
 	icon_state = "bed"
 	var/mob/living/buckled_mob
+	anchored = 1.0
 
 /obj/structure/stool/bed/alien
 	name = "Resting contraption"
@@ -779,6 +777,7 @@
 	name = "chair"
 	desc = "You sit in this. Either by will or force."
 	icon_state = "chair"
+	anchored = 0
 
 /obj/structure/stool/bed/chair/comfy
 	name = "comfy chair"
@@ -1476,6 +1475,7 @@
 	var/list/list3 = list()
 	var/list/list4 = list()
 	var/list/list5 = list()
+	var/list/list6 = list()
 
 	var/var1 = null
 	var/var2 = null

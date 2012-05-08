@@ -1,10 +1,27 @@
 /obj/machinery/door_control/attack_ai(mob/user as mob)
-	return src.attack_hand(user)
+	if(wires & 2)
+		return src.attack_hand(user)
+	else
+		user << "Error, no route to host."
 
 /obj/machinery/door_control/attack_paw(mob/user as mob)
 	return src.attack_hand(user)
 
 /obj/machinery/door_control/attackby(obj/item/weapon/W, mob/user as mob)
+	/* For later implementation
+	if (istype(W, /obj/item/weapon/screwdriver))
+	{
+		if(wiresexposed)
+			icon_state = "doorctrl0"
+			wiresexposed = 0
+
+		else
+			icon_state = "doorctrl-open"
+			wiresexposed = 1
+
+		return
+	}
+	*/
 	if(istype(W, /obj/item/device/detective_scanner))
 		return
 	return src.attack_hand(user)
@@ -12,6 +29,11 @@
 /obj/machinery/door_control/attack_hand(mob/user as mob)
 	if(stat & (NOPOWER|BROKEN))
 		return
+
+	if(!allowed(user) && (wires & 1))
+		flick("doorctrl-denied",src)
+		return
+
 	use_power(5)
 	icon_state = "doorctrl1"
 
@@ -49,7 +71,7 @@
 
 
 	else
-		for(var/obj/machinery/door/poddoor/M in machines)
+		for(var/obj/machinery/door/poddoor/M in world)
 			if (M.id == src.id)
 				if (M.density)
 					spawn( 0 )
@@ -97,7 +119,7 @@
 	active = 1
 	icon_state = "launcheract"
 
-	for(var/obj/machinery/door/poddoor/M in machines)
+	for(var/obj/machinery/door/poddoor/M in world)
 		if (M.id == src.id)
 			spawn( 0 )
 				M.open()
@@ -111,7 +133,7 @@
 
 	sleep(50)
 
-	for(var/obj/machinery/door/poddoor/M in machines)
+	for(var/obj/machinery/door/poddoor/M in world)
 		if (M.id == src.id)
 			spawn( 0 )
 				M.close()

@@ -11,6 +11,11 @@
 	name = "close"
 	master = null
 
+/obj/screen/close/DblClick()
+	if (src.master)
+		src.master:close(usr)
+	return
+
 /obj/screen/grab
 	name = "grab"
 	master = null
@@ -18,6 +23,10 @@
 /obj/screen/storage
 	name = "storage"
 	master = null
+
+/obj/screen/storage/attackby(W, mob/user as mob)
+	src.master.attackby(W, user)
+	return
 
 /obj/screen/zone_sel
 	name = "Damage Zone"
@@ -430,13 +439,13 @@
 			usr.pulling = null
 		if("sleep")
 			if(usr.sleeping && usr.sleeping_willingly)
-				usr.sleeping = 0
-				usr.sleeping_willingly = 0
+				return
 			else if(!usr.sleeping)
-				usr.sleeping = 1
+				usr.sleeping = 20 //Short nap
 				usr.sleeping_willingly = 1
 		if("rest")
-			usr.resting = !usr.resting
+			usr.resting = !( usr.resting )
+			//kavala2
 		if("throw")
 			if (!usr.stat && isturf(usr.loc) && !usr.restrained())
 				usr:toggle_throw_mode()
@@ -447,13 +456,16 @@
 		if("hand")
 			usr:swap_hand()
 		if("resist")
-			if(usr.next_move < world.time)
+			if(usr.next_move > world.time)
 				return
 			usr.next_move = world.time + 20
 			if ((!( usr.stat ) && usr.canmove && !( usr.restrained() )))
+				var/resisting = 0
 				for(var/obj/O in usr.requests)
 					del(O)
+					resisting++
 				for(var/obj/item/weapon/grab/G in usr.grabbed_by)
+					resisting++
 					if (G.state == 1)
 						del(G)
 					else
@@ -468,9 +480,9 @@
 									for(var/mob/O in viewers(usr, null))
 										O.show_message(text("\red [] has broken free of []'s headlock!", usr, G.assailant), 1)
 									del(G)
-				for(var/mob/O in viewers(usr, null))
-					O.show_message(text("\red <B>[] resists!</B>", usr), 1)
-
+				if(resisting)
+					for(var/mob/O in viewers(usr, null))
+						O.show_message(text("\red <B>[] resists!</B>", usr), 1)
 			if(usr:handcuffed && usr:canmove && (usr.last_special <= world.time))
 				var/breakouttime = 1200
 				var/displaytime = 2
@@ -485,7 +497,8 @@
 						O.show_message(text("\red <B>[] is trying to break the handcuffs!</B>", usr), 1)
 					spawn(0)
 						if(do_after(usr, 50))
-							if(!usr:handcuffed || usr:buckled) return
+							if(!usr:handcuffed || usr:buckled)
+								return
 							for(var/mob/O in viewers(usr))
 								O.show_message(text("\red <B>[] manages to break the handcuffs!</B>", usr), 1)
 							usr << "\green You successfully break your handcuffs."
@@ -560,11 +573,14 @@
 					O.show_message(text("\red <B>[] attempts to unbuckle themself!</B>", usr), 1)
 				spawn(0)
 					if(do_after(usr, 1200))
-						if(!usr:buckled) return
+						if(!usr:buckled)
+							return
 						for(var/mob/O in viewers(usr))
 							O.show_message(text("\red <B>[] manages to unbuckle themself!</B>", usr), 1)
 						usr << "\blue You successfully unbuckle yourself."
 						usr:buckled.manual_unbuckle(usr)
+
+
 		if("module")
 			if(issilicon(usr))
 				if(usr:module)

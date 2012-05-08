@@ -6,7 +6,7 @@ obj/machinery/atmospherics/pipe
 	var/volume = 0
 	var/force = 20
 
-	layer = 2.4 //under wires with their 2.5
+	layer = 2.4 //under wires with their 2.44
 
 	var/alert_pressure = 80*ONE_ATMOSPHERE
 		//minimum pressure before check_pressure(...) should be called
@@ -437,6 +437,123 @@ obj/machinery/atmospherics/pipe
 
 				..()
 
+		n2o
+			icon = 'n2o_pipe_tank.dmi'
+			name = "Pressure Tank (N2O)"
+
+			New()
+				air_temporary = new
+				air_temporary.volume = volume
+				air_temporary.temperature = T0C
+
+				var/datum/gas/sleeping_agent/trace_gas = new
+				trace_gas.moles = (25*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+				air_temporary.trace_gases += trace_gas
+
+				..()
+
+
+		highcap
+			carbon_dioxide
+				name = "High Capacity Pressure Tank (Carbon Dioxide)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T20C
+
+					air_temporary.carbon_dioxide = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					..()
+
+			toxins
+				icon = 'orange_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (Plasma)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T20C
+
+					air_temporary.toxins = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					..()
+
+			oxygen_agent_b
+				icon = 'red_orange_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (Oxygen + Plasma)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T0C
+
+					var/datum/gas/oxygen_agent_b/trace_gas = new
+					trace_gas.moles = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					air_temporary.trace_gases += trace_gas
+
+					..()
+
+			oxygen
+				icon = 'blue_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (Oxygen)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T20C
+
+					air_temporary.oxygen = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					..()
+
+			nitrogen
+				icon = 'red_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (Nitrogen)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T20C
+
+					air_temporary.nitrogen = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					..()
+
+			air
+				icon = 'red_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (Air)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T20C
+
+					air_temporary.oxygen = (160*ONE_ATMOSPHERE*O2STANDARD)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+					air_temporary.nitrogen = (160*ONE_ATMOSPHERE*N2STANDARD)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					..()
+
+			n2o
+				icon = 'n2o_pipe_tank.dmi'
+				name = "High Capacity Pressure Tank (N2O)"
+
+				New()
+					air_temporary = new
+					air_temporary.volume = volume
+					air_temporary.temperature = T0C
+
+					var/datum/gas/sleeping_agent/trace_gas = new
+					trace_gas.moles = (160*ONE_ATMOSPHERE)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature)
+
+					air_temporary.trace_gases += trace_gas
+
+					..()
+
+
+
 		Del()
 			if(node1)
 				node1.disconnect(src)
@@ -605,6 +722,7 @@ obj/machinery/atmospherics/pipe
 		var/obj/machinery/atmospherics/node3
 
 		level = 1
+		layer = 2.4 //under wires with their 2.44
 
 		New()
 			switch(dir)
@@ -1014,9 +1132,21 @@ obj/machinery/atmospherics/pipe
 		volume = 35
 
 		dir = SOUTH
-		initialize_directions = SOUTH
+		initialize_directions = NORTH
 
 		var/obj/machinery/atmospherics/node
+
+		New()
+			..()
+			switch(dir)
+				if(SOUTH)
+				 initialize_directions = NORTH
+				if(NORTH)
+				 initialize_directions = SOUTH
+				if(WEST)
+				 initialize_directions = EAST
+				if(EAST)
+				 initialize_directions = WEST
 
 		hide(var/i)
 			if(level == 1 && istype(loc, /turf/simulated))

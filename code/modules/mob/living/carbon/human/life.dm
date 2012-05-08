@@ -25,6 +25,8 @@
 	if(!loc)			// Fixing a null error that occurs when the mob isn't found in the world -- TLE
 		return
 
+	..()
+
 	//Being buckled to a chair or bed
 	check_if_buckled()
 
@@ -125,8 +127,6 @@
 		if(!currentTurf.sd_lumcount)
 			playsound_local(src,pick(scarySounds),50, 1, -1)
 
-	..() //for organs
-
 	src.moved_recently = max(0, moved_recently-1)
 
 /mob/living/carbon/human
@@ -186,14 +186,23 @@
 				//	a.hallucinate(src)
 				if(!handling_hal && hallucination > 20)
 					spawn handle_hallucinations() //The not boring kind!
-				hallucination = max(hallucination - 2, 0)
+				hallucination = max(hallucination - 2, 0) // A more compact way of doing it. DMTG
 				//if(health < 0)
 				//	for(var/obj/a in hallucinations)
 				//		del a
 			else
-				halloss = 0
+				//halloss = 0
 				for(var/atom/a in hallucinations)
 					del a
+
+				if(halloss > 100)
+					src << "You're too tired to keep going..."
+					for(var/mob/O in viewers(src, null))
+						if(O == src)
+							continue
+						O.show_message(text("\red <B>[src] slumps to the ground panting, too weak to continue fighting."), 1)
+					Paralyse(15)
+					setHalLoss(99)
 
 			if(mutations2 & mSmallsize)
 				if(!(pass_flags & PASSTABLE))
@@ -448,8 +457,10 @@
 			return null
 
 		update_canmove()
-			if(paralysis || resting || stunned || weakened || buckled || (changeling && changeling.changeling_fakedeath)) canmove = 0
-			else canmove = 1
+			if(paralysis || stunned || weakened || resting || buckled || (changeling && changeling.changeling_fakedeath))
+				canmove = 0
+			else
+				canmove = 1
 
 		handle_breath(datum/gas_mixture/breath)
 			if(nodamage || (mutations & mNobreath))
@@ -534,7 +545,7 @@
 					if(SA_pp > SA_para_min) // Enough to make us paralysed for a bit
 						Paralyse(3) // 3 gives them one second to wake up and run away a bit!
 						if(SA_pp > SA_sleep_min) // Enough to make us sleep as well
-							sleeping = max(sleeping, 4)
+							sleeping = max(src.sleeping+2, 10)
 					else if(SA_pp > 0.01)	// There is sleeping gas in their lungs, but only a little, so give them a bit of a warning
 						if(prob(20) && isbreathing)
 							spawn(0) emote(pick("giggle", "laugh"))
@@ -808,7 +819,7 @@
 				drowsyness--
 				eye_blurry = max(2, eye_blurry)
 				if (prob(5))
-					sleeping = 1
+					sleeping += 1
 					Paralyse(5)
 
 			confused = max(0, confused - 1)
@@ -927,7 +938,7 @@
 			if(getOxyLoss() > 50) Paralyse(3)
 
 			if(sleeping)
-//				adjustHalLoss(-5)
+				adjustHalLoss(-5)
 				if(paralysis <= 0)
 					Paralyse(2)
 				if (prob(10) && health && !hal_crit) spawn(0) emote("snore")
@@ -1231,35 +1242,35 @@
 
 			if(pullin)	pullin.icon_state = "pull[pulling ? 1 : 0]"
 
-			if(resting || lying || sleeping)	rest.icon_state = "rest[(resting || lying || sleeping) ? 1 : 0]"
+			if(rest)	rest.icon_state = "rest[(resting || lying || sleeping) ? 1 : 0]"
 
 
 			if (toxin || hal_screwyhud == 4)	toxin.icon_state = "tox[toxins_alert ? 1 : 0]"
-			if (oxygen || hal_screwyhud == 3) oxygen.icon_state = "oxy[oxygen_alert ? 1 : 0]"
-			if (fire) fire.icon_state = "fire[fire_alert ? 1 : 0]"
+			if (oxygen || hal_screwyhud == 3)	oxygen.icon_state = "oxy[oxygen_alert ? 1 : 0]"
+			if (fire) fire.icon_state = "fire[fire_alert ? 1 : 0]"													//NOTE: INVESTIGATE NUKE BURNINGS
 			//NOTE: the alerts dont reset when youre out of danger. dont blame me,
 			//blame the person who coded them. Temporary fix added.
 
-			switch(bodytemperature) //310.055 optimal body temp
-
-				if(370 to INFINITY)
-					bodytemp.icon_state = "temp4"
-				if(350 to 370)
-					bodytemp.icon_state = "temp3"
-				if(335 to 350)
-					bodytemp.icon_state = "temp2"
-				if(320 to 335)
-					bodytemp.icon_state = "temp1"
-				if(300 to 320)
-					bodytemp.icon_state = "temp0"
-				if(295 to 300)
-					bodytemp.icon_state = "temp-1"
-				if(280 to 295)
-					bodytemp.icon_state = "temp-2"
-				if(260 to 280)
-					bodytemp.icon_state = "temp-3"
-				else
-					bodytemp.icon_state = "temp-4"
+			if(bodytemp)
+				switch(bodytemperature) //310.055 optimal body temp
+					if(370 to INFINITY)
+						bodytemp.icon_state = "temp4"
+					if(350 to 370)
+						bodytemp.icon_state = "temp3"
+					if(335 to 350)
+						bodytemp.icon_state = "temp2"
+					if(320 to 335)
+						bodytemp.icon_state = "temp1"
+					if(300 to 320)
+						bodytemp.icon_state = "temp0"
+					if(295 to 300)
+						bodytemp.icon_state = "temp-1"
+					if(280 to 295)
+						bodytemp.icon_state = "temp-2"
+					if(260 to 280)
+						bodytemp.icon_state = "temp-3"
+					else
+						bodytemp.icon_state = "temp-4"
 
 			if(!client)	return 0 //Wish we did not need these
 			client.screen -= hud_used.blurry
@@ -1360,21 +1371,6 @@
 
 
 			return
-
-
-		check_if_buckled()
-			if(buckle_check != (buckled ? 1 : 0))
-				buckle_check = (buckled ? 1 : 0)
-				if (buckled)
-					lying = istype(buckled, /obj/structure/stool/bed) || istype(buckled, /obj/machinery/conveyor)
-					if(lying)
-						drop_item()
-					density = 1
-				else
-					density = !lying
-			if(buckle_check)
-				if(istype(buckled, /obj/structure/stool/bed) || istype(buckled, /obj/machinery/conveyor))
-					drop_item()
 
 		handle_stomach()
 			spawn(0)

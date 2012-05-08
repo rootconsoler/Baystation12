@@ -10,22 +10,36 @@
 		updateicon()
 //		syndicate = syndie
 		if(real_name == "Cyborg")
-			real_name += " [pick(rand(1, 999))]"
+			ident = rand(1, 999)
+			real_name += "-[ident]"
 			name = real_name
+
 	spawn (4)
-		if (client)
-			connected_ai = activeais()
-		if (connected_ai)
-			connected_ai.connected_robots += src
-//			laws = connected_ai.laws //The borg inherits its AI's laws
-			laws = new /datum/ai_laws
-			lawsync()
-			src << "<b>Unit slaved to [connected_ai.name], downloading laws.</b>"
-			lawupdate = 1
+		if(!syndie)
+			if (client)
+				connected_ai = activeais()
+			if (connected_ai)
+				connected_ai.connected_robots += src
+	//			laws = connected_ai.laws //The borg inherits its AI's laws
+				laws = new /datum/ai_laws
+				lawsync()
+				src << "<b>Unit slaved to [connected_ai.name], downloading laws.</b>"
+				lawupdate = 1
+			else
+				laws = new /datum/ai_laws/nanotrasen/New
+				lawupdate = 0
+				src << "<b>Unable to locate an AI, reverting to standard NanoTrasen laws.</b>"
 		else
-			laws = new /datum/ai_laws/nanotrasen
+			laws = new /datum/ai_laws/antimov
 			lawupdate = 0
-			src << "<b>Unable to locate an AI, reverting to standard NanoTrasen laws.</b>"
+			scrambledcodes = 1
+			src << "Follow your laws."
+			cell.maxcharge = 25000
+			cell.charge = 25000
+			module = new /obj/item/weapon/robot_module/syndicate(src)
+			hands.icon_state = "standard"
+			icon_state = "secborg"
+			modtype = "Synd"
 
 		radio = new /obj/item/device/radio(src)
 		camera = new /obj/machinery/camera(src)
@@ -44,6 +58,12 @@
 /mob/living/silicon/robot/Del()
 	if(mmi)//Safety for when a cyborg gets dust()ed. Or there is no MMI inside.
 		mmi.loc = get_turf(loc)//To hopefully prevent run time errors.
+
+		if(!key)
+			for(var/mob/dead/observer/ghost in world)
+				if(ghost.corpse == src && ghost.client)
+					ghost.client.mob = ghost.corpse
+
 		if(key)//If there is a client attached to host.
 			if(client)
 				client.screen.len = null
@@ -56,6 +76,7 @@
 				mmi.brainmob.key = key
 			else//If the brain does have a mind. Also shouldn't happen but who knows.
 				mmi.brainmob.key = key
+
 		mmi = null
 	..()
 
@@ -67,13 +88,16 @@
 		return
 	switch(mod)
 		if("Standard")
+			updatename()
 			module = new /obj/item/weapon/robot_module/standard(src)
 			hands.icon_state = "standard"
 			icon_state = "robot"
 			modtype = "Stand"
+			//feedback_inc("cyborg_standard",1)
 			channels = list()
 
 		if("Service")
+			updatename(mod)
 			module = new /obj/item/weapon/robot_module/butler(src)
 			hands.icon_state = "service"
 			var/icontype = input("Select an icon!", "Robot", null, null) in list("Waitress", "Bro", "Butler", "Kent", "Rich")
@@ -88,17 +112,21 @@
 			else
 				icon_state = "Service2"
 			modtype = "Butler"
+			//feedback_inc("cyborg_service",1)
 			channels = list()
 
 		if("Miner")
+			updatename(mod)
 			module = new /obj/item/weapon/robot_module/miner(src)
 			hands.icon_state = "miner"
 			icon_state = "Miner"
 			modtype = "Miner"
+			//feedback_inc("cyborg_miner",1)
 			channels = list("Mining" = 1)
 
 		if("Medical")
 			var/sprite = input(src,"Chassis Style", "Chassis Style", "Cancel") in list("Humanoid","Non-Humanoid")
+			updatename(mod)
 			module = new /obj/item/weapon/robot_module/medical(src)
 			hands.icon_state = "medical"
 			if (sprite == "Humanoid")
@@ -107,10 +135,12 @@
 				src.icon_state = "surgeon"
 			modtype = "Med"
 			nopush = 1
+			//feedback_inc("cyborg_medical",1)
 			channels = list("Medical" = 1)
 
 		if("Security")
 			var/sprite = input(src,"Chassis Style", "Chassis Style", "Cancel") in list("Humanoid","Non-Humanoid")
+			updatename(mod)
 			module = new /obj/item/weapon/robot_module/security(src)
 			hands.icon_state = "security"
 			if (sprite == "Humanoid")
@@ -118,9 +148,13 @@
 			if (sprite == "Non-Humanoid")
 				src.icon_state = "bloodhound"
 			modtype = "Sec"
+			//speed = -1 Secborgs have nerfed tasers now, so the speed boost is not necessary
+			nopush = 1
 			channels = list("Security" = 1)
+			//feedback_inc("cyborg_security",1)
 
 		if("Engineering")
+			updatename(mod)
 			var/sprite = input(src,"Chassis Style", "Chassis Style", "Cancel") in list("Humanoid","Non-Humanoid")
 			module = new /obj/item/weapon/robot_module/engineering(src)
 			hands.icon_state = "engineer"
@@ -129,9 +163,11 @@
 			if (sprite == "Non-Humanoid")
 				src.icon_state = "landmate"
 			modtype = "Eng"
+			//feedback_inc("cyborg_engineering",1)
 			channels = list("Engineering" = 1)
 
 		if("Janitor")
+			updatename(mod)
 			var/sprite = input(src,"Chassis Style", "Chassis Style", "Cancel") in list("Humanoid","Non-Humanoid")
 			module = new /obj/item/weapon/robot_module/janitor(src)
 			hands.icon_state = "janitor"
@@ -140,11 +176,21 @@
 			if (sprite == "Non-Humanoid")
 				src.icon_state = "mopgearrex"
 			modtype = "Jan"
+			//feedback_inc("cyborg_janitor",1)
 			channels = list()
 
 	overlays -= "eyes" //Takes off the eyes that it started with
 	radio.config(channels)
 	updateicon()
+
+/mob/living/silicon/robot/proc/updatename(var/prefix as text)
+	if( length(real_name) < 7 || !prefix )	return
+	//not really necessary but just to avoid annoying people with
+	//unique names seeming as nobody could give me a straight answer as
+	//to whether to remove custom borg names completely.
+	if(copytext(real_name, 1, 7) == "Cyborg")
+		real_name = "[prefix] [real_name]"
+		name = real_name
 
 /mob/living/silicon/robot/verb/cmd_robot_alerts()
 	set category = "Robot Commands"
@@ -173,6 +219,20 @@
 
 	viewalerts = 1
 	src << browse(dat, "window=robotalerts&can_close=0")
+
+/mob/living/silicon/robot/proc/ai_roster()
+	set category = "Robot Commands"
+	set name = "Show Crew Manifest"
+
+	var/dat = "<html><head><title>Crew Roster</title></head><body><b>Crew Roster:</b><br><br>"
+
+	for (var/datum/data/record/t in data_core.general)
+		dat += "[t.fields["name"]] - [t.fields["rank"]]<br>"
+
+	dat += "</body></html>"
+
+	src << browse(dat, "window=airoster")
+	onclose(src, "airoster")
 
 /mob/living/silicon/robot/blob_act()
 	if (stat != 2)
@@ -352,6 +412,9 @@
 
 
 /mob/living/silicon/robot/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if (istype(W, /obj/item/weapon/handcuffs)) // fuck i don't even know why isrobot() in handcuff code isn't working so this will have to do
+		return
+
 	if (istype(W, /obj/item/weapon/weldingtool) && W:welding)
 		if(getBruteLoss() == 0)
 			user << "There are no dents to fix here!"
@@ -488,9 +551,62 @@
 					if(prob(25))
 						src << "Hack attempt detected."
 			return
+
+	else if(istype(W, /obj/item/borg/upgrade/))
+		var/obj/item/borg/upgrade/U = W
+		if(!opened)
+			usr << "You must access the borgs internals!"
+		else if(!src.module && U.require_module)
+			usr << "The borg must choose a module before he can be upgraded!"
+		else if(U.locked)
+			usr << "The upgrade is locked and cannot be used yet!"
+		else
+			if(U.action(src))
+				usr << "You apply the upgrade to [src]!"
+				usr.drop_item()
+				U.loc = src
+			else
+				usr << "Upgrade error!"
+
+
 	else
 		spark_system.start()
 		return ..()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /mob/living/silicon/robot/attack_alien(mob/living/carbon/alien/humanoid/M as mob)
 	if (!ticker)
@@ -866,6 +982,26 @@
 		else
 			src << "Module isn't activated"
 		installed_modules()
+
+	if (href_list["lawc"]) // Toggling whether or not a law gets stated by the State Laws verb --NeoFite
+		var/L = text2num(href_list["lawc"])
+		switch(lawcheck[L+1])
+			if ("Yes") lawcheck[L+1] = "No"
+			if ("No") lawcheck[L+1] = "Yes"
+//		src << text ("Switching Law [L]'s report status to []", lawcheck[L+1])
+		checklaws()
+
+	if (href_list["lawi"]) // Toggling whether or not a law gets stated by the State Laws verb --NeoFite
+		var/L = text2num(href_list["lawi"])
+		switch(ioncheck[L])
+			if ("Yes") ioncheck[L] = "No"
+			if ("No") ioncheck[L] = "Yes"
+//		src << text ("Switching Law [L]'s report status to []", lawcheck[L+1])
+		checklaws()
+
+	if (href_list["laws"]) // With how my law selection code works, I changed statelaws from a verb to a proc, and call it through my law selection panel. --NeoFite
+		statelaws()
+
 	return
 
 /mob/living/silicon/robot/proc/uneq_active()
@@ -1031,7 +1167,26 @@ Frequency:
 		. = ..()
 	if ((s_active && !( s_active in contents ) ))
 		s_active.close(src)
-	return
+
+	if(module)
+		if(module.type == /obj/item/weapon/robot_module/janitor)	//you'd think checking the module would work
+			var/turf/tile = get_turf(loc)
+
+			tile.clean_blood()
+			for(var/obj/effect/R in tile)
+				if(istype(R, /obj/effect/rune) || istype(R, /obj/effect/decal/cleanable) || istype(R, /obj/effect/overlay))
+					del(R)
+
+			for(var/obj/item/cleaned_item in tile)
+				cleaned_item.clean_blood()
+
+			for(var/mob/living/carbon/human/cleaned_human in tile)	//HUE HUE I CLEAN U
+				if(cleaned_human.lying)
+					cleaned_human.clean_blood()
+					cleaned_human << "\red [src] cleans your face!"
+					for(var/obj/item/carried_item in cleaned_human.contents)
+						carried_item.clean_blood()
+		return
 
 /mob/living/silicon/robot/proc/reset_module()
 	modtype = "robot"
@@ -1044,5 +1199,35 @@ Frequency:
 	del(module)
 
 /mob/living/silicon/robot/proc/self_destruct()
-	gib(1)
+	gib()
+	return
 
+/mob/living/silicon/robot/proc/UnlinkSelf()
+	if (src.connected_ai)
+		src.connected_ai = null
+	lawupdate = 0
+	lockcharge = 0
+	canmove = 1
+	scrambledcodes = 1
+
+
+
+/mob/living/silicon/robot/proc/ResetSecurityCodes()
+	set category = "Robot Commands"
+	set name = "Reset Identity Codes"
+	set desc = "Scrambles your security and identification codes and resets your current buffers.  Unlocks you and but permenantly severs you from your AI and the robotics console."
+
+	var/mob/living/silicon/robot/R = usr
+
+	if(R)
+		R.UnlinkSelf()
+		R << "Buffers flushed and reset.  All systems operational."
+		src.verbs -= /mob/living/silicon/robot/proc/ResetSecurityCodes
+
+
+/mob/living/silicon/robot/proc/flashproof()
+	if(module)
+		for(var/obj/item/borg/upgrade/flashproof/F in module.modules)
+			return 1
+
+	return 0

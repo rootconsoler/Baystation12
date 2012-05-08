@@ -1334,7 +1334,7 @@ datum
 			build_type = PROTOLATHE
 			materials = list("$metal" = 5000, "$glass" = 1000)
 			build_path = "/obj/item/weapon/gun/syringe/rapidsyringe"
-
+/*
 		largecrossbow
 			name = "Energy Crossbow"
 			desc = "A weapon favoured by syndicate infiltration teams."
@@ -1343,7 +1343,7 @@ datum
 			build_type = PROTOLATHE
 			materials = list("$metal" = 5000, "$glass" = 1000, "$uranium" = 1000, "$silver" = 1000)
 			build_path = "/obj/item/weapon/gun/energy/crossbow/largecrossbow"
-
+*/
 		temp_gun
 			name = "Temperature Gun"
 			desc = "A gun that shoots temperature bullet energythings to change temperature."//Change it if you want
@@ -1353,6 +1353,15 @@ datum
 			materials = list("$metal" = 5000, "$glass" = 500, "$silver" = 3000)
 			build_path = "/obj/item/weapon/gun/energy/temperature"
 			locked = 1
+
+		flora_gun
+			name = "Floral Somatoray"
+			desc = "A tool that discharges controlled radiation which induces mutation in plant cells. Harmless to other organic life."
+			id = "flora_gun"
+			req_tech = list("materials" = 2, "biotech" = 3, "powerstorage" = 3)
+			build_type = PROTOLATHE
+			materials = list("$metal" = 2000, "$glass" = 500, "$uranium" = 500)
+			build_path = "/obj/item/weapon/gun/energy/floragun"
 
 		large_grenade
 			name = "Large Grenade"

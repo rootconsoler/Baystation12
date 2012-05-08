@@ -34,14 +34,14 @@ datum
 
 				holder.clear_reagents()
 				return
-
+/*
 		silicate
 			name = "Silicate"
 			id = "silicate"
 			result = "silicate"
 			required_reagents = list("aluminum" = 1, "silicon" = 1, "oxygen" = 1)
 			result_amount = 3
-
+*/
 		stoxin
 			name = "Sleep Toxin"
 			id = "stoxin"
@@ -430,6 +430,7 @@ datum
 			result = "LSD"
 			required_reagents = list("silicon" = 1, "hydrogen" = 1, "anti_toxin" = 1)
 			result_amount = 5
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 // foam and foam precursor
@@ -471,7 +472,6 @@ datum
 				holder.clear_reagents()
 				return
 
-
 		metalfoam
 			name = "Metal Foam"
 			id = "metalfoam"
@@ -488,7 +488,7 @@ datum
 					M << "\red The solution spews out a metalic foam!"
 
 				var/datum/effect/effect/system/foam_spread/s = new()
-				s.set_up(created_volume/2, location, holder, 1)
+				s.set_up(created_volume, location, holder, 1)
 				s.start()
 				return
 
@@ -508,7 +508,7 @@ datum
 					M << "\red The solution spews out a metalic foam!"
 
 				var/datum/effect/effect/system/foam_spread/s = new()
-				s.set_up(created_volume/2, location, holder, 2)
+				s.set_up(created_volume, location, holder, 2)
 				s.start()
 				return
 
@@ -759,13 +759,14 @@ datum
 					if(M:eyecheck() <= 0)
 						flick("e_flash", M.flash)
 
-				for(var/i = 1, i <= created_volume, i++)
+				for(var/i = 1, i <= created_volume + rand(1,2), i++)
 					var/chosen = pick(borks)
 					var/obj/B = new chosen
-					B.loc = get_turf_loc(holder.my_atom)
-					if(prob(50))
-						for(var/j = 1, j <= rand(1, 3), j++)
-							step(B, pick(NORTH,SOUTH,EAST,WEST))
+					if(B)
+						B.loc = get_turf_loc(holder.my_atom)
+						if(prob(50))
+							for(var/j = 1, j <= rand(1, 3), j++)
+								step(B, pick(NORTH,SOUTH,EAST,WEST))
 
 
 
