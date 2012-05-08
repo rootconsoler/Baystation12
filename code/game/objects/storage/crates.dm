@@ -304,8 +304,8 @@
 				else
 					return
 				if(hl <= 0)
-					var/A = new /obj/item/stack/sheet/metal(src.loc)
-					A:amount = 5 //FUCK YEAH, NEW COD
+					var/B = new /obj/item/stack/sheet/metal(src.loc)
+					B:amount = 5 //FUCK YEAH, NEW COD
 					slice()
 					user << "You slice crate"
 				sleep(10)
