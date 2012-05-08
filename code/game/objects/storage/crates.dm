@@ -10,6 +10,7 @@
 	opened = 0
 	flags = FPRINT
 	var/hl = 0
+	var/slicing = 0
 //	mouse_drag_pointer = MOUSE_ACTIVE_POINTER	//???
 
 /obj/structure/closet/crate/internals
@@ -286,7 +287,6 @@
 		var/slice_time = hl
 		var/turf/T = get_turf(user)
 		var/holding = user.equipped()
-		var/slicing = 0
 		if(!slicing)
 			slicing = 1
 			user << "You began slice a crate"
@@ -296,8 +296,7 @@
 			for(var/i=0, i<slice_time)
 				if(user.loc == T && user.equipped() == holding && !(user.stat))
 					if(A.get_fuel() > 0)
-						hl--
-						A.reagents.remove_reagent("fuel",1)
+						hl -= rand(0.1,3)
 					else
 						user << "Need more fuel"
 						slicing = 0
@@ -305,7 +304,8 @@
 				else
 					return
 				if(hl <= 0)
-					new /obj/item/stack/sheet/metal(src.loc)
+					var/A = new /obj/item/stack/sheet/metal(src.loc)
+					A:amount = 5 //FUCK YEAH, NEW COD
 					slice()
 					user << "You slice crate"
 				sleep(10)
