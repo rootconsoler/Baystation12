@@ -1,6 +1,7 @@
 //SUPPLY PACKS
 //NOTE: only secure crate types use the access var (and are lockable)
 //NOTE: hidden packs only show up when the computer has been hacked.
+//ANOTER NOTE: Contraband is obtainable through modified supplycomp circuitboards.
 //BIG NOTE: Don't add living things to crates, that's bad, it will break the shuttle.
 /datum/supply_packs/specialops
 	name = "Special Ops supplies"
@@ -313,18 +314,11 @@
 	containertype = "/obj/structure/closet/crate"
 	containername = "Janitorial supplies"
 
-/obj/item/weapon/storage/lightbox/tubes
-
 /datum/supply_packs/lightbulbs
 	name = "Replacement lights"
-	contains = list("/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/tubes",
-					"/obj/item/weapon/storage/lightbox/bulbs",
-					"/obj/item/weapon/storage/lightbox/bulbs")
+	contains = list("/obj/item/weapon/storage/lightbox/mixed",
+					"/obj/item/weapon/storage/lightbox/mixed",
+					"/obj/item/weapon/storage/lightbox/mixed")
 	cost = 5
 	containertype = "/obj/structure/closet/crate"
 	containername = "Replacement lights"
@@ -373,6 +367,7 @@
 					"/obj/item/weapon/plantbgone",
 					"/obj/item/weapon/plantbgone",
 					"/obj/item/weapon/plantbgone",
+					"/obj/item/weapon/hatchet",
 					"/obj/item/weapon/minihoe",
 					"/obj/item/device/analyzer/plant_analyzer",
 					"/obj/item/clothing/gloves/botanic_leather",
@@ -395,7 +390,8 @@
 					"/obj/item/seeds/carrotseed",
 					"/obj/item/seeds/sunflowerseed",
 					"/obj/item/seeds/chantermycelium",
-					"/obj/item/seeds/potatoseed")
+					"/obj/item/seeds/potatoseed",
+					"/obj/item/seeds/sugarcaneseed")
 	cost = 10
 	containertype = /obj/structure/closet/crate/hydroponics
 	containername = "Seeds crate"
@@ -717,8 +713,8 @@
 	name = "Ballistic gear crate"
 	contains = list("/obj/item/clothing/suit/armor/bulletproof",
 					"/obj/item/clothing/suit/armor/bulletproof",
-					"/obj/item/weapon/gun/projectile/shotgun/combat2",
-					"/obj/item/weapon/gun/projectile/shotgun/combat2")
+					"/obj/item/weapon/gun/projectile/shotgun/pump/combat",
+					"/obj/item/weapon/gun/projectile/shotgun/pump/combat")
 	cost = 50
 	containertype = "/obj/structure/closet/crate/secure"
 	containername = "Ballistic gear crate"
@@ -799,5 +795,20 @@
 	..()
 
 
+/datum/supply_packs/contraband
+	contains = list("/obj/item/weapon/contraband/poster",) //We randomly pick 5 items from this list through the constructor, look below
+	name = "Contraband Crate"
+	cost = 30
+	containertype = "/obj/structure/closet/crate/contraband"
+	containername = "Contraband crate"
+	group = "ERROR"
+	contraband = 1
+
+/datum/supply_packs/contraband/New()
+	var/list/tempContains = list()
+	for(var/i = 0,i<5,i++)
+		tempContains += pick(contains)
+	src.contains = tempContains
+	..()
 
 //SUPPLY PACKS

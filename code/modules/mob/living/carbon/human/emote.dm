@@ -164,7 +164,9 @@
 
 		if ("faint")
 			message = "<B>[src]</B> faints."
-			src.sleeping = 1
+			if(src.sleeping)
+				return //Can't faint while asleep
+			src.sleeping += 10 //Short-short nap
 			m_type = 1
 
 		if ("cough")
@@ -509,7 +511,27 @@
 		else
 			src << "\blue Unusable emote '[act]'. Say *help for a list."
 
+
+
+
+
 	if (message)
+		log_emote("[name]/[key] : [message]")
+
+ //Hearing gasp and such every five seconds is not good emotes were not global for a reason.
+ // Maybe some people are okay with that.
+
+		for(var/mob/M in world)
+			if (!M.client)
+				continue //skip monkeys and leavers
+			if (istype(M, /mob/new_player))
+				continue
+			if(findtext(message," snores.")) //Because we have so many sleeping people.
+				continue
+			if(M.stat == 2 && M.client.ghost_sight && !(M in viewers(src,null)))
+				M.show_message(message)
+
+
 		if (m_type & 1)
 			for (var/mob/O in viewers(src, null))
 				O.show_message(message, m_type)

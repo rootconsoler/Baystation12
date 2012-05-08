@@ -19,6 +19,7 @@
 		caliber = ""
 		silenced = 0
 		recoil = 0
+		ejectshell = 1
 		tmp/list/mob/living/target //List of who yer targeting.
 		tmp/lock_time = -100
 		tmp/mouthshoot = 0 ///To stop people from suiciding twice... >.>
@@ -107,6 +108,11 @@
 			update_icon()
 			return
 		else if(user.a_intent != "hurt" && load_into_chamber() && istype(in_chamber,/obj/item/projectile/energy/electrode)) //Point blank tasering.
+			if (M.canstun == 0 || M.canweaken == 0)
+				user.visible_message("\red <B>[M] has been stunned with the taser gun by [user] to no effect!</B>")
+				del(in_chamber)
+				update_icon()
+				return
 			if (prob(50))
 				if (M.paralysis < 60 && (!(M.mutations & 8)) )
 					M.paralysis = 60
@@ -189,6 +195,7 @@
 
 		in_chamber.original = targloc
 		in_chamber.loc = get_turf(user)
+		in_chamber.starting = get_turf(user)
 		user.next_move = world.time + 4
 		in_chamber.silenced = silenced
 		in_chamber.current = curloc

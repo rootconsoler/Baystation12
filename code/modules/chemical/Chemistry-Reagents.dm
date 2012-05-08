@@ -436,7 +436,7 @@ datum
 					if(15 to 25)
 						M:drowsyness  = max(M:drowsyness, 20)
 					if(25 to INFINITY)
-						M.sleeping = 1
+						M.sleeping += 1
 						M.adjustOxyLoss(-M.getOxyLoss())
 						M.SetWeakened(0)
 						M.SetStunned(0)
@@ -500,7 +500,7 @@ datum
 					holder.remove_reagent(src.id, 0.1)
 				return
 
-		silicate
+/*		silicate
 			name = "Silicate"
 			id = "silicate"
 			description = "A compound that can be used to reinforce glass."
@@ -534,7 +534,7 @@ datum
 							O.icon = I
 							O:silicateIcon = I
 
-				return
+				return*/
 
 		oxygen
 			name = "Oxygen"
@@ -861,11 +861,11 @@ datum
 				..()
 				return
 
-
 			reaction_turf(var/turf/T, var/volume)
 				src = null
 				if(!istype(T, /turf/space))
 					new /obj/effect/decal/cleanable/greenglow(T)
+					return
 
 
 		ryetalyn
@@ -881,6 +881,7 @@ datum
 				data++
 				M.mutations = 0
 				M.disabilities = 0
+				M.jitteriness = 0
 				if(volume > REAGENTS_OVERDOSE)
 					M:adjustToxLoss(1)
 //				switch(data)
@@ -1044,6 +1045,8 @@ datum
 			reagent_state = LIQUID
 			color = "#660000" // rgb: 102, 0, 0
 
+//Commenting this out as it's horribly broken. It's a neat effect though, so it might be worth making a new reagent (that is less common) with similar effects.	-Pete
+// Sort of fixed by creating plasma instead.
 			reaction_obj(var/obj/O, var/volume)
 				src = null
 				var/turf/the_turf = get_turf(O)
@@ -1065,6 +1068,7 @@ datum
 				M:adjustToxLoss(1)
 				..()
 				return
+
 
 		space_cleaner
 			name = "Space cleaner"
@@ -1706,6 +1710,7 @@ datum
 //					M:adjustToxLoss(0.1)
 				..()
 				return
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2442,7 +2447,7 @@ datum
 				M:drowsyness = max(0,M:drowsyness-3)
 				M:slurring = max(0, M:slurring-3)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping - 2)
 				if (M.bodytemperature < 310)//310 is the normal bodytemp. 310.055
 					M.bodytemperature = min(310, M.bodytemperature+5)
 				M.make_jittery(1)
@@ -2484,7 +2489,7 @@ datum
 				M:drowsyness = max(0,M:drowsyness-3)
 				M:slurring = max(0, M:slurring-3)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping-2)
 				if (M.bodytemperature > 310)//310 is the normal bodytemp. 310.055
 					M.bodytemperature = min(310, M.bodytemperature-5)
 				M.make_jittery(1)
@@ -2503,7 +2508,7 @@ datum
 				M.dizziness = max(0,M.dizziness-2)
 				M:drowsyness = max(0,M:drowsyness-1)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M.sleeping = max(0,M.sleeping-2)
 				if(M:getToxLoss() && prob(20))
 					M:adjustToxLoss(-1)
 				if (M.bodytemperature > 310)//310 is the normal bodytemp. 310.055
@@ -2538,7 +2543,7 @@ datum
 				M.dizziness +=5
 				M:drowsyness = 0
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping-2)
 				if (M.bodytemperature > 310)//310 is the normal bodytemp. 310.055
 					M.bodytemperature = max(310, M.bodytemperature-5)
 				M:nutrition += 1
@@ -2555,7 +2560,7 @@ datum
 			on_mob_life(var/mob/living/M as mob)
 				M:drowsyness = max(0,M:drowsyness-7)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping-1)
 				if (M.bodytemperature > 310)
 					M.bodytemperature = max(310, M.bodytemperature-5)
 				M.make_jittery(1)
@@ -2775,7 +2780,7 @@ datum
 				on_mob_life(var/mob/living/M as mob)
 					M:drowsyness = max(0,M:drowsyness-7)
 					if(!M:sleeping_willingly)
-						M:sleeping = 0
+						M:sleeping = max(0,M.sleeping-2)
 					if (M.bodytemperature > 310)
 						M.bodytemperature = max(310, M.bodytemperature-5)
 					M.make_jittery(1)
@@ -3091,7 +3096,7 @@ datum
 				M.dizziness = max(0,M.dizziness-5)
 				M:drowsyness = max(0,M:drowsyness-3)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping-2)
 				if (M.bodytemperature > 310)
 					M.bodytemperature = max(310, M.bodytemperature-5)
 				..()
@@ -3108,7 +3113,7 @@ datum
 				M.dizziness = max(0,M.dizziness-5)
 				M:drowsyness = max(0,M:drowsyness-3)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping-2)
 				M.make_jittery(1)
 				..()
 				return
@@ -3124,7 +3129,7 @@ datum
 				M.dizziness = max(0,M.dizziness-5)
 				M:drowsyness = max(0,M:drowsyness-3)
 				if(!M:sleeping_willingly)
-					M:sleeping = 0
+					M:sleeping = max(0,M.sleeping - 2)
 				if (M.bodytemperature > 310)
 					M.bodytemperature = max(310, M.bodytemperature-5)
 				..()

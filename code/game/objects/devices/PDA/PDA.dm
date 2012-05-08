@@ -125,6 +125,16 @@
 	icon_state = "pda-lawyer"
 	ttone = "objection"
 
+/obj/item/device/pda/botanist
+	//default_cartridge = /obj/item/weapon/cartridge/botanist
+	icon_state = "pda-hydro"
+
+/obj/item/device/pda/librarian
+	icon_state = "pda-libb"
+	desc = "A portable microcomputer by Thinktronic Systems, LTD. This is model is a WGW-11 series e-reader."
+	note = "Congratulations, your station has chosen the Thinktronic 5290 WGW-11 Series E-reader and Personal Data Assistant!"
+	silent = 1 //Quiet in the library!
+
 /*
  *	The Actual PDA
  */
@@ -510,14 +520,14 @@
 						last_text = world.time
 
 
-//						var/AnsweringMS = 0
+						var/AnsweringMS = 0
 						for (var/obj/machinery/message_server/MS in world)
 							MS.send_pda_message("[P.owner]","[owner]","[t]")
-//							if(MS.active)
-//								AnsweringMS++
+							if(MS.active)
+								AnsweringMS++
 
-//						if(!AnsweringMS)
-//							return
+						if(!AnsweringMS)
+							return
 
 						tnote += "<i><b>&rarr; To [P.owner]:</b></i><br>[t]<br>"
 						P.tnote += "<i><b>&larr; From <a href='byond://?src=\ref[P];choice=Message;target=\ref[src]'>[owner]</a>:</b></i><br>[t]<br>"
@@ -544,7 +554,7 @@
 					// pAI Message
 					else
 
-/*						var/AnsweringMS = 0
+						var/AnsweringMS = 0
 						for (var/obj/machinery/message_server/MS in world)
 							MS.send_pda_message("[P]","[src]","[t]")
 							if(MS.active)
@@ -552,7 +562,7 @@
 
 						if(!AnsweringMS)
 							return
-*/
+
 
 						tnote += "<i><b>&rarr; To [P]:</b></i><br>[t]<br>"
 						P.tnote += "<i><b>&larr; From <a href='byond://?src=\ref[P];soft=pdamessage;target=\ref[src]'>[src]</a>:</b></i><br>[t]<br>"
@@ -567,7 +577,7 @@
 
 						playsound(P.loc, 'twobeep.ogg', 50, 1)
 
-//					log_pda("[usr] (PDA: [src.name]) sent \"[t]\" to [P.name]")
+					log_pda("[usr] (PDA: [src.name]) sent \"[t]\" to [P.name]")
 
 
 				if("Send Honk")//Honk virus

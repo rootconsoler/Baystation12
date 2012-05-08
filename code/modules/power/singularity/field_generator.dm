@@ -76,7 +76,8 @@ field_generator power level display
 				power = field_generator_max_power
 				anchored = 1
 				warming_up = 3
-				turn_on()
+				start_fields()
+				update_icon()
 			Varedit_start = 0
 
 		if(src.active == 2)
@@ -190,7 +191,6 @@ field_generator power level display
 			spawn(1)
 				src.cleanup()
 			update_icon()
-
 
 		turn_on()
 			active = 1
@@ -351,3 +351,15 @@ field_generator power level display
 				connected_gens.Remove(FG)
 			connected_gens = list()
 			clean_up = 0
+
+			//This is here to help fight the "hurr durr, release singulo cos nobody will notice before the
+			//singulo eats the evidence". It's not fool-proof but better than nothing.
+			//I want to avoid using global variables.
+			spawn(1)
+				var/temp = 1 //stops spam
+				for(var/obj/machinery/singularity/O in world)
+					if(O.last_warning && temp)
+						if((world.time - O.last_warning) > 50) //to stop message-spam
+							temp = 0
+							message_admins("A singulo exists and a containment field has failed.",1)
+					O.last_warning = world.time

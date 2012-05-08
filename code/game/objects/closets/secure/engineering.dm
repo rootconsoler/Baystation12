@@ -23,6 +23,7 @@
 		new /obj/item/clothing/head/helmet/welding(src)
 		new /obj/item/clothing/gloves/yellow(src)
 		new /obj/item/clothing/shoes/brown(src)
+		new /obj/item/weapon/cartridge/ce(src)
 		new /obj/item/weapon/storage/belt/utility/full(src)
 		new /obj/item/device/radio/headset/heads/ce(src)
 		new /obj/item/weapon/storage/toolbox/mechanical(src)
@@ -84,6 +85,9 @@
 		new /obj/item/weapon/weldingtool/largetank(src)
 		new /obj/item/weapon/weldingtool/largetank(src)
 		new /obj/item/weapon/weldingtool/largetank(src)
+		new /obj/item/weapon/weldpack(src)
+		new /obj/item/weapon/weldpack(src)
+		new /obj/item/weapon/weldpack(src)
 		return
 
 
@@ -113,6 +117,7 @@
 		new /obj/item/device/t_scanner(src)
 		new /obj/item/weapon/storage/belt/utility/full(src)
 		new /obj/item/weapon/storage/toolbox/mechanical(src)
+		new /obj/item/weapon/cartridge/engineering(src)
 		new /obj/item/device/radio/headset/headset_eng(src)
 		new /obj/item/clothing/suit/hazardvest(src)
 		new /obj/item/clothing/mask/gas(src)

@@ -44,7 +44,7 @@
 	brightness = 3
 	desc = "A small lighting fixture."
 	light_type = /obj/item/weapon/light/bulb
-	
+
 /obj/machinery/light/small/spot
 	brightness = 5
 
@@ -171,7 +171,6 @@
 // attack with item - insert light (if right type), otherwise try to break the light
 
 /obj/machinery/light/attackby(obj/item/W, mob/user)
-
 
 	// attempt to insert light
 	if(istype(W, /obj/item/weapon/light))
@@ -457,7 +456,7 @@
 	flags = FPRINT | TABLEPASS
 	force = 2
 	throwforce = 5
-	w_class = 2
+	w_class = 1
 	var/status = 0		// LIGHT_OK, LIGHT_BURNED or LIGHT_BROKEN
 	var/base_state
 	var/switchcount = 0	// number of times switched
@@ -476,6 +475,7 @@
 	brightness = 8
 
 	large
+		w_class = 2
 		name = "large light tube"
 		brightness = 15
 
@@ -524,12 +524,17 @@
 // also repairing them with wire and screwdriver
 // and glass if it's broken
 /obj/item/weapon/light/attackby(var/obj/item/I, var/mob/user)
+
 	if(istype(I, /obj/item/weapon/reagent_containers/syringe))
 		var/obj/item/weapon/reagent_containers/syringe/S = I
 
 		user << "You inject the solution into the [src]."
 
 		if(S.reagents.has_reagent("plasma", 5))
+
+			log_attack("<font color='red'>[user.name] ([user.ckey]) injected a light with plasma.</font>")
+			log_admin("ATTACK: [user] ([user.ckey]) injected a light with plasma.")
+			message_admins("ATTACK: [user] ([user.ckey]) injected a light with plasma.")
 
 			rigged = 1
 
@@ -600,13 +605,8 @@
 
 /obj/item/weapon/storage/lightbox/bulbs/New()
 	..()
-	new /obj/item/weapon/light/bulb(src)
-	new /obj/item/weapon/light/bulb(src)
-	new /obj/item/weapon/light/bulb(src)
-
-	new /obj/item/weapon/light/bulb(src)
-	new /obj/item/weapon/light/bulb(src)
-	new /obj/item/weapon/light/bulb(src)
+	for(var/i = 0; i < 21; i++)
+		new /obj/item/weapon/light/bulb(src)
 
 /obj/item/weapon/storage/lightbox/tubes
 	name = "replacement tubes"
@@ -614,13 +614,19 @@
 
 /obj/item/weapon/storage/lightbox/tubes/New()
 	..()
-	new /obj/item/weapon/light/tube(src)
-	new /obj/item/weapon/light/tube(src)
-	new /obj/item/weapon/light/tube(src)
+	for(var/i = 0; i < 21; i++)
+		new /obj/item/weapon/light/tube(src)
 
-	new /obj/item/weapon/light/tube(src)
-	new /obj/item/weapon/light/tube(src)
-	new /obj/item/weapon/light/tube(src)
+/obj/item/weapon/storage/lightbox/mixed
+	name = "replacement lights"
+	icon_state = "lightmixed"
+
+/obj/item/weapon/storage/lightbox/mixed/New()
+	..()
+	for(var/i = 0; i < 14; i++)
+		new /obj/item/weapon/light/tube(src)
+	for(var/i = 0; i < 7; i++)
+		new /obj/item/weapon/light/bulb(src)
 
 /obj/structure/light_frame
 	name = "Light Fixture Frame"

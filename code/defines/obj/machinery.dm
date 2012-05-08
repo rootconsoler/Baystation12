@@ -43,7 +43,7 @@
 
 /obj/machinery/camera
 	name = "security camera"
-	desc = "This is used to monitor rooms."
+	desc = "It's used to monitor rooms."
 	icon = 'monitors.dmi'
 	icon_state = "camera"
 	var/network = "SS13"
@@ -224,45 +224,6 @@
 	idle_power_usage = 10
 	active_power_usage = 400
 
-/obj/machinery/scan_consolenew
-	name = "DNA Modifier Access Console"
-	desc = "Scans DNA."
-	icon = 'computer.dmi'
-	icon_state = "scanner"
-	density = 1
-	var/uniblock = 1.0
-	var/strucblock = 1.0
-	var/subblock = 1.0
-	var/status = null
-	var/radduration = 2.0
-	var/radstrength = 1.0
-	var/radacc = 1.0
-	var/buffer1 = null
-	var/buffer2 = null
-	var/buffer3 = null
-	var/buffer1owner = null
-	var/buffer2owner = null
-	var/buffer3owner = null
-	var/buffer1label = null
-	var/buffer2label = null
-	var/buffer3label = null
-	var/buffer1type = null
-	var/buffer2type = null
-	var/buffer3type = null
-	var/buffer1iue = 0
-	var/buffer2iue = 0
-	var/buffer3iue = 0
-	var/delete = 0
-	var/injectorready = 1
-	var/temphtml = null
-	var/obj/machinery/dna_scanner/connected = null
-	var/obj/item/weapon/disk/data/diskette = null
-	var/list/message = list()
-	anchored = 1.0
-	use_power = 1
-	idle_power_usage = 10
-	active_power_usage = 400
-
 /obj/machinery/door_control
 	name = "remote door-control"
 	desc = "It controls doors, remotely."
@@ -378,7 +339,7 @@
 	layer = 2.6 // a bit above wires
 
 /obj/machinery/power/generator
-	name = "thermoelectric generator"
+	name = "thermoelectric generator mark I"
 	desc = "It's a high efficiency thermoelectric generator."
 	icon_state = "teg"
 	anchored = 1
@@ -391,7 +352,7 @@
 	var/lastgenlev = -1
 
 /obj/machinery/power/generator_type2
-	name = "thermoelectric generator"
+	name = "thermoelectric generator mark II"
 	desc = "It's a high efficiency thermoelectric generator."
 	icon_state = "teg"
 	anchored = 1
@@ -404,29 +365,17 @@
 	var/lastgenlev = -1
 
 /obj/machinery/power/monitor
-    name = "power monitoring computer"
-    desc = "It monitors power levels across the station, and can remotely toggle main breakers."
-    icon = 'computer.dmi'
-    icon_state = "power"
-    density = 1
-    anchored = 1
-    use_power = 2
-    idle_power_usage = 20
-    active_power_usage = 80
-    var/control = 0
-    req_access = list(access_engine_equip)
-
-/obj/machinery/cell_charger
-	name = "cell charger"
-	desc = "A charging unit for power cells."
-	icon = 'power.dmi'
-	icon_state = "ccharger0"
-	var/obj/item/weapon/cell/charging = null
-	var/chargelevel = -1
+	name = "power monitoring computer"
+	desc = "It monitors power levels across the station, and can remotely toggle main breakers."
+	icon = 'computer.dmi'
+	icon_state = "power"
+	density = 1
 	anchored = 1
-	use_power = 1
-	idle_power_usage = 5
-	active_power_usage = 60
+	use_power = 2
+	idle_power_usage = 20
+	active_power_usage = 80
+	var/control = 0
+	req_access = list(access_engine_equip)
 
 /obj/machinery/light_switch
 	name = "light switch"

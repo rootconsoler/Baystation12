@@ -13,7 +13,7 @@ WELDINGTOOOL
 	desc = "A wrench with common uses. Can be found in your hand."
 	icon = 'items.dmi'
 	icon_state = "wrench"
-	flags = FPRINT | TABLEPASS| CONDUCT
+	flags = FPRINT | TABLEPASS| CONDUCT | ONBELT
 	force = 5.0
 	throwforce = 7.0
 	w_class = 2.0
@@ -44,7 +44,7 @@ WELDINGTOOOL
 	name = "Welding Tool"
 	icon = 'items.dmi'
 	icon_state = "welder"
-	flags = FPRINT | TABLEPASS| CONDUCT
+	flags = FPRINT | TABLEPASS| CONDUCT | ONBELT
 	force = 3.0
 	throwforce = 5.0
 	throw_speed = 1
@@ -256,8 +256,8 @@ WELDINGTOOOL
 			user.eye_blind = 5
 			user.eye_blurry = 5
 			user.disabilities |= 1
-			spawn(100)
-				user.disabilities &= ~1
+//			spawn(100)
+//				user.disabilities &= ~1 //Simpler to just leave them short sighted.
 		return
 
 	attack(mob/M as mob, mob/user as mob)
@@ -310,7 +310,7 @@ WELDINGTOOOL
 	desc = "This cuts wires."
 	icon = 'items.dmi'
 	icon_state = "cutters"
-	flags = FPRINT | TABLEPASS| CONDUCT
+	flags = FPRINT | TABLEPASS| CONDUCT | ONBELT
 	force = 6.0
 	throw_speed = 2
 	throw_range = 9

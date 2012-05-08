@@ -122,7 +122,7 @@
 					world << "Aborting world restart!"
 					return
 
-			feedback_set_details("end_error","no live players")
+			//feedback_set_details("end_error","no live players")
 
 			if(blackbox)
 				blackbox.save_all_data_to_sql()
@@ -191,28 +191,16 @@
 	var/obj/item/W = equipped()
 
 	if (W)
-		if(W.twohanded)
-			if(W.wielded)
-				if(hand)
-					var/obj/item/weapon/offhand/O = r_hand
-					del O
-				else
-					var/obj/item/weapon/offhand/O = l_hand
-					del O
-			W.wielded = 0          //Kinda crude, but gets the job done with minimal pain -Agouri
-			W.name = "[initial(W.name)]" //name reset so people don't see world fireaxes with (unwielded) or (wielded) tags
-			W.update_icon()
 		u_equip(W)
 		if (client)
 			client.screen -= W
 		if (W)
+			W.layer = initial(W.layer)
 			if(target)
 				W.loc = target.loc
 			else
 				W.loc = loc
 			W.dropped(src)
-			if (W)
-				W.layer = initial(W.layer)
 		var/turf/T = get_turf(loc)
 		if (istype(T))
 			T.Entered(W)
@@ -235,7 +223,7 @@
 		return r_hand
 
 /mob/proc/get_inactive_hand()
-	if ( ! hand)
+	if (!hand)
 		return l_hand
 	else
 		return r_hand
@@ -420,7 +408,7 @@
 	set src in usr
 	if(usr != src)
 		usr << "No."
-	var/msg = input(usr,"Set the flavor text in your 'examine' verb. Don't metagame!","Flavor Text",html_decode(flavor_text)) as message|null
+	var/msg = input(usr,"Set the flavor text in your 'examine' verb. Can also be used for OOC notes about your character.","Flavor Text",html_decode(flavor_text)) as message|null
 
 	if(msg != null)
 		msg = copytext(msg, 1, MAX_MESSAGE_LEN)
@@ -454,14 +442,35 @@
 	set category = "OOC"
 
 	if (!( abandon_allowed ))
+		usr << "\blue Respawn is disabled."
 		return
 	if ((stat != 2 || !( ticker )))
 		usr << "\blue <B>You must be dead to use this!</B>"
 		return
+	if (ticker.mode.name == ("meteor" || "epidemic"))
+		usr << "\blue Respawn is disabled."
+		return
+	else
+		var/deathtime = world.time - src.timeofdeath
+		var/deathtimeminutes = round(deathtime / 600)
+		var/pluralcheck = "minute"
+		if(deathtimeminutes == 0)
+			pluralcheck = ""
+		else if(deathtimeminutes == 1)
+			pluralcheck = " [deathtimeminutes] minute and"
+		else if(deathtimeminutes > 1)
+			pluralcheck = " [deathtimeminutes] minutes and"
+		var/deathtimeseconds = round((deathtime - deathtimeminutes * 600) / 10,1)
+		usr << "You have been dead for[pluralcheck] [deathtimeseconds] seconds."
+		if (deathtime < 18000)
+			usr << "You must wait 30 minutes to respawn!"
+			return
+		else
+			usr << "You can respawn now, enjoy your new life!"
 
 	log_game("[usr.name]/[usr.key] used abandon mob.")
 
-	usr << "\blue <B>Please roleplay correctly!</B>"
+	usr << "\blue <B>Make sure to play a different character, and please roleplay correctly!</B>"
 
 	if(!client)
 		log_game("[usr.key] AM failed due to disconnect.")
@@ -515,6 +524,19 @@
 		usr << "\blue Now you hear all speech in the world"
 	else
 		usr << "\blue Now you hear speech only from nearest creatures."
+
+/client/var/ghost_sight = 1
+/client/verb/toggle_ghost_sight()
+	set name = "Ghost sight"
+	set category = "OOC"
+	set desc = "Hear emotes from everywhere"
+	ghost_sight = !ghost_sight
+	if (ghost_sight)
+		usr << "\blue Now you hear all emotes in the world"
+	else
+		usr << "\blue Now you hear emotes only from nearest creatures."
+
+
 
 /mob/verb/observe()
 	set name = "Observe"
@@ -616,10 +638,11 @@
 						for (var/mob/living/silicon/decoy/D in world)
 							if (eye)
 								eye = D
-		if (eye)
-			client.eye = eye
-		else
-			client.eye = client.mob
+		if (client)
+			if (eye)
+				client.eye = eye
+			else
+				client.eye = client.mob
 
 /mob/verb/cancel_camera()
 	set name = "Cancel Camera View"
@@ -631,7 +654,21 @@
 			src:cameraFollow = null
 
 
+/client/Topic(href, href_list)
+	if(href_list["priv_msg"])
+		var/client/C = locate(href_list["priv_msg"])
+		if(ismob(C)) //Old stuff can pass in mobs instead of clients
+			var/mob/M = C
+			C = M.client
+		cmd_admin_pm(C,null)
+	else
+		..()
+
 /mob/Topic(href, href_list)
+	if(href_list["priv_msg"])	//for priv_msg references that have yet to be updated to target clients. Forwards it to client/Topic()
+		if(client)
+			client.Topic(href, href_list)
+
 	if(href_list["mach_close"])
 		var/t1 = text("window=[href_list["mach_close"]]")
 		machine = null
@@ -707,7 +744,7 @@
 	set category = "IC"
 	set src in oview(1)
 
-	if (!( usr ))
+	if ( !usr || usr==src || !istype(src.loc,/turf) )	//if there's no person pulling OR the person is pulling themself OR the object being pulled is inside something: abort!
 		return
 	if (!( anchored ))
 		usr.pulling = src
@@ -726,7 +763,7 @@
 
 	if (!( usr ))
 		return
-	usr << "This is \an [name]."
+	usr << "That's \a [src]." //changed to "That's" from "This is" because "This is some metal sheets" sounds dumb compared to "That's some metal sheets" ~Carn
 	usr << desc
 	// *****RM
 	//usr << "[name]: Dn:[density] dir:[dir] cont:[contents] icon:[icon] is:[icon_state] loc:[loc]"
@@ -788,7 +825,7 @@
 /mob/proc/can_use_hands()
 	if(handcuffed)
 		return 0
-	if(buckled && istype(buckled, /obj/structure/stool/bed)) // buckling does not restrict hands
+	if(buckled && ! istype(buckled, /obj/structure/stool/bed/chair)) // buckling does not restrict hands
 		return 0
 	return ..()
 
@@ -805,9 +842,9 @@
 	for(var/mob/M in viewers())
 		M.see(message)
 
-//This is the proc for gibbing a mob. Cannot gib ghosts. Removed the medal reference,
+//This is the proc for gibbing a mob. Cannot gib ghosts.
 //added different sort of gibs and animations. N
-/mob/proc/gib(var/ex_act = 0)
+/mob/proc/gib()
 
 	if (istype(src, /mob/dead/observer))
 		gibs(loc, viruses)
@@ -866,10 +903,6 @@ Currently doesn't work, but should be useful later or at least as a template
 			else
 				gibs(loc, viruses, dna)
 		sleep(15)
-		for(var/obj/item/I in contents)
-			I.loc = get_turf(src)
-			if(ex_act)
-				I.ex_act(ex_act)
 		del(src)
 
 /*
@@ -991,8 +1024,8 @@ note dizziness decrements automatically in the mob's Life() proc.
 		stat(null, "([x], [y], [z])")
 		stat(null, "CPU: [world.cpu]")
 		stat(null, "Controller: [controllernum]")
-		//if (master_controller)
-		//	stat(null, "Loop: [master_controller.loop_freq]")
+		if (master_controller)
+			stat(null, "Current Iteration: [controller_iteration]")
 
 	if (spell_list.len)
 
@@ -1005,42 +1038,6 @@ note dizziness decrements automatically in the mob's Life() proc.
 				if("holdervar")
 					statpanel("Spells","[S.holder_var_type] [S.holder_var_amount]",S)
 
-
-/client/proc/station_explosion_cinematic(var/station_missed)
-	if(!mob || !ticker)	return
-	if(!mob.client || !mob.hud_used || !ticker.mode)	return
-//	M.loc = null this might make it act weird but fuck putting them in nullspace, it causes issues.
-	var/obj/screen/boom = mob.hud_used.station_explosion
-	if(!istype(boom))	return
-
-	mob.client.screen += boom
-
-	switch(ticker.mode.name)
-		if("nuclear emergency")
-			flick("start_nuke", boom)
-		if("AI malfunction")
-			flick("start_malf", boom)
-		else
-			boom.icon_state = "start"
-
-	sleep(40)
-	mob << sound('explosionfar.ogg')
-	boom.icon_state = "end"
-	if(!station_missed) flick("explode", boom)
-	else flick("explode2", boom)
-	sleep(40)
-
-	switch(ticker.mode.name)
-		if("nuclear emergency")
-			if(!station_missed) boom.icon_state = "loss_nuke"
-			else boom.icon_state = "loss_nuke2"
-		if("malfunction")
-			boom.icon_state = "loss_malf"
-		if("blob")
-			return//Nothin here yet and the general one does not fit.
-		else
-			boom.icon_state = "loss_general"
-	return
 
 
 // facing verbs
@@ -1136,3 +1133,66 @@ note dizziness decrements automatically in the mob's Life() proc.
 /mob/proc/AdjustParalysis(amount)
 	paralysis = max(paralysis + amount,0)
 	return
+
+// ++++ROCKDTBEN++++ MOB PROCS -- Ask me before touching
+
+/mob/proc/getBruteLoss()
+	return bruteloss
+
+/mob/proc/adjustBruteLoss(var/amount)
+	bruteloss = max(bruteloss + amount, 0)
+
+/mob/proc/getOxyLoss()
+	return oxyloss
+
+/mob/proc/adjustOxyLoss(var/amount)
+	oxyloss = max(oxyloss + amount, 0)
+
+/mob/proc/setOxyLoss(var/amount)
+	oxyloss = amount
+
+/mob/proc/getToxLoss()
+	return toxloss
+
+/mob/proc/adjustToxLoss(var/amount)
+	toxloss = max(toxloss + amount, 0)
+
+/mob/proc/setToxLoss(var/amount)
+	toxloss = amount
+
+/mob/proc/getFireLoss()
+	return fireloss
+
+/mob/proc/adjustFireLoss(var/amount)
+	fireloss = max(fireloss + amount, 0)
+
+/mob/proc/getCloneLoss()
+	return cloneloss
+
+/mob/proc/adjustCloneLoss(var/amount)
+	cloneloss = max(cloneloss + amount, 0)
+
+/mob/proc/setCloneLoss(var/amount)
+	cloneloss = amount
+
+/mob/proc/getHalLoss()
+	return halloss
+
+/mob/proc/adjustHalLoss(var/amount)
+	halloss = max(halloss + amount, 0)
+
+/mob/proc/setHalLoss(var/amount)
+	halloss = amount
+
+
+
+/mob/proc/getBrainLoss()
+	return brainloss
+
+/mob/proc/adjustBrainLoss(var/amount)
+	brainloss = max(brainloss + amount, 0)
+
+/mob/proc/setBrainLoss(var/amount)
+	brainloss = amount
+
+// ++++ROCKDTBEN++++ MOB PROCS //END
