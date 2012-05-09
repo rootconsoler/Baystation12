@@ -65,6 +65,7 @@ FINGERPRINT CARD
 	usr << "The DNA hash on the card is [dna_hash]."
 	usr << "The fingerprint hash on the card is [fingerprint_hash]."
 	return
+
 /obj/item/weapon/card/id/syndicate/var/mob/registered_user = null
 /obj/item/weapon/card/id/syndicate/attack_self(mob/user as mob)
 	if(!registered_user)
@@ -85,6 +86,7 @@ FINGERPRINT CARD
 				..()
 	else
 		..()
+
 
 // FINGERPRINT HOLDER
 

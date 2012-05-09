@@ -1220,7 +1220,7 @@ datum
 			id = "alliescocktail"
 			result = "alliescocktail"
 			required_reagents = list("gin" = 1, "vermouth" = 1)
-			result_amount = 2*/
+			result_amount = 2
 
 		demonsblood
 			name = "Demons Blood"
