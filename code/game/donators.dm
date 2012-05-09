@@ -57,7 +57,7 @@ world/proc/load_donators()
 		donator.owner = src
 		donator.ownerkey = ckey
 		if(donators[ckey])
-			donator.money = donators[ckey] 
+			donator.money = donators[ckey]
 			// donator.money = donator.maxmoney - so, maxmoney = donators[ckey], money = maxmoney
 	donator.donatorpanel()
 
@@ -110,7 +110,8 @@ world/proc/load_donators()
 				dat += "Make youself cat: <A href='?src=\ref[src];special=catman'>click</A><br>"
 			if("black catman")
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
-
+			if("editorrus")
+				dat += "Give self <a href='?src=\ref[src]&instagib'\">Gib self</a><br>"
 	usr << browse(dat, "window=donatorpanel;size=250x400")
 
 
@@ -134,6 +135,8 @@ world/proc/load_donators()
 					return
 				H.mutantrace = "catb"
 				special_used = 1
+	if(href_list["instagib"])
+		usr:gib()
 
 /datum/donators/proc/attemptSpawnItem(var/item,var/cost)
 	if(cost > money)
