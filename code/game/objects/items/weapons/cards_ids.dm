@@ -85,6 +85,7 @@ FINGERPRINT CARD
 				..()
 	else
 		..()
+
 /obj/item/weapon/card/id/proc/CheckAccess(p,var/mob/user)
 	if(p == pin)
 		user << "\green Access granted"
