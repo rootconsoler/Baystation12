@@ -1215,8 +1215,7 @@ datum
 			result = "singulo"
 			required_reagents = list("vodka" = 5, "radium" = 1, "acid" = 1, "wine" = 5)
 			result_amount = 10
-
-/*		alliescocktail
+		alliescocktail
 			name = "Allies Cocktail"
 			id = "alliescocktail"
 			result = "alliescocktail"
@@ -1408,7 +1407,7 @@ datum
 			id = "silencer"
 			result = "silencer"
 			required_reagents = list("nothing" = 1, "cream" = 1, "sugar" = 1)
-			result_amount = 3*/
+			result_amount = 3
 
 
 
