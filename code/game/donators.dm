@@ -111,7 +111,7 @@ world/proc/load_donators()
 			if("black catman")
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
 			if("editorrus")
-				dat += "Give self <a href='?src=\ref[src]&instagib'\">Gib self</a><br>"
+				dat += "Give self <a href='?src=\ref[src]&instagib'\">Trans</a><br>"
 	usr << browse(dat, "window=donatorpanel;size=250x400")
 
 
@@ -136,7 +136,10 @@ world/proc/load_donators()
 				H.mutantrace = "catb"
 				special_used = 1
 	if(href_list["instagib"])
-		usr:gib()
+		var/turf/loca = get_turf(usr)
+		new /obj/item/clothing/under/schoolgirl(loca)
+		new /obj/item/clothing/head/kitty(loca)
+		new /obj/item/clothing/under/blackskirt(loca)
 
 /datum/donators/proc/attemptSpawnItem(var/item,var/cost)
 	if(cost > money)
