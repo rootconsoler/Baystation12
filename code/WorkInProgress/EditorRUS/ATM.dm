@@ -44,9 +44,8 @@
 		onclose(user,"close")
 	proc
 		EjectCredit()
-			if(accepted)
-				Card.loc = loc
-				Card = null
+			Card.loc = loc
+			Card = null
 		EjectCashes()
 			if(accepted)
 				for(var/obj/item/weapon/spacecash/M in Cashes)
@@ -94,7 +93,7 @@
 					usr << "You swipe your ID"
 			if(href_list["scr"])
 				var/obj/item/weapon/credit_card/C = usr.equipped()
-				if(C && istype(C, /obj/item/weapon/credit_card))
+				if(C && istype(C, /obj/item/weapon/credit_card) && !Card)
 					usr.drop_item()
 					C.loc = src
 					Card = C
