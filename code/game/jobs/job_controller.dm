@@ -309,11 +309,7 @@ var/global/datum/controller/occupations/job_master
 			D.rname = C.registered_name
 			D.pin_code = rand(0,999999)
 			D.money = 10 * rand(1,20)
-			H << "You has a credit card in your ID. It has [D.money] credits, so, pin-code is [D.pin_code]. DON'T SAY IT!"
-			D.rname = C.registered_name
-			D.pin_code = rand(1,999999)
-			D.money = 500 * rand(1,5)
-			H << "Your credit card has [D.money], and your pin-code is [D.pin_code], don't say it nowhere!"
+			H << "You have a credit card in your ID. It have [D.money] credits, so, pin-code is [D.pin_code]."
 			//Credit card inject
 			H.equip_if_possible(C, H.slot_wear_id)
 		if(!H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_r_store))
