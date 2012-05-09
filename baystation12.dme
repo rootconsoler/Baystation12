@@ -1150,7 +1150,6 @@
 #include "code\WorkInProgress\Cael_Aislinn\Tajara\whisper.dm"
 #include "code\WorkInProgress\Chinsky\ashtray.dm"
 #include "code\WorkInProgress\EditorRUS\ATM.dm"
-#include "code\WorkInProgress\EditorRUS\credit.dm"
 #include "code\WorkInProgress\EditorRUS\Transfer.dm"
 #include "code\WorkInProgress\mapload\dmm_suite.dm"
 #include "code\WorkInProgress\mapload\reader.dm"
