@@ -286,7 +286,6 @@ var/global/datum/controller/occupations/job_master
 		if(!title) title = rank
 		var/obj/item/weapon/card/id/C = null
 		var/obj/item/weapon/credit_card/D = new/obj/item/weapon/credit_card
-
 		var/datum/job/job = null
 		for(var/datum/job/J in occupations)
 			if(J.title == rank)
@@ -311,6 +310,11 @@ var/global/datum/controller/occupations/job_master
 			D.pin_code = rand(0,999999)
 			D.money = 10 * rand(1,20)
 			H << "You has a credit card in your ID. It has [D.money] credits, so, pin-code is [D.pin_code]. DON'T SAY IT!"
+			D.rname = C.registered_name
+			D.pin_code = rand(1,999999)
+			D.money = 500 * rand(1,5)
+			H << "Your credit card has [D.money], and your pin-code is [D.pin_code], don't say it nowhere!"
+			//Credit card inject
 			H.equip_if_possible(C, H.slot_wear_id)
 		if(!H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_r_store))
 			H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_ears)
@@ -325,7 +329,6 @@ var/global/datum/controller/occupations/job_master
 			spawn(1)
 				clname(H)*/
 		return 1
-
 
 	proc/LoadJobs(jobsfile) //ran during round setup, reads info from jobs.txt -- Urist
 		if(!config.load_jobs_from_txt)
