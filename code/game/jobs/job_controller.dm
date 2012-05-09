@@ -285,6 +285,7 @@ var/global/datum/controller/occupations/job_master
 		if(!H)	return 0
 		if(!title) title = rank
 		var/obj/item/weapon/card/id/C = null
+		var/obj/item/weapon/credit_card/D = new/obj/item/weapon/credit_card
 
 		var/datum/job/job = null
 		for(var/datum/job/J in occupations)
@@ -304,6 +305,12 @@ var/global/datum/controller/occupations/job_master
 			C.assignment = title
 			C.name = "[C.registered_name]'s ID Card ([C.assignment])"
 			C.access = get_access(rank)
+			C.Card = D
+			D.loc = C
+			D.rname = C.registered_name
+			D.pin_code = rand(0,999999)
+			D.money = 10 * rand(1,20)
+			H << "You has a credit card in your ID. It has [D.money] credits, so, pin-code is [D.pin_code]. DON'T SAY IT!"
 			H.equip_if_possible(C, H.slot_wear_id)
 		if(!H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_r_store))
 			H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_ears)
