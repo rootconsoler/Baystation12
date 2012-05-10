@@ -102,12 +102,8 @@
 
 	var/msg = input("Message:", text("Enter the text you wish to appear to your target:")) as text
 
-<<<<<<< HEAD
+
 	msg = sanitize(msg)
-=======
-	if( !msg )
-		return
->>>>>>> ea390487f23928dfa13e0ee6784ec5b17d8c1c9d
 
 	M << msg
 	log_admin("DirectNarrate: [key_name(usr)] to ([M.name]/[M.key]): [msg]")

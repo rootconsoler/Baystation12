@@ -109,31 +109,32 @@
 				src.updateUsrDialog()
 			if(href_list["with"] && href_list["us"] && output)
 				var/amount = input(href_list["us"],"Select a cash",0) in list(1,10,20,50,100,200,500,1000, 0) as num
-				switch(amount)
-					if(1)
-						new /obj/item/weapon/spacecash(output.loc)
-						credits -= 1
-					if(10)
-						new /obj/item/weapon/spacecash/c10(output.loc)
-						credits -= 10
-					if(20)
-						new /obj/item/weapon/spacecash/c20(output.loc)
-						credits -= 20
-					if(50)
-						new /obj/item/weapon/spacecash/c50(output.loc)
-						credits -= 50
-					if(100)
-						new /obj/item/weapon/spacecash/c100(output.loc)
-						credits -= 100
-					if(200)
-						new /obj/item/weapon/spacecash/c200(output.loc)
-						credits -= 200
-					if(500)
-						new /obj/item/weapon/spacecash/c500(output.loc)
-						credits -= 500
-					if(1000)
-						new /obj/item/weapon/spacecash/c1000(output.loc)
-						credits -= 1000
+				if(amount >= credits)
+					switch(amount)
+						if(1)
+							new /obj/item/weapon/spacecash(output.loc)
+							credits -= 1
+						if(10)
+							new /obj/item/weapon/spacecash/c10(output.loc)
+							credits -= 10
+						if(20)
+							new /obj/item/weapon/spacecash/c20(output.loc)
+							credits -= 20
+						if(50)
+							new /obj/item/weapon/spacecash/c50(output.loc)
+							credits -= 50
+						if(100)
+							new /obj/item/weapon/spacecash/c100(output.loc)
+							credits -= 100
+						if(200)
+							new /obj/item/weapon/spacecash/c200(output.loc)
+							credits -= 200
+						if(500)
+							new /obj/item/weapon/spacecash/c500(output.loc)
+							credits -= 500
+						if(1000)
+							new /obj/item/weapon/spacecash/c1000(output.loc)
+							credits -= 1000
 				src.updateUsrDialog()
 		else
 			usr.machine = null
