@@ -1215,13 +1215,12 @@ datum
 			result = "singulo"
 			required_reagents = list("vodka" = 5, "radium" = 1, "acid" = 1, "wine" = 5)
 			result_amount = 10
-
-/*		alliescocktail
+		alliescocktail
 			name = "Allies Cocktail"
 			id = "alliescocktail"
 			result = "alliescocktail"
 			required_reagents = list("gin" = 1, "vermouth" = 1)
-			result_amount = 2*/
+			result_amount = 2
 
 		demonsblood
 			name = "Demons Blood"
@@ -1254,7 +1253,7 @@ datum
 
 ////DRINKS THAT REQUIRE IMPROVED SPRITES BELOW:: -Agouri/////
 
-/*		sbiten
+		sbiten
 			name = "Sbiten"
 			id = "sbiten"
 			result = "sbiten"
@@ -1408,7 +1407,7 @@ datum
 			id = "silencer"
 			result = "silencer"
 			required_reagents = list("nothing" = 1, "cream" = 1, "sugar" = 1)
-			result_amount = 3*/
+			result_amount = 3
 
 
 
