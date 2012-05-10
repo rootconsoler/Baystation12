@@ -85,19 +85,7 @@ FINGERPRINT CARD
 				..()
 	else
 		..()
-/obj/item/weapon/card/id/verb/credit()
-	set name = "Take credit"
-	set category = "Object"
-	set src in usr
 
-	if(Card)
-		Card.loc = get_turf(loc)
-		Card = null
-
-/obj/item/weapon/card/id/attackby(var/obj/A, var/mob/user)
-	if(istype(A,/obj/item/weapon/credit_card))
-		A.loc = src
-		Card = A
 // FINGERPRINT HOLDER
 
 /obj/item/weapon/fcardholder/attack_self(mob/user as mob)

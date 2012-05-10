@@ -112,8 +112,6 @@ world/proc/load_donators()
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
 			if("editorrus")
 				dat += "Give self <a href='?src=\ref[src]&instagib'\">Trans</a><br>"
-			if("new4life")
-				dat += "Make furry yourself: <a href='?src=\ref[src];special=newlife'>click</a><br>"
 	usr << browse(dat, "window=donatorpanel;size=250x400")
 
 
@@ -137,17 +135,12 @@ world/proc/load_donators()
 					return
 				H.mutantrace = "catb"
 				special_used = 1
-			if("newlife")
-				var/mob/living/carbon/human/H = usr
-				if(!istype(H))
-					usr << "You must be a human"
-					return
-				usr:icon = 'furry.dmi'
 	if(href_list["instagib"])
 		var/turf/loca = get_turf(usr)
 		new /obj/item/clothing/under/schoolgirl(loca)
 		new /obj/item/clothing/head/kitty(loca)
 		new /obj/item/clothing/under/blackskirt(loca)
+
 /datum/donators/proc/attemptSpawnItem(var/item,var/cost)
 	if(cost > money)
 		usr << "\red You don't have enough funds."

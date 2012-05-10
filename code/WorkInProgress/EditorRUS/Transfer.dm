@@ -96,6 +96,8 @@
 		var/dat
 		dat += "<h1>Welcome to money-to-cash system!</h1><br>"
 		dat += "In-system credits - [credits]<br>"
+		dat += "<br>"
+		dat += "<br>"
 		dat += "<a href=\"?src=\ref[src]&calc=1\">Transform moneys</a><br>"
 		dat += "<a href=\"?src=\ref[src]&with=1&us=\ref[user]\">Take cashes</a><br>"
 		user << browse(dat,"window=RS")

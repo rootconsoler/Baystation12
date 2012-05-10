@@ -53,7 +53,10 @@ rcd light flash thingy on matter drain
 		turret.health += 30
 		turret.shot_delay = 20
 
-/*
+/datum/AI_Module/large/disable_rcd
+	module_name = "RCD disable"
+	mod_pick_name = "rcd"
+
 /client/proc/disable_rcd()
 	set category = "Malfunction"
 	set name = "Disable RCDs"
@@ -66,7 +69,7 @@ rcd light flash thingy on matter drain
 				rcd.disabled = 1
 			usr << "RCD-disabling pulse emitted."
 		else usr << "Out of uses."
-Now, it's very small used. - EditorRUS */
+
 /datum/AI_Module/small/overload_machine
 	module_name = "Machine overload"
 	mod_pick_name = "overload"
@@ -197,6 +200,19 @@ Now, it's very small used. - EditorRUS */
 			src.temp = "Improves the firing speed and health of all AI turrets. This effect is permanent."
 			src.processing_time -= 50
 		else src.temp = "This module is only needed once."
+
+	else if (href_list["rcd"])
+		var/already
+		for (var/datum/AI_Module/mod in usr:current_modules)
+			if(istype(mod, /datum/AI_Module/large/disable_rcd))
+				mod:uses += 1
+				already = 1
+		if (!already)
+			usr:current_modules += new /datum/AI_Module/large/disable_rcd
+			usr.verbs += /client/proc/disable_rcd
+			src.temp = 	"Send a specialised pulse to break all RCD devices on the station."
+		else src.temp = "Additional use added to RCD disabler."
+		src.processing_time -= 50
 
 	else if (href_list["overload"])
 		var/already
