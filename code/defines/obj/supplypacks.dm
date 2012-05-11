@@ -781,10 +781,10 @@
 					"/obj/item/clothing/head/collectable/xenom",
 					"/obj/item/clothing/head/collectable/xenom",
 					"/obj/item/clothing/head/collectable/petehat")
-	name = "Collectable Hat Crate!"
+	name = "Collectable hat crate!"
 	cost = 200
 	containertype = "/obj/structure/closet/crate/hat"
-	containername = "Collectable Hats Crate! Brought to you by Bass.inc!"
+	containername = "Collectable hats crate! Brought to you by Bass.inc!"
 	group = "Clothing"
 
 /datum/supply_packs/hats/New()
@@ -796,19 +796,17 @@
 
 
 /datum/supply_packs/contraband
-	contains = list("/obj/item/weapon/contraband/poster",) //We randomly pick 5 items from this list through the constructor, look below
-	name = "Contraband Crate"
+	contains = list("/obj/item/weapon/contraband/poster","/obj/item/weapon/cigpacket/dromedaryco") //We randomly pick 5 items from this list through the constructor, look below
+	name = "Contraband crate"
 	cost = 30
 	containertype = "/obj/structure/closet/crate/contraband"
 	containername = "Contraband crate"
-	group = "ERROR"
 	contraband = 1
+	group = "NanoTrasen Contraband Storage"
 
-/datum/supply_packs/contraband/New()
+/datum/supply_packs/poster/New()
 	var/list/tempContains = list()
 	for(var/i = 0,i<5,i++)
 		tempContains += pick(contains)
 	src.contains = tempContains
 	..()
-
-//SUPPLY PACKS
