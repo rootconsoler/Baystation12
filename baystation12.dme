@@ -201,6 +201,7 @@
 #define FILE_DIR "icons/vending_icons"
 #define FILE_DIR "interface"
 #define FILE_DIR "maps"
+#define FILE_DIR "maps/backup"
 #define FILE_DIR "maps/RandomZLevels"
 #define FILE_DIR "sound"
 #define FILE_DIR "sound/AI"
@@ -1199,5 +1200,5 @@
 #include "code\WorkInProgress\Wrongnumber\weldbackpack.dm"
 #include "interface\interface.dm"
 #include "interface\skin.dmf"
-#include "maps\tgstation.2.0.8b.dmm"
+#include "maps\tgstation.2.0.8.dmm"
 // END_INCLUDE

@@ -12,13 +12,13 @@
 	var/strapped = 0.0
 	var/updatesicon = 1
 
-	var/obj/machinery/computer/operating/computer = null
+	var/obj/machinery/computer/operating/id = null
 
 /obj/machinery/optable/New()
 	..()
 	for(dir in list(NORTH,EAST,SOUTH,WEST))
-		computer = locate(/obj/machinery/computer/operating, get_step(src, dir))
-		if (!isnull(computer))
+		id = locate(/obj/machinery/computer/operating, get_step(src, dir))
+		if (!isnull(id))
 			break
 	spawn(100)
 		process()
