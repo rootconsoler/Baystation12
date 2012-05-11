@@ -305,9 +305,9 @@ var/global/datum/controller/occupations/job_master
 			C.access = get_access(rank)
 			C.pin = rand(100000,999999)
 			C.money = 10 * rand(1,10)
-			H << "Your ID has [C.money], so,\red pin-code is [C.pin]"
+			H << "\bold \red Your ID has [C.money] credits, so, pin-code is [C.pin]"
 			if(H.mind)
-				H.mind.memory += "Your pin-code is - [C.pin]"
+				H.mind.memory += "Your pin-code is - [C.pin]<br>"
 			H.equip_if_possible(C, H.slot_wear_id)
 		if(!H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_r_store))
 			H.equip_if_possible(new /obj/item/weapon/pen(H), H.slot_ears)

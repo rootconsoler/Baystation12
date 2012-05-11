@@ -21,25 +21,26 @@
 			return
 		..()
 	attack_hand(var/mob/user)
-		var/dat
-		user.machine = src
-		if(!accepted)
-			dat += "<a href=\"?src=\ref[src]&sid=1\">Insert ID</a><br>"
-			dat += "<a href=\"?src=\ref[src]&pin=1\">Enter pin-code</a><br>"
-			dat += "Entered pin-code is: [pincode]<br>"
-			dat += "<a href=\"?src=\ref[src]&ent=1\">Access</a><br>"
-		else
-			dat = null
-			dat += "<h1>Welcome, [Card.registered_name]! You has [Card.money] credits</h1><br>"
-			dat += "That ATM has [inserted] real moneys<br>"
-			dat += "Please, select action<br>"
-			dat += "<a href=\"?src=\ref[src]&ecr=1\">Eject ID</a><br/>"
-			dat += "<a href=\"?src=\ref[src]&eca=1\">Eject inserted cashes</a><br/>"
-			dat += "<a href=\"?src=\ref[src]&with=1\">Withdraw</a><br/>"
-			dat += "<a href=\"?src=\ref[src]&ins=1\">Inject cashes</a><br/>"
-			dat += "<a href=\"?src=\ref[src]&lock=1\">Lock</a><br/>"
-		user << browse(dat,"window=atm")
-		onclose(user,"close")
+		if(!(stat && NOPOWER))
+			var/dat
+			user.machine = src
+			if(!accepted)
+				dat += "<a href=\"?src=\ref[src]&sid=1\">Insert ID</a><br>"
+				dat += "<a href=\"?src=\ref[src]&pin=1\">Enter pin-code</a><br>"
+				dat += "Entered pin-code is: [pincode]<br>"
+				dat += "<a href=\"?src=\ref[src]&ent=1\">Access</a><br>"
+			else
+				dat = null
+				dat += "<h1>Welcome, [Card.registered_name]! You has [Card.money] credits</h1><br>"
+				dat += "That ATM has [inserted] real moneys<br>"
+				dat += "Please, select action<br>"
+				dat += "<a href=\"?src=\ref[src]&ecr=1\">Eject ID</a><br/>"
+				dat += "<a href=\"?src=\ref[src]&eca=1\">Eject inserted cashes</a><br/>"
+				dat += "<a href=\"?src=\ref[src]&with=1\">Withdraw</a><br/>"
+				dat += "<a href=\"?src=\ref[src]&ins=1\">Inject cashes</a><br/>"
+				dat += "<a href=\"?src=\ref[src]&lock=1\">Lock</a><br/>"
+			user << browse(dat,"window=atm")
+			onclose(user,"close")
 	proc
 		Withdraw(var/mob/user)
 			if(accepted)
