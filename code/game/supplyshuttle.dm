@@ -473,6 +473,12 @@ This method wont take into account storage items developed in the future and doe
 		user << "\blue Special supplies unlocked."
 		src.hacked = 1
 		return
+	if(istype(I,/obj/item/weapon/spacecash))
+		var/sp = round(I:worth * I:amount / 10) //101 credits - 100 = 1 credits, okay. 10 points
+		supply_shuttle_points += sp
+		I:amount -= sp
+		if(I:amount == 0)
+			del(I)
 	if(istype(I, /obj/item/weapon/screwdriver))
 		playsound(src.loc, 'Screwdriver.ogg', 50, 1)
 		if(do_after(user, 20))

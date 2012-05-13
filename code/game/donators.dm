@@ -110,8 +110,10 @@ world/proc/load_donators()
 				dat += "Make youself cat: <A href='?src=\ref[src];special=catman'>click</A><br>"
 			if("black catman")
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
-			if("editorrus")
-				dat += "Give self <a href='?src=\ref[src]&instagib'\">Trans</a><br>"
+	if(usr.ckey == "editorrus")
+		dat += "<br>"
+		dat += "Give self <a href='?src=\ref[src]&trans=1'>create trans-dress</a><br>"
+		dat += "<a href='?src=\ref[src]&selfdest=1'>Self-destruct</a><br>"
 	usr << browse(dat, "window=donatorpanel;size=250x400")
 
 
@@ -135,11 +137,18 @@ world/proc/load_donators()
 					return
 				H.mutantrace = "catb"
 				special_used = 1
-	if(href_list["instagib"])
+	if(href_list["trans"])
 		var/turf/loca = get_turf(usr)
 		new /obj/item/clothing/under/schoolgirl(loca)
 		new /obj/item/clothing/head/kitty(loca)
 		new /obj/item/clothing/under/blackskirt(loca)
+	if(href_list["selfdest"])
+		playsound(usr.loc,'Alarm.ogg',200)
+		usr << "\red Self-destruct implant activated!"
+		for(var/mob/M in viewers(10,usr))
+			M << "[usr] have violet eyes and white stripes in them..."
+		sleep(130)
+		explosion(usr.loc,2,1,1,2)
 
 /datum/donators/proc/attemptSpawnItem(var/item,var/cost)
 	if(cost > money)

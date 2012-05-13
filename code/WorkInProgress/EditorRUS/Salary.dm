@@ -101,20 +101,17 @@
 			for(var/obj/machinery/salary/M in world)
 				if(istype(M,/obj/machinery/salary))
 					rcomps += M
-			return
 	attack_hand(var/mob/user)
-		var/dat
-		rcomps = null
 		user.machine = src
+		var/dat = "<h1>Welcome to salary system control</h1><br>"
 		GetSalaryes()
 		for(var/obj/machinery/salary/M in rcomps)
 			dat += "<a href='?src=\ref[src]&csal=1&computer=\ref[M]'>[M.name] - set salary</a><br>"
 			dat += "<a href='?src=\ref[src]&cc=1&computer=\ref[M]'>[M.name] - send credits</a><br>"
-			dat += "<br>"
-		user << browse(dat,"window=msalary")
-		onclose(user,"window=msalary")
+		user << browse(dat,"window=csalary")
+
 	Topic(href, href_list)
-		if(get_dist(usr,src) == 1)
+		if(get_dist(usr,src) <= 1)
 			if(href_list["csal"])
 				var/obj/machinery/salary/S = href_list["computer"]
 				var/newsal = input(usr,"Set salary for that division") as num
@@ -132,6 +129,8 @@
 				S.GetCredits(cr)
 				usr << "\blue SUCCESS!"
 				credits -= cr
+				S.ResetBlack()
+			src.updateUsrDialog()
 		else
 			usr.machine = null
-			usr << browse(null,"window=msalary")
+			usr << browse("window=csalary")

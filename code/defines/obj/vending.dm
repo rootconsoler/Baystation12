@@ -12,6 +12,7 @@
 	var/product_paths = "" //String of product paths separated by semicolons. No spaces!
 	var/product_amounts = "" //String of product amounts separated by semicolons, must have amount for every path in product_paths
 	var/points = 10
+	var/course = 5 //Money/points course
 	var/product_prices = "" //String of product prices in Points separated by semicolons, must have amount for every path in product_paths
 	var/product_slogans = "" //String of slogans separated by semicolons, optional
 	var/product_ads = "" //String of small ad messages in the vending screen - random chance
@@ -390,6 +391,21 @@
 	hidden_prices = ""
 	charge_type = "robotics"
 
+/obj/machinery/vending/attackby(var/obj/I,var/mob/user)
+	if(istype(I,/obj/item/weapon/spacecash))
+		var/obj/item/weapon/spacecash/W = I
+		var/ama = round(input(user,"How much you want insert? Course - [course] credit/1 point. Your amount of [W.worth] cashes - [W.amount]") as num)
+		if(ama <= 0)
+			return
+		if(ama > W.amount)
+			user << "\red You don't have that amount"
+			return
+		var/npoint = round(W.worth * ama / course)
+		W.amount =- ama
+		if(W.amount == 0)
+			del(W)
+		points += npoint
+		user << "\blue Your insert [ama] cashes to machine. [npoint] points taked."
 /obj/item/weapon/vending_charge
 	name = "Vending Charge"
 	var/charge_type = "generic"
@@ -473,8 +489,3 @@
 	name = "Soda Charge"
 	charge_type = "soda"
 	icon_state = "soda-charge"
-
-/*/obj/item/weapon/vending_charge/toxinslab
-	name = "Toxins Lab Charge"
-	charge_type = "toxinslab"
-	icon_state = "toxinslab-charge"*/
