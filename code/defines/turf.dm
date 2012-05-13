@@ -128,7 +128,7 @@
 	icon = 'shuttle.dmi'
 	thermal_conductivity = 0.05
 	heat_capacity = 0
-	layer = 2
+	layer = 2.1
 
 /turf/simulated/shuttle/wall
 	name = "wall"

@@ -20,13 +20,13 @@
 			return 1
 		Salary(var/mob/user)
 			if(insID in blacklist)
-				user << "You already get your salary"
+				user << "\red You already get your salary"
 				return
 			if(!insID)
-				user << "Insert your ID, please"
+				user << "\blue Insert your ID, please"
 				return
 			if(credits < salary)
-				user << "Enough credits"
+				user << "\red Enough credits"
 				insID.money += credits
 				credits = 0
 			insID.money += salary
@@ -104,6 +104,7 @@
 			return
 	attack_hand(var/mob/user)
 		var/dat
+		rcomps = null
 		user.machine = src
 		GetSalaryes()
 		for(var/obj/machinery/salary/M in rcomps)
@@ -116,7 +117,7 @@
 		if(get_dist(usr,src) == 1)
 			if(href_list["csal"])
 				var/obj/machinery/salary/S = href_list["computer"]
-				var/newsal = input(usr,"Set salary for that division",S.salary) as num
+				var/newsal = input(usr,"Set salary for that division") as num
 				if(newsal < 0)
 					usr << "Salary must be positive!"
 					return
@@ -129,6 +130,7 @@
 				if(cr > credits)
 					usr << "Enough credits"
 				S.GetCredits(cr)
+				usr << "\blue SUCCESS!"
 				credits -= cr
 		else
 			usr.machine = null
