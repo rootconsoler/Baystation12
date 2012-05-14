@@ -3,7 +3,7 @@
 
 // proc to find out in how much pain the mob is at the moment
 /mob/living/carbon/proc/updateshock()
-	src.traumatic_shock = src.getOxyLoss() + src.getToxLoss() + src.getFireLoss() + 1.2*src.getBruteLoss() + 2*src.getCloneLoss()
+	src.traumatic_shock = src.getOxyLoss() + src.getToxLoss() + src.getFireLoss() + 1.2*src.getBruteLoss() + 2*src.getCloneLoss() + src.halloss
 	if(reagents.has_reagent("alkysine"))
 		src.traumatic_shock -= 10
 	if(reagents.has_reagent("inaprovaline"))
@@ -20,9 +20,9 @@
 		var/mob/living/carbon/human/M = src
 		for(var/name in M.organs)
 			var/datum/organ/external/organ = M.organs[name]
-			if(organ.destroyed || organ.open)
+			if(organ.destroyed)
 				src.traumatic_shock += 60
-			else if(organ.broken)
+			else if(organ.broken || organ.open)
 				src.traumatic_shock += 30
 
 	if(src.traumatic_shock < 0)

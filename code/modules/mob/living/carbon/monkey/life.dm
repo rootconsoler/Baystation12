@@ -3,8 +3,8 @@
 	voice_name = "monkey"
 	voice_message = "chimpers"
 	say_message = "chimpers"
-	icon = 'monkey.dmi'
-	icon_state = "monkey1"
+	icon = 'mob.dmi'
+	icon_state = "m-none"
 	gender = NEUTER
 	pass_flags = PASSTABLE
 
@@ -22,6 +22,8 @@
 
 	if (src.monkeyizing)
 		return
+
+	..()
 
 	var/datum/gas_mixture/environment // Added to prevent null location errors-- TLE
 	if(src.loc)
@@ -45,7 +47,6 @@
 	//code. Very ugly. I dont care. Moving this stuff here so its easy
 	//to find it.
 	src.blinded = null
-
 
 	//Disease Check
 	handle_virus_updates()
@@ -260,7 +261,7 @@
 				return
 
 			if(!breath || (breath.total_moles() == 0))
-				oxyloss += 7
+				adjustOxyLoss(7)
 
 				oxygen_alert = max(oxygen_alert, 1)
 
@@ -288,7 +289,7 @@
 				if (O2_pp == 0)
 					O2_pp = 0.01
 				var/ratio = safe_oxygen_min/O2_pp
-				oxyloss += min(5*ratio, 7) // Don't fuck them up too fast (space only does 7 after all!)
+				adjustOxyLoss(min(5*ratio, 7)) // Don't fuck them up too fast (space only does 7 after all!)
 				oxygen_used = breath.oxygen*ratio/6
 				oxygen_alert = max(oxygen_alert, 1)
 			/*else if (O2_pp > safe_oxygen_max) 		// Too much oxygen (commented this out for now, I'll deal with pressure damage elsewhere I suppose)
@@ -298,7 +299,7 @@
 				oxygen_used = breath.oxygen*ratio/6
 				oxygen_alert = max(oxygen_alert, 1)*/
 			else 									// We're in safe limits
-				oxyloss = max(getOxyLoss()-5, 0)
+				adjustOxyLoss(-5)
 				oxygen_used = breath.oxygen/6
 				oxygen_alert = 0
 
@@ -310,9 +311,9 @@
 					co2overloadtime = world.time
 				else if(world.time - co2overloadtime > 120)
 					Paralyse(3)
-					oxyloss += 3 // Lets hurt em a little, let them know we mean business
+					adjustOxyLoss(3) // Lets hurt em a little, let them know we mean business
 					if(world.time - co2overloadtime > 300) // They've been in here 30s now, lets start to kill them for their own good!
-						oxyloss += 8
+						adjustOxyLoss(8)
 				if(prob(20)) // Lets give them some chance to know somethings not right though I guess.
 					spawn(0) emote("cough")
 
@@ -332,7 +333,7 @@
 					if(SA_pp > SA_para_min) // Enough to make us paralysed for a bit
 						Paralyse(3) // 3 gives them one second to wake up and run away a bit!
 						if(SA_pp > SA_sleep_min) // Enough to make us sleep as well
-							src.sleeping = max(src.sleeping, 2)
+							src.sleeping = max(src.sleeping+2, 10)
 					else if(SA_pp > 0.01)	// There is sleeping gas in their lungs, but only a little, so give them a bit of a warning
 						if(prob(20))
 							spawn(0) emote(pick("giggle", "laugh"))
@@ -368,8 +369,21 @@
 
 			if(stat==2)
 				bodytemperature += 0.1*(environment.temperature - bodytemperature)*environment_heat_capacity/(environment_heat_capacity + 270000)
-
 			//Account for massive pressure differences
+			var/pressure = environment.return_pressure()
+
+		//	if(!wear_suit)		Monkies cannot into space.
+		//		if(!istype(wear_suit, /obj/item/clothing/suit/space))
+
+					/*if(pressure < 20)
+						if(prob(25))
+							src << "You feel the splittle on your lips and the fluid on your eyes boiling away, the capillteries in your skin breaking."
+						adjustBruteLoss(5)
+					*/
+
+			if(pressure > HAZARD_HIGH_PRESSURE)
+
+				adjustBruteLoss(min((10+(round(pressure/(HIGH_STEP_PRESSURE)-2)*5)),MAX_PRESSURE_DAMAGE))
 			return //TODO: DEFERRED
 
 		handle_temperature_damage(body_part, exposed_temperature, exposed_intensity)
@@ -406,6 +420,28 @@
 			return //TODO: DEFERRED
 
 		handle_regular_status_updates()
+			var/leg_tally = 2
+			for(var/name in organs)
+				var/datum/organ/external/E = organs[name]
+				E.process()
+				if(E.broken || E.destroyed)
+					if(E.name == "l_hand" || E.name == "l_arm")
+						if(hand && equipped())
+							drop_item()
+							emote("scream")
+					else if(E.name == "r_hand" || E.name == "r_arm")
+						if(!hand && equipped())
+							drop_item()
+							emote("scream")
+					else if(E.name == "l_leg" || E.name == "l_foot" \
+						|| E.name == "r_leg" || E.name == "r_foot" && !lying)
+						leg_tally--									// let it fail even if just foot&leg
+
+			// can't stand
+			if(leg_tally == 0 && !paralysis && !(lying || resting))
+				emote("scream")
+				emote("collapse")
+				paralysis = 10
 
 			health = 100 - (getOxyLoss() + getToxLoss() + getFireLoss() + getBruteLoss() + getCloneLoss())
 
@@ -423,8 +459,8 @@
 			else if(src.health < config.health_threshold_crit)
 				if(src.health <= 20 && prob(1)) spawn(0) emote("gasp")
 
-				if(!src.rejuv) src.oxyloss++
-				if(!src.reagents.has_reagent("inaprovaline")) src.oxyloss++
+				//if(!src.rejuv) src.oxyloss++	//-Nodrak (I can't believe I thought this should be commented back in)
+				if(!src.reagents.has_reagent("inaprovaline") && src.stat != 2) src.adjustOxyLoss(2)
 
 				if(src.stat != 2)	src.stat = 1
 				Paralyse(5)
@@ -530,6 +566,21 @@
 							src.healths.icon_state = "health6"
 				else
 					src.healths.icon_state = "health7"
+			if (pressure)
+				var/datum/gas_mixture/environment = loc.return_air()
+				if(environment)
+					switch(environment.return_pressure())
+
+						if(HAZARD_HIGH_PRESSURE to INFINITY)
+							pressure.icon_state = "pressure2"
+						if(WARNING_HIGH_PRESSURE to HAZARD_HIGH_PRESSURE)
+							pressure.icon_state = "pressure1"
+						if(WARNING_LOW_PRESSURE to WARNING_HIGH_PRESSURE)
+							pressure.icon_state = "pressure0"
+						if(HAZARD_LOW_PRESSURE to WARNING_LOW_PRESSURE)
+							pressure.icon_state = "pressure-1"
+						else
+							pressure.icon_state = "pressure-2"
 
 			if(src.pullin)	src.pullin.icon_state = "pull[src.pulling ? 1 : 0]"
 
@@ -540,26 +591,26 @@
 			//NOTE: the alerts dont reset when youre out of danger. dont blame me,
 			//blame the person who coded them. Temporary fix added.
 
-			switch(src.bodytemperature) //310.055 optimal body temp
-
-				if(345 to INFINITY)
-					src.bodytemp.icon_state = "temp4"
-				if(335 to 345)
-					src.bodytemp.icon_state = "temp3"
-				if(327 to 335)
-					src.bodytemp.icon_state = "temp2"
-				if(316 to 327)
-					src.bodytemp.icon_state = "temp1"
-				if(300 to 316)
-					src.bodytemp.icon_state = "temp0"
-				if(295 to 300)
-					src.bodytemp.icon_state = "temp-1"
-				if(280 to 295)
-					src.bodytemp.icon_state = "temp-2"
-				if(260 to 280)
-					src.bodytemp.icon_state = "temp-3"
-				else
-					src.bodytemp.icon_state = "temp-4"
+			if(bodytemp)
+				switch(src.bodytemperature) //310.055 optimal body temp
+					if(345 to INFINITY)
+						src.bodytemp.icon_state = "temp4"
+					if(335 to 345)
+						src.bodytemp.icon_state = "temp3"
+					if(327 to 335)
+						src.bodytemp.icon_state = "temp2"
+					if(316 to 327)
+						src.bodytemp.icon_state = "temp1"
+					if(300 to 316)
+						src.bodytemp.icon_state = "temp0"
+					if(295 to 300)
+						src.bodytemp.icon_state = "temp-1"
+					if(280 to 295)
+						src.bodytemp.icon_state = "temp-2"
+					if(260 to 280)
+						src.bodytemp.icon_state = "temp-3"
+					else
+						src.bodytemp.icon_state = "temp-4"
 
 			src.client.screen -= src.hud_used.blurry
 			src.client.screen -= src.hud_used.druggy
@@ -612,19 +663,9 @@
 			else
 				virus2.activate(src)
 
-
-		check_if_buckled()
-			if (src.buckled)
-				src.lying = istype(src.buckled, /obj/structure/stool/bed) || istype(src.buckled, /obj/machinery/conveyor)
-				if(src.lying)
-					src.drop_item()
-				src.density = 1
-			else
-				src.density = !src.lying
-
 		handle_changeling()
 			if (mind)
 				if (mind.special_role == "Changeling" && changeling)
-					changeling.chem_charges = between(0, (max((0.9 - (changeling.chem_charges / 50)), 0.1) + changeling.chem_charges), 50)
+					changeling.chem_charges = between(0, ((max((0.9 - (changeling.chem_charges / 50)), 0.1)*changeling.chem_recharge_multiplier) + changeling.chem_charges), changeling.chem_storage)
 					if ((changeling.geneticdamage > 0))
 						changeling.geneticdamage = changeling.geneticdamage-1

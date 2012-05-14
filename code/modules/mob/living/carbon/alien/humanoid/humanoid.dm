@@ -10,6 +10,7 @@
 		if(!istype(src, /mob/living/carbon/alien/humanoid/queen))
 			stand_icon = new /icon('alien.dmi', "alien_s")
 			lying_icon = new /icon('alien.dmi', "alien_l")
+			resting_icon = new /icon('alien.dmi', "alienh_sleep")
 		icon = stand_icon
 		update_clothing()
 		src << "\blue Your icons have been generated!"
@@ -58,7 +59,9 @@
 		tally += 2
 	if (istype(src, /mob/living/carbon/alien/humanoid/sentinel))
 		tally += 1
-	return tally
+	if (istype(src, /mob/living/carbon/alien/humanoid/hunter))
+		tally = -1 // hunters go supersuperfast
+	return tally + move_delay_add
 
 //This needs to be fixed
 /mob/living/carbon/alien/humanoid/Stat()
@@ -87,7 +90,7 @@
 	flick("flash", flash)
 
 //	if (stat == 2 && client)
-//		gib(1)
+//		gib()
 //		return
 
 //	else if (stat == 2 && !client)
@@ -102,7 +105,7 @@
 	switch (severity)
 		if (1.0)
 			b_loss += 500
-			gib(1)
+			gib()
 			return
 
 		if (2.0)
@@ -121,7 +124,7 @@
 			ear_damage += 15
 			ear_deaf += 60
 
-	bruteloss += b_loss
+	adjustBruteLoss(b_loss)
 	adjustFireLoss(f_loss)
 
 	updatehealth()
@@ -224,7 +227,7 @@
 		if ((M.client && !( M.blinded )))
 			M.show_message(text("\red [] has been hit by []", src, O), 1)
 	if (health > 0)
-		bruteloss += (istype(O, /obj/effect/meteor/small) ? 10 : 25)
+		adjustFireLoss((istype(O, /obj/effect/meteor/small) ? 10 : 25))
 		adjustFireLoss(30)
 
 		updatehealth()
@@ -315,10 +318,10 @@
 	overlays = null
 
 	if(buckled)
-		if(istype(buckled, /obj/structure/stool/bed))
-			lying = 1
-		else
+		if(istype(buckled, /obj/structure/stool/bed/chair))
 			lying = 0
+		else
+			lying = 1
 
 	// Automatically drop anything in store / id / belt if you're not wearing a uniform.
 	if (zone_sel)
@@ -328,7 +331,10 @@
 
 	if (lying)
 		if(update_icon)
-			icon = lying_icon
+			if(!resting)
+				icon = lying_icon
+			else
+				icon = resting_icon
 
 		overlays += body_lying
 
@@ -472,7 +478,7 @@
 			for(var/mob/O in viewers(src, null))
 				if ((O.client && !( O.blinded )))
 					O.show_message(text("\red <B>[M.name] has bit []!</B>", src), 1)
-			bruteloss  += rand(1, 3)
+			adjustBruteLoss(rand(1, 3))
 
 			updatehealth()
 	return
@@ -501,7 +507,7 @@
 				for(var/mob/O in viewers(src, null))
 					if ((O.client && !( O.blinded )))
 						O.show_message(text("\red <B>[M.name] has bit [src]!</B>"), 1)
-				bruteloss  += rand(1, 3)
+				adjustBruteLoss(rand(1, 3))
 				updatehealth()
 	return
 
@@ -526,7 +532,7 @@
 		else
 			damage = rand(5, 35)
 
-		bruteloss += damage
+		adjustBruteLoss(damage)
 
 		if(M.powerlevel > 0)
 			var/stunprob = 10
@@ -565,6 +571,16 @@
 		updatehealth()
 
 	return
+
+/mob/living/carbon/alien/humanoid/attack_animal(mob/living/simple_animal/M as mob)
+	if(M.melee_damage_upper == 0)
+		M.emote("[M.friendly] [src]")
+	else
+		for(var/mob/O in viewers(src, null))
+			O.show_message("\red <B>[M]</B> [M.attacktext] [src]!", 1)
+		var/damage = rand(M.melee_damage_lower, M.melee_damage_upper)
+		adjustBruteLoss(damage)
+		updatehealth()
 
 /mob/living/carbon/alien/humanoid/attack_hand(mob/living/carbon/human/M as mob)
 	if (!ticker)
@@ -672,7 +688,7 @@
 					for(var/mob/O in viewers(M, null))
 						if ((O.client && !( O.blinded )))
 							O.show_message(text("\red <B>[] has weakened []!</B>", M, src), 1, "\red You hear someone fall.", 2)
-				bruteloss += damage
+				adjustBruteLoss(damage)
 				updatehealth()
 			else
 				if(M.type != /mob/living/carbon/human/tajaran)
@@ -725,7 +741,7 @@ In all, this is a lot like the monkey code. /N
 
 		if ("help")
 			if(!sleeping_willingly)
-				sleeping = 0
+				sleeping = max(0,sleeping-5)
 			resting = 0
 			AdjustParalysis(-3)
 			AdjustStunned(-3)
@@ -741,7 +757,7 @@ In all, this is a lot like the monkey code. /N
 				for(var/mob/O in viewers(src, null))
 					if ((O.client && !( O.blinded )))
 						O.show_message(text("\red <B>[M.name] has bit []!</B>", src), 1)
-				bruteloss += damage
+				adjustBruteLoss(damage)
 				updatehealth()
 			else
 				M << "\green <B>[name] is too injured for that.</B>"
@@ -767,7 +783,7 @@ In all, this is a lot like the monkey code. /N
 	<BR><B>Right Hand:</B> <A href='?src=\ref[src];item=r_hand'>[(r_hand ? text("[]", r_hand) : "Nothing")]</A>
 	<BR><B>Head:</B> <A href='?src=\ref[src];item=head'>[(head ? text("[]", head) : "Nothing")]</A>
 	<BR><B>(Exo)Suit:</B> <A href='?src=\ref[src];item=suit'>[(wear_suit ? text("[]", wear_suit) : "Nothing")]</A>
-	<BR><A href='?src=\ref[src];item=pockets'>Empty Pockets</A>
+	<BR><A href='?src=\ref[src];item=pockets'>Empty Pouches</A>
 	<BR><A href='?src=\ref[user];mach_close=mob[name]'>Close</A>
 	<BR>"}
 	user << browse(dat, text("window=mob[name];size=340x480"))

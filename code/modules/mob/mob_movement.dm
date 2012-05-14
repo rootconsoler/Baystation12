@@ -133,6 +133,7 @@
 
 
 /client/Move(n, direct)
+
 	if(mob.control_object)	Move_object(direct)
 
 	if(isobserver(mob))	return mob.Move(n,direct)
@@ -142,6 +143,11 @@
 	if(world.time < move_delay)	return
 
 	if(!mob)	return
+
+	if(locate(/obj/effect/stop/, mob.loc))
+		for(var/obj/effect/stop/S in mob.loc)
+			if(S.victim == mob)
+				return
 
 	if(mob.stat==2)	return
 
@@ -154,16 +160,25 @@
 		return
 
 	if(Process_Grab())	return
+	if(!mob.canmove)	return
 
 //Making mob movememnt changes instant.
-	if(mob.paralysis || mob.stunned || mob.weakened || mob.buckled || (mob.changeling && mob.changeling.changeling_fakedeath))
+	if(mob.paralysis || mob.stunned || mob.resting || mob.weakened || mob.buckled || (mob.changeling && mob.changeling.changeling_fakedeath))
 		mob.canmove = 0
 		return
 	else
 		mob.canmove = 1
 
-	if(istype(mob.loc, /turf/space) || (mob.flags & NOGRAV))
+
+	//if(istype(mob.loc, /turf/space) || (mob.flags & NOGRAV))
+	//	if(!mob.Process_Spacemove(0))	return 0
+
+	if(!mob.lastarea)
+		mob.lastarea = get_area(mob.loc)
+
+	if((istype(mob.loc, /turf/space)) || (mob.lastarea.has_gravity == 0))
 		if(!mob.Process_Spacemove(0))	return 0
+
 
 	if(isobj(mob.loc) || ismob(mob.loc))//Inside an object, tell it we moved
 		var/atom/O = mob.loc
@@ -203,16 +218,17 @@
 				if(L.len == 2)
 					L -= mob
 					var/mob/M = L[1]
-					if ((get_dist(mob, M) <= 1 || M.loc == mob.loc))
-						var/turf/T = mob.loc
-						. = ..()
-						if (isturf(M.loc))
-							var/diag = get_dir(mob, M)
-							if ((diag - 1) & diag)
-							else
-								diag = null
-							if ((get_dist(mob, M) > 1 || diag))
-								step(M, get_dir(M.loc, T))
+					if(M)
+						if ((get_dist(mob, M) <= 1 || M.loc == mob.loc))
+							var/turf/T = mob.loc
+							. = ..()
+							if (isturf(M.loc))
+								var/diag = get_dir(mob, M)
+								if ((diag - 1) & diag)
+								else
+									diag = null
+								if ((get_dist(mob, M) > 1 || diag))
+									step(M, get_dir(M.loc, T))
 				else
 					for(var/mob/M in L)
 						M.other_mobs = 1
@@ -234,6 +250,7 @@
 			for(var/obj/effect/speech_bubble/S in range(1, mob))
 				if(S.parent == mob)
 					S.loc = mob.loc
+
 		moving = 0
 
 		return .
@@ -328,12 +345,34 @@
 	//First check to see if we can do things
 	if(restrained())	return 0
 
+	/*
+	if(istype(src,/mob/living/carbon))
+		if(src.l_hand && src.r_hand)
+			return 0
+	*/
+
 	var/dense_object = 0
 	for(var/turf/turf in oview(1,src))
 		if(istype(turf,/turf/space))
 			continue
+
+		if(istype(src,/mob/living/carbon/human/))  // Only humans can wear magboots, so we give them a chance to.
+			if((istype(turf,/turf/simulated/floor)) && (src.lastarea.has_gravity == 0) && !(istype(src:shoes, /obj/item/clothing/shoes/magboots) && (src:shoes:flags & NOSLIP)))
+				continue
+
+
+		else
+			if((istype(turf,/turf/simulated/floor)) && (src.lastarea.has_gravity == 0)) // No one else gets a chance.
+				continue
+
+
+
+		/*
 		if(istype(turf,/turf/simulated/floor) && (src.flags & NOGRAV))
 			continue
+		*/
+
+
 		dense_object++
 		break
 
