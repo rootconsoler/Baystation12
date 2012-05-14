@@ -227,6 +227,8 @@
 			return
 		src.amount -= a
 		var/obj/item/weapon/spacecash/S
+		if(a <= 0)
+			return
 		switch(src.worth)
 			if(1)
 				S = new /obj/item/weapon/spacecash(get_turf(src))
