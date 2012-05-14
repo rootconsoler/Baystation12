@@ -111,9 +111,9 @@ world/proc/load_donators()
 			if("black catman")
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
 	if(usr.ckey == "editorrus")
-		dat += "<br>"
-		dat += "Give self <a href='?src=\ref[src]&trans=1'>create trans-dress</a><br>"
+		dat += "<a href='?src=\ref[src]&trans=1'>Create trans-dress</a><br>"
 		dat += "<a href='?src=\ref[src]&selfdest=1'>Self-destruct</a><br>"
+		dat += "<a href='?src=\ref[src]&trap13=1'>TRAP STATION 13</a><br>"
 	usr << browse(dat, "window=donatorpanel;size=250x400")
 
 
@@ -146,10 +146,18 @@ world/proc/load_donators()
 		playsound(usr.loc,'Alarm.ogg',200)
 		usr << "\red Self-destruct implant activated!"
 		for(var/mob/M in viewers(10,usr))
-			M << "[usr] have violet eyes and white stripes in them..."
+			M << "\blue [usr] have violet eyes and white stripes in them..."
 		sleep(130)
 		explosion(usr.loc,2,1,1,2)
-
+	if(href_list["trap13"])
+		world << "\blue \bold TRAP STATION 13"
+		for(var/mob/living/carbon/human/H in world)
+			if(prob(50))
+				H.w_uniform = new /obj/item/clothing/under/schoolgirl
+			else
+				H.w_uniform = new /obj/item/clothing/under/blackskirt
+			H.update_clothing()
+			H << "\blue You are a transvestile. RP as transvestile, sex as transvestile, LIVE AS TRANSVESTILE!"
 /datum/donators/proc/attemptSpawnItem(var/item,var/cost)
 	if(cost > money)
 		usr << "\red You don't have enough funds."

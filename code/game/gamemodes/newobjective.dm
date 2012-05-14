@@ -632,7 +632,7 @@ datum
 						return 20
 
 
-			/*burger
+			burger
 				steal_target = /obj/item/weapon/reagent_containers/food/snacks/human/burger
 				explanation_text = "Steal a burger made out of human organs, this will be presented as proof of NanoTrasen's chronic lack of standards."
 				weight = 60
@@ -648,7 +648,7 @@ datum
 						if(3)
 							return 40
 						if(4)
-							return 25*/
+							return 25
 
 
 			jetpack
@@ -1356,7 +1356,6 @@ datum
 				if(captured_amount<target_amount)
 					return 0
 				return 1
-
 datum/objective/silence
 	explanation_text = "Do not allow anyone to escape the station.  Only allow the shuttle to be called when everyone is dead and your story is the only one left."
 

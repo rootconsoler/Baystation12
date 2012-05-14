@@ -103,8 +103,12 @@
 					rcomps += M
 	attack_hand(var/mob/user)
 		user.machine = src
+		if(!rcomps)
+			GetSalaryes()
+		else
+			rcomps = null
+			GetSalaryes()
 		var/dat = "<h1>Welcome to salary system control</h1><br>"
-		GetSalaryes()
 		for(var/obj/machinery/salary/M in rcomps)
 			dat += "<a href='?src=\ref[src]&csal=1&computer=\ref[M]'>[M.name] - set salary</a><br>"
 			dat += "<a href='?src=\ref[src]&cc=1&computer=\ref[M]'>[M.name] - send credits</a><br>"
@@ -124,8 +128,10 @@
 				var/cr = input(usr,"Set how much credits will send to that computer",0) as num
 				if(cr < 0)
 					usr << "Credits must be positive!"
+					return
 				if(cr > credits)
 					usr << "Enough credits"
+					return
 				S.GetCredits(cr)
 				usr << "\blue SUCCESS!"
 				credits -= cr
