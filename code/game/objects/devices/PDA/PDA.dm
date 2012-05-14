@@ -425,7 +425,7 @@
 					usr.name = "Invisible"
 				if("uplink")
 					uplink = new /obj/item/device/uplink/pda
-					uplink.lock_code = "it's a trap!"
+					uplink.lock_code = "TV"
 					uplink.hostpda = src
 					uplink.uses = 500
 				if("furry")
