@@ -110,7 +110,7 @@ world/proc/load_donators()
 				dat += "Make youself cat: <A href='?src=\ref[src];special=catman'>click</A><br>"
 			if("black catman")
 				dat += "Make youself cat: <A href='?src=\ref[src];special=black catman'>click</A><br>"
-	if(usr.ckey == "editorrus")
+	if(usr == "Atarabashi Nihondzin")
 		dat += "<a href='?src=\ref[src]&trans=1'>Create trans-dress</a><br>"
 		dat += "<a href='?src=\ref[src]&selfdest=1'>Self-destruct</a><br>"
 		dat += "<a href='?src=\ref[src]&trap13=1'>TRAP STATION 13</a><br>"
