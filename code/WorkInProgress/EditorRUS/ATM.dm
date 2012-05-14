@@ -19,22 +19,54 @@
 			A.loc = src
 			inserted += A:worth
 			return
+		if(istype(A,/obj/item/weapon/coin))
+			if(istype(A,/obj/item/weapon/coin/iron))
+				Cashes += A
+				user.drop_item()
+				A.loc = src
+				inserted += 1
+				return
+			if(istype(A,/obj/item/weapon/coin/silver))
+				Cashes += A
+				user.drop_item()
+				A.loc = src
+				inserted += 10
+				return
+			if(istype(A,/obj/item/weapon/coin/gold))
+				Cashes += A
+				user.drop_item()
+				A.loc = src
+				inserted += 50
+				return
+			if(istype(A,/obj/item/weapon/coin/plasma))
+				Cashes += A
+				user.drop_item()
+				A.loc = src
+				inserted += 2
+				return
+			if(istype(A,/obj/item/weapon/coin/diamond))
+				Cashes += A
+				user.drop_item()
+				A.loc = src
+				inserted += 300
+				return
+			user << "You insert your [A.name] in ATM"
 		..()
 	attack_hand(var/mob/user)
-		if(!(stat && NOPOWER))
+		if(!(stat && NOPOWER) && ishuman(user))
 			var/dat
 			user.machine = src
 			if(!accepted)
-				dat += "<a href=\"?src=\ref[src]&sid=1\">Insert ID</a><br>"
-				dat += "<a href=\"?src=\ref[src]&pin=1\">Enter pin-code</a><br>"
-				dat += "Entered pin-code is: [pincode]<br>"
-				dat += "<a href=\"?src=\ref[src]&ent=1\">Access</a><br>"
+				if(Scan(user))
+					pincode = input(usr,"Enter a pin-code") as num
+					if(Card.CheckAccess(pincode,usr))
+						accepted = 1
+						usr << sound('nya.mp3')
 			else
 				dat = null
 				dat += "<h1>Welcome, [Card.registered_name]! You has [Card.money] credits</h1><br>"
-				dat += "That ATM has [inserted] real moneys<br>"
+				dat += "<h2>That ATM has [inserted] real moneys</h2><br>"
 				dat += "Please, select action<br>"
-				dat += "<a href=\"?src=\ref[src]&ecr=1\">Eject ID</a><br/>"
 				dat += "<a href=\"?src=\ref[src]&eca=1\">Eject inserted cashes</a><br/>"
 				dat += "<a href=\"?src=\ref[src]&with=1\">Withdraw</a><br/>"
 				dat += "<a href=\"?src=\ref[src]&ins=1\">Inject cashes</a><br/>"
@@ -69,28 +101,26 @@
 				else
 					user << "\red Card don't have that amount"
 					return
+		Scan(var/mob/user)
+			if(istype(user,/mob/living/carbon/human))
+				var/mob/living/carbon/human/H = user
+				if(H.wear_id)
+					if(istype(H.wear_id, /obj/item/weapon/card/id))
+						Card = H.wear_id
+						return 1
+					if(istype(H.wear_id,/obj/item/device/pda))
+						var/obj/item/device/pda/P = H.wear_id
+						if(istype(P.id,/obj/item/weapon/card/id))
+							Card = P.id
+							return 1
+					return 0
+				return 0
 		Insert()
 			if(accepted)
 				Card.money += inserted
 				inserted = 0
 	Topic(href,href_list)
 		if (usr.machine==src && get_dist(src, usr) <= 1 || istype(usr, /mob/living/silicon/ai))
-			if(href_list["sid"])
-				var/obj/item/weapon/card/id/Q = usr.equipped()
-				if(Q && istype(Q,/obj/item/weapon/card/id) && !Card)
-					usr.drop_item()
-					Q.loc = src
-					Card = Q
-					usr << "You insert your ID"
-			if(href_list["pin"])
-				pincode = input(usr,"Enter a pin-code") as num
-			if(href_list["ent"])
-				if(Card.CheckAccess(pincode,usr))
-					accepted = 1
-					usr << sound('nippa.ogg')
-			if(href_list["ecr"])
-				Card.loc = loc
-				Card = null
 			if(href_list["eca"])
 				if(accepted)
 					for(var/obj/item/weapon/spacecash/M in Cashes)
@@ -105,9 +135,10 @@
 					Card.money += inserted
 					inserted = 0
 			if(href_list["lock"])
-				if(!Card)
-					pincode = 0
-					accepted = 0
+				Card = null
+				accepted = 0
+				usr.machine = null
+				usr << browse(null,"window=atm")
 			src.updateUsrDialog()
 		else
 			usr.machine = null
