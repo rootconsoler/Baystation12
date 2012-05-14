@@ -2,7 +2,7 @@
 #define SUPPLY_DOCKZ 2          //Z-level of the Dock.
 #define SUPPLY_STATIONZ 1       //Z-level of the Station.
 #define SUPPLY_POINTSPER 10      //Points per tick.
-#define SUPPLY_POINTDELAY 3000 //Delay between ticks in milliseconds.
+#define SUPPLY_POINTDELAY 5000 //Delay between ticks in milliseconds.
 #define SUPPLY_MOVETIME 1800	//Time to station is milliseconds.
 #define SUPPLY_POINTSPERCRATE 5	//Points per crate sent back.
 #define SUPPLY_STATION_AREATYPE "/area/supply/station" //Type of the supply shuttle area for station
@@ -474,9 +474,10 @@ This method wont take into account storage items developed in the future and doe
 		src.hacked = 1
 		return
 	if(istype(I,/obj/item/weapon/spacecash))
-		var/sp = round(I:worth * I:amount / 10) //101 credits - 100 = 1 credits, okay. 10 points
+		var/sp = round(I:worth * I:amount / 10)
+		var/ei = sp * 10 / I:worth
 		supply_shuttle_points += sp
-		I:amount -= sp
+		I:amount -= ei
 		if(I:amount == 0)
 			del(I)
 	if(istype(I, /obj/item/weapon/screwdriver))

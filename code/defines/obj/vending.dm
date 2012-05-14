@@ -80,6 +80,7 @@
 	product_hidden = "/obj/item/weapon/reagent_containers/food/drinks/tea"
 	hidden_prices = "4"
 	points = 60
+	course = 5
 	product_slogans = "I hope nobody asks me for a bloody cup o' tea...;Alcohol is humanity's friend. Would you abandon a friend?;Quite delighted to serve you!;Is nobody thirsty on this station?"
 	product_ads = "Drink up!;Booze is good for you!;Alcohol is humanity's best friend.;Quite delighted to serve you!;Care for a nice, cold beer?;Nothing cures you like booze!;Have a sip!;Have a drink!;Have a beer!;Beer is good for you!;Only the finest alcohol!;Best quality booze since 2053!;Award-winning wine!;Maximum alcohol!;Man loves beer.;A toast for progress!"
 	charge_type = "bar"
@@ -92,6 +93,7 @@
 //	product_hideamt = "5;2"
 	hidden_prices = "2;5"
 	points = 15
+	course = 10
 	product_ads = "Only the finest!;Have some tools.;The most robust equipment.;The finest gear in space!"
 	charge_type = "engineering"
 
@@ -100,6 +102,7 @@
 	desc = "A vending machine which dispenses hot drinks."
 	icon_state = "coffee"
 	icon_vend = "coffee-vend"
+	course = 5
 	product_paths = "/obj/item/weapon/reagent_containers/food/drinks/coffee;/obj/item/weapon/reagent_containers/food/drinks/tea;/obj/item/weapon/reagent_containers/food/drinks/h_chocolate"
 	product_prices = "1;1;1"
 	vend_delay = 34
@@ -116,6 +119,7 @@
 	product_paths = "/obj/item/weapon/reagent_containers/food/snacks/candy;/obj/item/weapon/reagent_containers/food/drinks/dry_ramen;/obj/item/weapon/reagent_containers/food/snacks/chips;/obj/item/weapon/reagent_containers/food/snacks/sosjerky;/obj/item/weapon/reagent_containers/food/snacks/no_raisin;/obj/item/weapon/reagent_containers/food/snacks/spacetwinkie;/obj/item/weapon/reagent_containers/food/snacks/cheesiehonkers"
 //	product_amounts = "10;10;10;10;10;10;10"
 	product_prices = "1;1;1;1;1;1;1"
+	course = 5
 	product_slogans = "Try our new nougat bar!;Twice the calories for half the price!"
 	product_hidden = "/obj/item/weapon/reagent_containers/food/snacks/syndicake"
 //	product_hideamt = "10"
@@ -134,6 +138,7 @@
 	product_hidden = "/obj/item/weapon/reagent_containers/food/drinks/thirteenloko"
 	product_hideamt = "5"
 	hidden_prices = "2"
+	course = 5
 	product_ads = "Refreshing!;Hope you're thirsty!;Over 1 million drinks sold!;Thirsty? Why not cola?;Please, have a drink!;Drink up!;The best drinks in space."
 	charge_type = "soda"
 
@@ -142,6 +147,7 @@
 	desc = "Cartridges for PDAs"
 	icon_state = "cart"
 	icon_deny = "cart-deny"
+	course = 20
 	product_paths = "/obj/item/weapon/cartridge/medical;/obj/item/weapon/cartridge/engineering;/obj/item/weapon/cartridge/security;/obj/item/weapon/cartridge/janitor;/obj/item/weapon/cartridge/signal/toxins;/obj/item/device/pda/heads;/obj/item/weapon/cartridge/captain;/obj/item/weapon/cartridge/quartermaster"
 //	product_amounts = "10;10;10;10;10;10;3;10"
 	product_prices = "1;1;1;1;1;3;1"
@@ -160,6 +166,7 @@
 	product_prices = "1;1;2"
 	product_slogans = "Space cigs taste good like a cigarette should.;I'd rather toolbox than switch.;Smoke!;Don't believe the reports - smoke today!"
 	vend_delay = 34
+	course = 8
 	product_hidden = "/obj/item/weapon/lighter/zippo"
 //	product_hideamt = "4"
 	hidden_prices = "2"
@@ -174,6 +181,7 @@
 	icon_state = "med"
 	icon_deny = "med-deny"
 	req_access_txt = "5"
+	course = 10
 	product_paths = "/obj/item/clothing/under/rank/medical;/obj/item/clothing/under/rank/chemist;/obj/item/clothing/suit/storage/labcoat;/obj/item/clothing/shoes/white;/obj/item/device/healthanalyzer;/obj/item/weapon/reagent_containers/glass/bottle/antitoxin;/obj/item/weapon/reagent_containers/glass/bottle/inaprovaline;/obj/item/weapon/reagent_containers/glass/bottle/stoxin;/obj/item/weapon/reagent_containers/glass/bottle/toxin;/obj/item/weapon/reagent_containers/syringe/antiviral;/obj/item/weapon/reagent_containers/syringe;/obj/item/device/healthanalyzer;/obj/item/weapon/reagent_containers/glass/beaker;/obj/item/weapon/reagent_containers/dropper"
 //	product_amounts = "4;4;4;4;4;12;5;4;2"
 	product_prices = "1;1;1;1;2;2;2;2;2;2;1;2;2;5"
@@ -197,6 +205,7 @@
 //	product_hideamt = "4;4;1"
 	hidden_prices = "2;2;2"
 	points = 5
+	course = 10
 	density = 0 //It is wall-mounted, and thus, not dense. --Superxpdude
 	product_ads = "Go save some lives!;The best stuff for your medbay.;Only the finest tools.;Natural chemicals!;This stuff saves lives.;Don't you want some?"
 	charge_type = "medical"
@@ -207,6 +216,7 @@
 	icon_state = "wallmed"
 	icon_deny = "wallmed-deny"
 	req_access_txt = "5"
+	course = 10
 	product_paths = "/obj/item/weapon/reagent_containers/syringe/inaprovaline;/obj/item/weapon/reagent_containers/syringe/antitoxin;/obj/item/stack/medical/bruise_pack;/obj/item/stack/medical/ointment;/obj/item/device/healthanalyzer"
 //	product_amounts = "5;3;3;3;3"
 	product_prices = "2;2;1;1;2"
@@ -223,6 +233,7 @@
 	icon_state = "sec"
 	icon_deny = "sec-deny"
 	req_access_txt = "1"
+	course = 20
 	product_paths = "/obj/item/clothing/under/color/red;/obj/item/clothing/under/ftech;/obj/item/clothing/under/det;/obj/item/clothing/suit/storage/det_suit;/obj/item/clothing/head/det_hat;/obj/item/clothing/head/helmet;/obj/item/clothing/suit/armor/vest;/obj/item/clothing/suit/storage/gearharness;/obj/item/weapon/storage/belt/security;/obj/item/device/radio/headset/security;/obj/item/weapon/handcuffs;/obj/item/weapon/flashbang;/obj/item/device/flash;/obj/item/weapon/reagent_containers/food/snacks/donut;/obj/item/weapon/storage/box/evidence"
 //	product_amounts = "8;4;5;12;6"
 	product_prices = "1;1;1;1;1;3;3;3;2;1;1;3;2;1;2"
@@ -238,6 +249,7 @@
 	desc = "A plant nutrients vendor"
 	icon_state = "nutri"
 	icon_deny = "nutri-deny"
+	course = 5
 	product_paths = "/obj/item/nutrient/ez;/obj/item/nutrient/l4z;/obj/item/nutrient/rh;/obj/item/weapon/pestspray;/obj/item/weapon/reagent_containers/syringe;/obj/item/weapon/plantbag"
 //	product_amounts = "35;25;15;20;5;5"
 	product_prices = "1;1;2;2;7;7"
@@ -253,6 +265,7 @@
 	name = "MegaSeed Servitor"
 	desc = "When you need seeds fast!"
 	icon_state = "seeds"
+	course = 5
 	product_paths = "/obj/item/seeds/bananaseed;/obj/item/seeds/berryseed;/obj/item/seeds/carrotseed;/obj/item/seeds/chantermycelium;/obj/item/seeds/chiliseed;/obj/item/seeds/cornseed;/obj/item/seeds/eggplantseed;/obj/item/seeds/potatoseed;/obj/item/seeds/replicapod;/obj/item/seeds/soyaseed;/obj/item/seeds/sunflowerseed;/obj/item/seeds/tomatoseed;/obj/item/seeds/towermycelium;/obj/item/seeds/wheatseed;/obj/item/seeds/appleseed;/obj/item/seeds/poppyseed;/obj/item/seeds/ambrosiavulgarisseed;/obj/item/seeds/whitebeetseed;/obj/item/seeds/watermelonseed;/obj/item/seeds/limeseed;/obj/item/seeds/lemonseed;/obj/item/seeds/orangeseed;/obj/item/seeds/grassseed;/obj/item/seeds/sugarcaneseed;/obj/item/seeds/cocoapodseed;/obj/item/seeds/cabbageseed;/obj/item/seeds/grapeseed;/obj/item/seeds/pumpkinseed"
 //	product_amounts = "3;2;2;2;2;2;2;2;3;2;2;2;2;2;3;5;4;3;3;3;3;3;3;3;3;3;3;3"
 	product_prices = "3;5;5;5;5;5;5;5;3;5;5;5;5;5;3;2;3;3;3;3;3;3;3;3;3;3;3;3"
@@ -270,6 +283,7 @@
 	name = "MagiVend"
 	desc = "A magic vending machine."
 	icon_state = "MagiVend"
+	course = 0
 //	product_amounts = "1;1;1;1;1;2"
 	product_prices = "10;10;10;10;10;5"
 	product_slogans = "Sling spells the proper way with MagiVend!;Be your own Houdini! Use MagiVend!"
@@ -294,6 +308,7 @@
 //	product_hideamt = "2;2;2;2"
 	hidden_prices = "5;5;5;5"
 	points = 15
+	course = 10
 	product_ads = "Mm, food stuffs!;Food and food accessories.;Get your plates!;You like forks?;I like forks.;Woo, utensils.;You don't really need these..."
 	charge_type = "kitchen"
 
@@ -308,6 +323,7 @@
 	product_hidden = "/obj/item/weapon/reagent_containers/food/drinks/drinkingglass/cola"
 //	product_hideamt = "20"
 	hidden_prices = "1"
+	course = 30
 	product_ads = "For Tsar and Country.;Have you fulfilled your nutrition quota today?;Very nice!;We are simple people, for this is all we eat.;If there is a person, there is a problem. If there is no person, then there is no problem."
 	charge_type = "soda"
 
@@ -334,6 +350,7 @@
 	icon_state = "med"
 	icon_deny = "med-deny"
 	req_access_txt = "5"
+	course = 5
 	product_paths = "/obj/item/clothing/suit/storage/labcoat;/obj/item/clothing/under/rank/geneticist;/obj/item/weapon/reagent_containers/glass/bottle/antitoxin;/obj/item/weapon/reagent_containers/glass/bottle/inaprovaline;/obj/item/weapon/reagent_containers/glass/bottle/stoxin;/obj/item/weapon/reagent_containers/glass/bottle/toxin;/obj/item/weapon/reagent_containers/syringe"
 //	product_amounts = "4;4;6;6;6;6;4"
 	product_prices = "1;1;2;2;2;2;1"
@@ -361,6 +378,7 @@
 	icon_state = "engi"
 	icon_deny = "engi-deny"
 	req_access_txt = "10"
+	course = 10
 	product_paths = "/obj/item/clothing/under/rank/chief_engineer;/obj/item/clothing/under/rank/engineer;/obj/item/clothing/shoes/orange;/obj/item/clothing/head/helmet/hardhat;/obj/item/weapon/storage/belt/utility;/obj/item/clothing/glasses/meson;/obj/item/clothing/gloves/yellow;/obj/item/weapon/screwdriver;/obj/item/weapon/crowbar;/obj/item/weapon/wirecutters;/obj/item/device/multitool;/obj/item/weapon/wrench;/obj/item/device/t_scanner;/obj/item/weapon/CableCoil/power;/obj/item/weapon/circuitry;/obj/item/weapon/cell;/obj/item/weapon/weldingtool;/obj/item/clothing/head/helmet/welding;/obj/item/weapon/light/tube;/obj/item/clothing/suit/fire;/obj/item/weapon/stock_parts/scanning_module;/obj/item/weapon/stock_parts/micro_laser;/obj/item/weapon/stock_parts/matter_bin;/obj/item/weapon/stock_parts/manipulator;/obj/item/weapon/stock_parts/console_screen"
 //	product_amounts = "4;4;4;4;4;4;4;12;12;12;12;12;12;8;4;8;8;8;10;4"
 	product_prices = "1;1;1;2;2;1;2;1;1;2;2;1;1;1;2;2;1;1;1;2;2;2;2;2;2"
@@ -373,6 +391,7 @@
 	desc = "All the fine parts you need in one vending machine!"
 	product_hidden = ""
 	product_hideamt = ""
+	course = 10
 	product_paths = "/obj/item/clothing/under/rank/scientist;/obj/item/clothing/suit/bio_suit;/obj/item/clothing/head/bio_hood;/obj/item/device/transfer_valve;/obj/item/device/assembly/signaler;/obj/item/device/assembly/prox_sensor;/obj/item/device/assembly/igniter;/obj/item/device/assembly/timer"
 //	product_amounts = "6;6;6;6;6"
 	product_prices = "1;2;2;2;2;2;2;2"
@@ -391,21 +410,6 @@
 	hidden_prices = ""
 	charge_type = "robotics"
 
-/obj/machinery/vending/attackby(var/obj/I,var/mob/user)
-	if(istype(I,/obj/item/weapon/spacecash))
-		var/obj/item/weapon/spacecash/W = I
-		var/ama = round(input(user,"How much you want insert? Course - [course] credit/1 point. Your amount of [W.worth] cashes - [W.amount]") as num)
-		if(ama <= 0)
-			return
-		if(ama > W.amount)
-			user << "\red You don't have that amount"
-			return
-		var/npoint = round(W.worth * ama / course)
-		W.amount =- ama
-		if(W.amount == 0)
-			del(W)
-		points += npoint
-		user << "\blue Your insert [ama] cashes to machine. [npoint] points taked."
 /obj/item/weapon/vending_charge
 	name = "Vending Charge"
 	var/charge_type = "generic"
