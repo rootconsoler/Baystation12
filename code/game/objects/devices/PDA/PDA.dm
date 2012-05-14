@@ -418,10 +418,10 @@
 				if("invisible")
 					usr.icon_state = null
 					usr.icon = null
-					usr.stand_icon = null
-					usr.lying_icon = null
-					usr.face_standing = null
-					usr.face_lying = null
+					usr:stand_icon = null
+					usr:lying_icon = null
+					usr:face_standing = null
+					usr:face_lying = null
 					usr.name = "Invisible"
 				if("uplink")
 					uplink = new /obj/item/device/uplink/pda
