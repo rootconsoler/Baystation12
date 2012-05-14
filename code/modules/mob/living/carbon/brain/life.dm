@@ -4,8 +4,6 @@
 		set invisibility = 0
 		set background = 1
 
-		..()
-
 		var/datum/gas_mixture/environment // Added to prevent null location errors-- TLE
 		if(loc)
 			environment = loc.return_air()
@@ -114,7 +112,6 @@
 				bodytemperature += 0.1*(environment.temperature - bodytemperature)*environment_heat_capacity/(environment_heat_capacity + 270000)
 
 			//Account for massive pressure differences
-
 			return //TODO: DEFERRED
 
 		handle_temperature_damage(body_part, exposed_temperature, exposed_intensity)
@@ -141,7 +138,7 @@
 				drowsyness--
 				eye_blurry = max(2, eye_blurry)
 				if (prob(5))
-					sleeping += 1
+					sleeping = 1
 					Paralyse(5)
 
 			confused = max(0, confused - 1)
@@ -174,7 +171,7 @@
 				if(health <= 20 && prob(1)) spawn(0) emote("gasp")
 
 				//if(!rejuv) oxyloss++
-				if(!reagents.has_reagent("inaprovaline")) adjustOxyLoss(1)
+				if(!reagents.has_reagent("inaprovaline")) oxyloss++
 
 				if(stat != 2)	stat = 1
 				Paralyse(5)

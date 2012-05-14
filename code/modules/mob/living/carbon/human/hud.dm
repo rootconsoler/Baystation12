@@ -41,6 +41,14 @@
 	src.druggy.layer = 17
 	src.druggy.mouse_opacity = 0
 
+	// station explosion cinematic
+	src.station_explosion = new src.h_type( src )
+	src.station_explosion.icon = 'station_explosion.dmi'
+	src.station_explosion.icon_state = "start"
+	src.station_explosion.layer = 20
+	src.station_explosion.mouse_opacity = 0
+	src.station_explosion.screen_loc = "1,3"
+
 	var/obj/screen/using
 
 	using = new src.h_type( src )
@@ -470,11 +478,6 @@
 	mymob.oxygen.name = "oxygen"
 	mymob.oxygen.screen_loc = ui_oxygen
 
-	mymob.pressure = new /obj/screen( null )
-	mymob.pressure.icon = 'screen1_old.dmi'
-	mymob.pressure.icon_state = "pressure0"
-	mymob.pressure.name = "pressure"
-	mymob.pressure.screen_loc = ui_pressure
 /*
 	mymob.i_select = new /obj/screen( null )
 	mymob.i_select.icon_state = "selector"
@@ -666,7 +669,7 @@
 	mymob.client.screen = null
 
 	//, mymob.i_select, mymob.m_select
-	mymob.client.screen += list( mymob.pain, mymob.throw_icon, mymob.zone_sel, mymob.oxygen, mymob.toxin, mymob.bodytemp, mymob.internals, mymob.fire, mymob.hands, mymob.healths, mymob.nutrition_icon, mymob.pullin, mymob.blind, mymob.flash, mymob.rest, mymob.pressure, mymob.sleep, mymob.gun_setting_icon) //, mymob.mach )
+	mymob.client.screen += list( mymob.pain, mymob.throw_icon, mymob.zone_sel, mymob.oxygen, mymob.toxin, mymob.bodytemp, mymob.internals, mymob.fire, mymob.hands, mymob.healths, mymob.nutrition_icon, mymob.pullin, mymob.blind, mymob.flash, mymob.rest, mymob.sleep, mymob.gun_setting_icon) //, mymob.mach )
 	mymob.client.screen += src.adding + src.other
 
 	//if(istype(mymob,/mob/living/carbon/monkey)) mymob.client.screen += src.mon_blo

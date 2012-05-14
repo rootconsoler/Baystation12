@@ -32,6 +32,8 @@
 	if (!message)
 		return
 
+	log_say("[name]/[key] : [message]")
+
 	if (length(message) >= 1)
 		if (miming && copytext(message, 1, 2) != "*")
 			return
@@ -69,7 +71,7 @@
 	var/message_range = null
 	var/message_mode = null
 
-	if (getBrainLoss() >= 60 && prob(50))
+	if (brainloss >= 60 && prob(50))
 		if (ishuman(src))
 			message_mode = "headset"
 	// Special message handling
@@ -142,9 +144,8 @@
 		//world << "channel_prefix=[channel_prefix]; message_mode=[message_mode]"
 		if (message_mode)
 			message = trim(copytext(message, 3))
-			if (!(ishuman(src) || istype(src, /mob/living/simple_animal)) && (message_mode=="department" || (message_mode in radiochannels)))
+			if (!ishuman(src) && (message_mode=="department" || (message_mode in radiochannels)))
 				message_mode = null //only humans can use headsets
-			// Check removed so parrots can use headsets!
 
 	if (!message)
 		return
@@ -159,7 +160,7 @@
 	message = capitalize(message) //capitalize the first letter of what they actually say
 
 	// :downs:
-	if (getBrainLoss() >= 60)
+	if (brainloss >= 60)
 		message = dd_replacetext(message, " am ", " ")
 		message = dd_replacetext(message, " is ", " ")
 		message = dd_replacetext(message, " are ", " ")
@@ -314,13 +315,11 @@
 		listening += src
 
 */
-/*  Handing this section over to get_mobs_in_view which was written with radiocode update
 	var/turf/T = get_turf(src)
 	listening = hearers(message_range, T)
-	for (var/O in listening)
-		world << O
 	var/list/V = view(message_range, T)
 	var/list/W = V
+
 	//find mobs in lockers, cryo, intellicards, brains, MMIs, and so on.
 	for (var/mob/M in world)
 		if (!M.client)
@@ -336,26 +335,11 @@
 			if (M.client && M.client.ghost_ears)
 				listening|=M
 
-*/
-
-	listening = get_mobs_in_view(message_range, src)
-	for(var/mob/M in world)
-		if (!M.client)
-			continue //skip monkeys and leavers
-		if (istype(M, /mob/new_player))
-			continue
-		if(M.stat == 2 && M.client.ghost_ears)
-			listening|=M
-
-	var/turf/T = get_turf(src)
-	var/list/V = view(message_range, T)
-	var/list/W = V
-
 	var/list/eavesdroppers = get_mobs_in_view(7, src)
 	for(var/mob/M in listening)
 		eavesdroppers.Remove(M)
 	for(var/mob/M in eavesdroppers)
-		if(M.stat || !M.client || istype(M, /mob/living/silicon/pai) || M == src)
+		if(M.stat || !M.client)
 			eavesdroppers.Remove(M)
 
 	for (var/obj/O in ((W | contents)-used_radios))
@@ -363,12 +347,11 @@
 
 	for (var/mob/M in W)
 		W |= M.contents
-		if(hasorgans(M))
-			var/mob/living/carbon/G = M
-			for(var/name in G:organs)
-				var/datum/organ/external/F = G:organs[name]
-				for(var/obj/item/weapon/implant/I in F.implant)
-					W |= I
+		if(ishuman(M))
+			var/mob/living/carbon/human/G = M
+			for(var/name in G.organs)
+				var/datum/organ/external/F = G.organs[name]
+				W |= F.implant
 
 	for (var/obj/item/device/pda/M in W)
 		W |= M.contents
@@ -378,20 +361,11 @@
 			if(O && !istype(O.loc, /obj/item/weapon/storage))
 				O.hear_talk(src, message)
 
-
-/*			Commented out as replaced by code above from BS12
-	for (var/obj/O in ((V | contents)-used_radios)) //radio in pocket could work, radio in backpack wouldn't --rastaf0
-		spawn (0)
-			if (O)
-				O.hear_talk(src, message)
-*/
 	if(isbrain(src))//For brains to properly talk if they are in an MMI..or in a brain. Could be extended to other mobs I guess.
 		for(var/obj/O in loc)//Kinda ugly but whatever.
 			if(O)
 				spawn(0)
 					O.hear_talk(src, message)
-
-
 
 	var/list/heard_a = list() // understood us
 	var/list/heard_b = list() // didn't understand us
@@ -544,8 +518,6 @@
 			M << "\blue [src] speaks into their radio..."
 			M << speech_bubble
 		spawn(30) del(speech_bubble)
-
-	log_say("[name]/[key] : [message]")
 
 
 

@@ -9,11 +9,9 @@
 	var/muzzled = istype(src.wear_mask, /obj/item/clothing/mask/muzzle)
 	//var/m_type = 1
 
-	for(var/named in organs)
-		var/datum/organ/external/F = organs[named]
-		for (var/obj/item/weapon/implant/I in F.implant)
-			if (I.implanted)
-				I.trigger(act, src)
+	for (var/obj/item/weapon/implant/I in src)
+		if (I.implanted)
+			I.trigger(act, src)
 
 	if(src.stat == 2.0 && (act != "deathgasp"))
 		return
@@ -164,9 +162,7 @@
 
 		if ("faint")
 			message = "<B>[src]</B> faints."
-			if(src.sleeping)
-				return //Can't faint while asleep
-			src.sleeping += 10 //Short-short nap
+			src.sleeping = 1
 			m_type = 1
 
 		if ("cough")
@@ -511,27 +507,7 @@
 		else
 			src << "\blue Unusable emote '[act]'. Say *help for a list."
 
-
-
-
-
 	if (message)
-		log_emote("[name]/[key] : [message]")
-
- //Hearing gasp and such every five seconds is not good emotes were not global for a reason.
- // Maybe some people are okay with that.
-
-		for(var/mob/M in world)
-			if (!M.client)
-				continue //skip monkeys and leavers
-			if (istype(M, /mob/new_player))
-				continue
-			if(findtext(message," snores.")) //Because we have so many sleeping people.
-				continue
-			if(M.stat == 2 && M.client.ghost_sight && !(M in viewers(src,null)))
-				M.show_message(message)
-
-
 		if (m_type & 1)
 			for (var/mob/O in viewers(src, null))
 				O.show_message(message, m_type)

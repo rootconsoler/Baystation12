@@ -4,7 +4,6 @@
 		halloss = 0
 		// And the suffocation was a hallucination (lazy)
 		//oxyloss = 0
-		updatehealth()
 		return
 	if(src.stat == 2)
 		return
@@ -56,17 +55,30 @@
 		message_admins("\red Traitor [key_name_admin(src)] has died.")
 		log_game("Traitor [key_name(src)] has died.")
 
+	var/cancel
+	for (var/mob/M in world)
+		if (M.client && !M.stat)
+			cancel = 1
+			break
+
+	if (!cancel && !abandon_allowed)
+		spawn (50)
+			cancel = 0
+			for (var/mob/M in world)
+				if (M.client && !M.stat)
+					cancel = 1
+					break
+
+			if (!cancel && !abandon_allowed)
+				world << "<B>Everyone is dead! Resetting in 30 seconds!</B>"
+
+				feedback_set_details("end_error","no live players")
+				feedback_set_details("round_end","[time2text(world.realtime)]")
+				if(blackbox)
+					blackbox.save_all_data_to_sql()
+
+				spawn (300)
+					log_game("Rebooting because of no live players")
+					world.Reboot()
+
 	return ..(gibbed)
-
-/mob/living/carbon/human/proc/ChangeToHusk()
-	if(mutations & HUSK)
-		return
-	mutations |= HUSK
-	real_name = "Unknown"
-	update_body()
-	return
-
-/mob/living/carbon/human/proc/Drain()
-	ChangeToHusk()
-	mutations2 |= NOCLONE
-	return

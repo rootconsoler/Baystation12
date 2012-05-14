@@ -28,16 +28,13 @@
 		now_pushing = 1
 		if(ismob(AM))
 			var/mob/tmob = AM
-			if(istype(tmob, /mob/living/carbon/human) && tmob.mutations & FAT)
-/*
+			/*if(istype(tmob, /mob/living/carbon/human) && tmob.mutations & FAT)
 				if(prob(70))
-					src << "\red <B>You fail to push [tmob]'s fat ass out of the way.</B>"
+					for(var/mob/M in viewers(src, null))
+						if(M.client)
+							M << "\red <B>[src] fails to push [tmob]'s fat ass out of the way.</B>"
 					now_pushing = 0
-					return
-*/
-				if(tmob.nopush)
-					now_pushing = 0
-					return
+					return*/
 			tmob.LAssailant = src
 
 		now_pushing = 0
@@ -80,7 +77,7 @@
 	flick("flash", flash)
 /*
 	if (stat == 2 && client)
-		gib()
+		gib(1)
 		return
 
 	else if (stat == 2 && !client)
@@ -93,7 +90,7 @@
 	switch (severity)
 		if (1.0)
 			b_loss += 500
-			gib()
+			gib(1)
 			return
 
 		if (2.0)
@@ -112,7 +109,7 @@
 			ear_damage += 15
 			ear_deaf += 60
 
-	adjustBruteLoss(b_loss)
+	bruteloss += b_loss
 	adjustFireLoss(f_loss)
 
 	updatehealth()
@@ -153,7 +150,7 @@
 		if ((M.client && !( M.blinded )))
 			M.show_message(text("\red [] has been hit by []", src, O), 1)
 	if (health > 0)
-		adjustBruteLoss((istype(O, /obj/effect/meteor/small) ? 10 : 25))
+		bruteloss += (istype(O, /obj/effect/meteor/small) ? 10 : 25)
 		adjustFireLoss(30)
 
 		updatehealth()
@@ -252,7 +249,9 @@
 			else
 				m_select.screen_loc = null
 
-	if (alien_invis)
+	if(client && client.admin_invis)
+		invisibility = 100
+	else if (alien_invis)
 		invisibility = 2
 		if(istype(loc, /turf))//If they are standing on a turf.
 			AddCamoOverlay(loc)//Overlay camo.
@@ -281,24 +280,11 @@
 					O.show_message(text("\red <B>[M.name] has bit []!</B>", src), 1)
 			var/damage = rand(1, 3)
 
-			adjustBruteLoss(damage)
+			bruteloss += damage
 
 			updatehealth()
 
 	return
-
-
-/mob/living/carbon/alien/larva/attack_animal(mob/living/simple_animal/M as mob)
-	if(M.melee_damage_upper == 0)
-		M.emote("[M.friendly] [src]")
-	else
-		for(var/mob/O in viewers(src, null))
-			O.show_message("\red <B>[M]</B> [M.attacktext] [src]!", 1)
-		var/damage = rand(M.melee_damage_lower, M.melee_damage_upper)
-		adjustBruteLoss(damage)
-		updatehealth()
-
-
 
 /mob/living/carbon/alien/larva/attack_paw(mob/living/carbon/monkey/M as mob)
 	if(!(istype(M, /mob/living/carbon/monkey)))	return//Fix for aliens receiving double messages when attacking other aliens.
@@ -324,7 +310,7 @@
 				for(var/mob/O in viewers(src, null))
 					if ((O.client && !( O.blinded )))
 						O.show_message(text("\red <B>[M.name] has bit [src]!</B>"), 1)
-				adjustBruteLoss(rand(1, 3))
+				bruteloss  += rand(1, 3)
 				updatehealth()
 	return
 
@@ -349,7 +335,7 @@
 		else
 			damage = rand(5, 35)
 
-		adjustBruteLoss(damage)
+		bruteloss += damage
 
 
 		updatehealth()
@@ -463,7 +449,7 @@
 					for(var/mob/O in viewers(M, null))
 						if ((O.client && !( O.blinded )))
 							O.show_message(text("\red <B>[] has weakened []!</B>", M, src), 1, "\red You hear someone fall.", 2)
-				adjustBruteLoss(damage)
+				bruteloss += damage
 				updatehealth()
 			else
 				if(M.type != /mob/living/carbon/human/tajaran)
@@ -490,7 +476,7 @@
 
 		if ("help")
 			if(!sleeping_willingly)
-				sleeping = max(0,sleeping-5)
+				sleeping = 0
 			resting = 0
 			AdjustParalysis(-3)
 			AdjustStunned(-3)
@@ -506,7 +492,7 @@
 				for(var/mob/O in viewers(src, null))
 					if ((O.client && !( O.blinded )))
 						O.show_message(text("\red <B>[M.name] has bit []!</B>", src), 1)
-				adjustBruteLoss(damage)
+				bruteloss += damage
 				updatehealth()
 			else
 				M << "\green <B>[name] is too injured for that.</B>"

@@ -58,14 +58,6 @@
 		name = "Longest Hair"
 		icon_state = "hair_vlong"
 
-	longalt
-		name = "Long Hair Alt"
-		icon_state = "hair_longfringe"
-
-	longestalt
-		name = "Longest Hair Alt"
-		icon_state = "hair_vlongfringe"
-
 	halfbang
 		name = "Half-banged Hair"
 		icon_state = "hair_halfbang"
@@ -97,7 +89,6 @@
 	mohawk
 		name = "Mohawk"
 		icon_state = "hair_d"
-		choose_female = 0 // gross
 
 	balding
 		name = "Balding Hair"
@@ -127,7 +118,6 @@
 	dreadlocks
 		name = "Dreadlocks"
 		icon_state = "hair_dreads"
-		choose_female = 0 // okay.jpg
 
 	jensen
 		name = "Adam Jensen Hair"
@@ -142,6 +132,14 @@
 		icon_state = "bald"
 		choose_female = 0
 
+	longalt
+		name = "Long Hair Alt"
+		icon_state = "hair_longfringe"
+
+	longestalt
+		name = "Longest Hair Alt"
+		icon_state = "hair_vlongfringe"
+
 	himecut
 		name = "Hime Cut"
 		icon_state = "hair_himecut"
@@ -150,9 +148,6 @@
 		name = "Curls"
 		icon_state = "hair_curls"
 
-	spikey
-		name = "Spikey"
-		icon_state = "hair_spikey"
 
 /*
 ///////////////////////////////////

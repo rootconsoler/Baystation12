@@ -69,7 +69,7 @@
 		src.modules += new /obj/item/weapon/reagent_containers/pill/dexalin(src)
 		src.modules += new /obj/item/weapon/reagent_containers/pill/antitox(src)
 		src.modules += new /obj/item/weapon/reagent_containers/pill/kelotane(src)
-		src.modules += new /obj/item/weapon/reagent_containers/pill/bicaridine(src)
+		src.modules += new /obj/item/weapon/reagent_containers/pill/bicardine(src)
 		return
 
 
@@ -78,7 +78,7 @@
 			/obj/item/weapon/reagent_containers/pill/dexalin,
 			/obj/item/weapon/reagent_containers/pill/antitox,
 			/obj/item/weapon/reagent_containers/pill/kelotane,
-			/obj/item/weapon/reagent_containers/pill/bicaridine
+			/obj/item/weapon/reagent_containers/pill/bicardine
 		)
 		for (var/T in what)
 			if (!(locate(T) in src.modules))
@@ -163,7 +163,9 @@
 
 	New()
 		..()
-		src.modules += new /obj/item/weapon/soap/nanotrasen(src)
+		src.modules += new /obj/item/weapon/cleaner(src)
+		src.modules += new /obj/item/weapon/mop(src)
+		src.modules += new /obj/item/weapon/reagent_containers/glass/bucket(src)
 		src.modules += new /obj/item/weapon/trashbag(src)
 		src.emag = new /obj/item/weapon/cleaner(src)
 
@@ -191,10 +193,7 @@
 		src.modules += M
 
 		src.modules += new /obj/item/weapon/reagent_containers/robodropper(src)
-
-		var/obj/item/weapon/lighter/zippo/L = new /obj/item/weapon/lighter/zippo(src)
-		L.lit = 1
-		src.modules += L
+		src.modules += new /obj/item/weapon/zippo(src)
 
 		src.modules += new /obj/item/weapon/tray(src)
 		src.modules += new /obj/item/weapon/reagent_containers/food/drinks/shaker(src)
@@ -228,8 +227,5 @@
 
 
 	New()
-		src.modules += new /obj/item/weapon/melee/energy/sword(src)
-		src.modules += new /obj/item/weapon/gun/energy/pulse_rifle/destroyer(src)
 		src.modules += new /obj/item/weapon/card/emag(src)
-		src.modules += new /obj/item/weapon/tank/jetpack/oxygen(src)
 		return

@@ -1,30 +1,14 @@
-/mob/living/Life()
-
-	..()
-
-	// While I'm doing a terriblly lazy way of initalizing things, why don't I make it so people's preferences tag along with them.  This could be useful in fixing the fucking cloned-as-unknown thing, making me not have to dynamically load them during tensioner, and of course, storing metadata.
-
-	if(!src.storedpreferences)
-		src.storedpreferences = new
-		storedpreferences.savefile_load(src, 0)
-
-
-
-
-	return
-
-
 /mob/living/verb/succumb()
 	set hidden = 1
 	if ((src.health < 0 && src.health > -95.0))
-		src.adjustOxyLoss(src.health + 200)
+		src.oxyloss += src.health + 200
 		src.health = 100 - src.getOxyLoss() - src.getToxLoss() - src.getFireLoss() - src.getBruteLoss()
 		src << "\blue You have given up life and succumbed to death."
 
 
 /mob/living/proc/updatehealth()
 	if(!src.nodamage)
-		src.health = 100 - src.getOxyLoss() - src.getToxLoss() - src.getFireLoss() - src.getBruteLoss() - src.getCloneLoss() -src.halloss
+		src.health = 100 - src.getOxyLoss() - src.getToxLoss() - src.getFireLoss() - src.getBruteLoss() - src.cloneloss - src.halloss
 	else
 		src.health = 100
 		src.stat = 0
@@ -111,13 +95,6 @@
 		L |= E:contents
 	for(var/obj/item/smallDelivery/S in L)
 		L |= S.wrapped
-	if(hasorgans(src))
-		for(var/named in src:organs)
-			var/datum/organ/external/O = src:organs[named]
-			for(var/obj/item/weapon/implant/I in O.implant)
-				L |= I
-				if(istype(I, /obj/item/weapon/implant/compressed))
-					L |= I:scanned
 
 	for(var/obj/B in L)
 		if(B.type == A)
@@ -137,13 +114,6 @@
 		L |= E:contents
 	for(var/obj/item/smallDelivery/S in L)
 		L |= S.wrapped
-	if(hasorgans(src))
-		for(var/named in src:organs)
-			var/datum/organ/external/O = src:organs[named]
-			for(var/obj/item/weapon/implant/I in O.implant)
-				L |= I
-				if(istype(I, /obj/item/weapon/implant/compressed))
-					L |= I:scanned
 
 	for(var/obj/item/weapon/reagent_containers/B in L)
 		for(var/datum/reagent/R in B.reagents.reagent_list)
@@ -172,25 +142,25 @@
 
 // heal ONE external organ, organ gets randomly selected from damaged ones.
 /mob/living/proc/heal_organ_damage(var/brute, var/burn)
-	adjustBruteLoss(-brute)
+	bruteloss = max(0, getBruteLoss()-brute)
 	adjustFireLoss(-burn)
 	src.updatehealth()
 
 // damage ONE external organ, organ gets randomly selected from damaged ones.
 /mob/living/proc/take_organ_damage(var/brute, var/burn)
-	adjustBruteLoss(brute)
+	bruteloss += brute
 	adjustFireLoss(burn)
 	src.updatehealth()
 
 // heal MANY external organs, in random order
 /mob/living/proc/heal_overall_damage(var/brute, var/burn)
-	adjustBruteLoss(-brute)
+	bruteloss = max(0, getBruteLoss()-brute)
 	adjustFireLoss(-burn)
 	src.updatehealth()
 
 // damage MANY external organs, in random order
 /mob/living/proc/take_overall_damage(var/brute, var/burn)
-	adjustBruteLoss(brute)
+	bruteloss += brute
 	adjustFireLoss(burn)
 	src.updatehealth()
 
@@ -205,9 +175,8 @@
 			affecting.heal_damage(1000, 1000)    //fixes getting hit after ingestion, killing you when game updates organ health
 			affecting.broken = 0
 			affecting.destroyed = 0
-			for(var/datum/organ/wound/W in affecting.wounds)
+			for(var/datum/organ/external/wound/W in affecting.wounds)
 				W.stopbleeding()
-				del(W)
 		H.UpdateDamageIcon()
 		H.update_body()
 	//src.fireloss = 0
@@ -226,41 +195,6 @@
 	return
 
 /mob/living/proc/UpdateDamageIcon()
-		return
-
-/mob/living/proc/check_if_buckled()
-	if (buckled)
-		if(buckled == /obj/structure/stool/bed || istype(buckled, /obj/machinery/conveyor))
-			lying = 1
-		if(lying)
-			var/h = hand
-			hand = 0
-			drop_item()
-			hand = 1
-			drop_item()
-			hand = h
-		density = 1
-	else
-		density = !lying
-
-
-/mob/living/proc/Examine_OOC()
-	set name = "Examine Meta-Info (OOC)"
-	set category = "OOC"
-	set src in view()
-
-	if(config.allow_Metadata)
-		usr << "[src]'s Metainfo:"
-
-		if(src.storedpreferences)
-			usr << "[src]'s OOC Notes:  [src.storedpreferences.metadata]"
-
-		else
-			usr << "[src] does not have any stored infomation!"
-
-	else
-		usr << "OOC Metadata is not supported by this server!"
-
 	return
 
 /mob/living/attack_animal(mob/M)

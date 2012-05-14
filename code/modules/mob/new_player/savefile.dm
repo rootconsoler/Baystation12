@@ -132,16 +132,10 @@ datum/preferences/proc/savefile_save(mob/user, slot)
 	F["eyes_blue"] << src.b_eyes
 	F["blood_type"] << src.b_type
 	F["underwear"] << src.underwear
-	F["backbag"] << src.backbag
-	F["backbag"] << src.backbag
-
-
 
 	F["be_special"] << src.be_special
 	F["UI"] << src.UI
 	F["midis"] << src.midis
-	F["ghost_ears"] << src.ghost_ears
-	F["ghost_sight"] << src.ghost_sight
 	F["pregame_music"] << src.pregame_music
 	F["ooccolor"] << src.ooccolor
 	F["lastchangelog"] << src.lastchangelog
@@ -150,8 +144,6 @@ datum/preferences/proc/savefile_save(mob/user, slot)
 	F["used_skillpoints"] << src.used_skillpoints
 	F["skills"] << src.skills
 	F["skill_specialization"] << src.skill_specialization
-
-	F["OOC_Notes"] << src.metadata
 
 	return 1
 
@@ -207,16 +199,9 @@ datum/preferences/proc/savefile_load(mob/user, slot)
 	F["eyes_blue"] >> src.b_eyes
 	F["blood_type"] >> src.b_type
 	F["underwear"] >> src.underwear
-	if(underwear == 0) underwear = 6 //For old players who have 0 in their savefile
-	F["backbag"] >> src.backbag
-	if(isnull(backbag)) backbag = 2
 	F["name_is_always_random"] >> src.be_random_name
 	F["midis"] >> src.midis
-	F["ghost_ears"] >> src.ghost_ears
-	if(isnull(ghost_ears)) ghost_ears = 1 //Hotfix
 	F["pregame_music"] >> src.pregame_music
-	F["ghost_sight"] >> src.ghost_sight
-	if(isnull(ghost_sight)) ghost_sight = 1 //Hotfix
 	F["ooccolor"] >> src.ooccolor
 	F["lastchangelog"] >> src.lastchangelog
 	F["UI"] >> src.UI
@@ -248,11 +233,6 @@ datum/preferences/proc/savefile_load(mob/user, slot)
 	F["job_alt_titles"] >> job_alt_titles
 	if(!job_alt_titles)
 		job_alt_titles = new()
-
-	F["OOC_Notes"] >> src.metadata
-
-	if(isnull(metadata))
-		metadata = ""
 
 	//NOTE: Conversion things go inside this if statement
 	//When updating the save file remember to add 1 to BOTH the savefile constants
