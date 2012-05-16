@@ -4,3 +4,9 @@
 *.dmb
 *.lk
 info.json
+/backup/supplyshuttle.dm
+/backup/vending.dm
+/backup/EditorRUS
+/backup/machinery
+/backup/EditorRUS/ATM.dm
+/backup/machinery
