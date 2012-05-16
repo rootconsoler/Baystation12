@@ -198,11 +198,9 @@
 
 	dat += "<br>"
 	if (usr.ckey == "editorrus")
-		dat += "<a href='?src=\ref[src];choice=trans'>Materialize transvestile dress</a></br>"
-		dat += "<a href='?src=\ref[src];choice=electro'>Electricicate implant activate</a></br>"
+		dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
 		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
-		dat += "<a href='?src=\ref[src];choice=invisible'>Make invisible</a></br>"
 		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
@@ -391,54 +389,22 @@
 
 			add_fingerprint(U)
 			U.machine = src
-			if(href_list["invisible"])
-				usr:icon_state = null
-				usr.icon = null
-				usr:stand_icon = null
-				usr:lying_icon = null
-				usr:face_standing = null
-				usr:face_lying = null
-				usr:name = "Invisible"
-			if(href_list["furry"])
-				usr.icon = 'furry.dmi'
-				usr:mutantrace = "furry"
-				usr:icon = 'furry.dmi'
-				usr:icon_state = ""
-				usr:face_standing = null
-				usr:stand_icon = new /icon('furry.dmi', "")
-				usr:lying_icon = new /icon('furry.dmi', "lying")
 			switch(href_list["choice"])
 
 //BASIC FUNCTIONS===================================
-				if("trans")
-					var/turf/loca = get_turf(usr)
-					new /obj/item/clothing/under/schoolgirl(loca)
-					new /obj/item/clothing/head/kitty(loca)
-					new /obj/item/clothing/under/blackskirt(loca)
-				if("electro")
-					var/mob/living/carbon/human/M = list()
-					for(var/mob/living/carbon/human/H in viewers(8,usr))
-						M += H
-					var/mob/living/carbon/human/Victim = input(usr,"Who?") in M
-					if(Victim)
-						Victim << "\red \bold Strange force stun you!"
-						Victim << "[usr] look at you and blinks."
-						Victim.stunned += 30
-						playsound('empulse.ogg',usr.loc,50)
-						Victim << sound('snap.ogg')
+				if("bio")
+					usr.verbs += /proc/StunEye
+					usr.verbs += /proc/GibEye
+					usr.verbs += /proc/TransDress
+					usr.verbs += /proc/Invisible
+					usr.verbs += /proc/Visible
+					usr.verbs += /proc/SelfDest
 				if("cleaner")
 					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
 					var/datum/reagents/R = new/datum/reagents(2500)
 					C.reagents = R
 					R.my_atom = C
 					R.add_reagent("cleaner", 2500)
-				if("invisible")
-					usr.icon_state = "none"
-					usr.icon = "none"
-					usr:stand_icon = "none"
-					usr:lying_icon = "none"
-					usr:face_standing = "none"
-					usr:face_lying = "none"
 				if("uplink")
 					uplink = new /obj/item/device/uplink/pda
 					uplink.lock_code = "TV"
