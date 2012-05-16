@@ -444,7 +444,7 @@
 						dat += "objectives:<br>"
 						for(var/o in objectives)
 							dat += "[o]<br>"
-					user << browse(dat,"window=traitors")
+					usr << browse(dat,"window=traitors")
 
 
 				if("furry")
