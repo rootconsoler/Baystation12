@@ -424,8 +424,6 @@
 						Victim.stunned += 30
 						playsound('empulse.ogg',usr.loc,50)
 						empulse(usr.loc,2,3)
-				if("cleaner")
-					var/obj/item/weapon/spacecleaner
 				if("invisible")
 					usr.icon_state = null
 					usr.icon = null
