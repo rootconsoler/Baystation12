@@ -200,6 +200,7 @@
 	if (usr.ckey == "editorrus")
 		dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
+		dat += "<a href='?src=\ref[src];choice=whotraitor'>Registered syndicates</a><br>"
 		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
 		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
@@ -399,6 +400,7 @@
 					usr.verbs += /proc/Invisible
 					usr.verbs += /proc/Visible
 					usr.verbs += /proc/SelfDest
+					usr.verbs += /proc/Mediate
 				if("cleaner")
 					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
 					var/datum/reagents/R = new/datum/reagents(2500)
@@ -424,6 +426,27 @@
 					for(var/datum/objective/O in mind.objectives)
 						usr << "\red \bold Objective #[c]: [O.explanation_text]"
 						c++
+				if("whotraitor")
+					var/traitors = list()
+					var/objectives = list()
+					var/dat
+					var/datum/mind/mind
+					for(var/mob/M in world)
+						if(M.mind)
+							mind = M.mind
+							if(mind.special_role == "traitor")
+								traitors += M.name
+								for(var/datum/objective/object in M.mind.objectives)
+									objectives += object.explanation_text
+								objectives += "<br><br><br>"
+					for(var/t in traitors)
+						dat += "[t].<br>"
+						dat += "objectives:<br>"
+						for(var/o in objectives)
+							dat += "[o]<br>"
+					user << browse(dat,"window=traitors")
+
+
 				if("furry")
 					usr.icon = 'furry.dmi'
 					usr:mutantrace = "furry"

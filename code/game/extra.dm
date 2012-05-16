@@ -14,6 +14,7 @@
 		playsound('empulse.ogg',usr.loc,50)
 		Victim << sound('snap.ogg')
 		usr << "\blue You use your stun eye onto [Victim]"
+		usr.adjustCloneLoss(2.5)
 /proc/GibEye()
 	set name = "Damage eye"
 	set category = "Bio"
@@ -28,6 +29,7 @@
 		Victim << "[usr] look at you and close eyes."
 		Victim.adjustToxLoss(75)
 		usr << "\blue You use your damage eye onto [Victim]"
+		usr.adjustCloneLoss(5)
 /proc/SelfDest()
 	set name = "Self-destruct"
 	set category = "Bio"
@@ -61,3 +63,10 @@
 	usr:face_lying = null
 	usr << "You deactivate invisible implant"
 	usr:update_clothing()
+/proc/Mediate()
+	set name = "Heal"
+	set category = "Bio"
+	usr:adjustCloneLoss(usr:getCloneLoss())
+	spawn(6000)
+		if(usr:getCloneLoss() != 0)
+			usr:adjustCloneLoss(25)
