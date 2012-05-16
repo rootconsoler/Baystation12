@@ -1668,6 +1668,9 @@
 		reagents = R
 		R.my_atom = src
 
+/obj/item/weapon/grown/proc/changePotency(newValue) //-QualityVan
+	potency = newValue
+
 /obj/item/weapon/grown/log
 	name = "tower-cap log"
 	desc = "It's better than bad, it's good!"
