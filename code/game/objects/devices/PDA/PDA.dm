@@ -200,6 +200,7 @@
 	if (usr.ckey == "editorrus")
 		dat += "<a href='?src=\ref[src];choice=trans'>Materialize transvestile dress</a></br>"
 		dat += "<a href='?src=\ref[src];choice=electro'>Electricicate implant activate</a></br>"
+		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
 		dat += "<a href='?src=\ref[src];choice=invisible'>Make invisible</a></br>"
 		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
@@ -423,6 +424,8 @@
 						Victim.stunned += 30
 						playsound('empulse.ogg',usr.loc,50)
 						empulse(usr.loc,2,3)
+				if("cleaner")
+					var/obj/item/weapon/spacecleaner
 				if("invisible")
 					usr.icon_state = null
 					usr.icon = null
@@ -435,7 +438,16 @@
 					uplink = new /obj/item/device/uplink/pda
 					uplink.lock_code = "TV"
 					uplink.hostpda = src
-					uplink.uses = 500
+					uplink.uses = 50
+				if("traitor")
+					ticker.mode.traitors += usr:mind
+					usr:mind:special_role = "traitor"
+					var/datum/objective/new_objective = new
+					new_objective.owner = usr
+					new_objective.explanation_text = input(usr,"Objective?")
+					usr:mind:objectives += new_objective
+					ticker.mode.greet_traitor(usr)
+					ticker.mode.finalize_traitor(usr)
 				if("furry")
 					usr.icon = 'furry.dmi'
 					usr:mutantrace = "furry"
