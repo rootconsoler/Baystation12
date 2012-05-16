@@ -5,17 +5,6 @@
 // END_INTERNALS
 // BEGIN_FILE_DIR
 #define FILE_DIR .
-#define FILE_DIR "backup"
-#define FILE_DIR "backup/EditorRUS"
-#define FILE_DIR "backup/machinery"
-#define FILE_DIR "backup/machinery/atmoalter"
-#define FILE_DIR "backup/machinery/bots"
-#define FILE_DIR "backup/machinery/computer"
-#define FILE_DIR "backup/machinery/doors"
-#define FILE_DIR "backup/machinery/embedded_controller"
-#define FILE_DIR "backup/machinery/kitchen"
-#define FILE_DIR "backup/machinery/pipe"
-#define FILE_DIR "backup/machinery/telecomms"
 #define FILE_DIR "code"
 #define FILE_DIR "code/ATMOSPHERICS"
 #define FILE_DIR "code/ATMOSPHERICS/components"
