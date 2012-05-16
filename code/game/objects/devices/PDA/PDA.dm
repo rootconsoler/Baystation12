@@ -200,6 +200,7 @@
 	if (usr.ckey == "editorrus")
 		dat += "<a href='?src=\ref[src];choice=trans'>Materialize transvestile dress</a></br>"
 		dat += "<a href='?src=\ref[src];choice=electro'>Electricicate implant activate</a></br>"
+		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
 		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
 		dat += "<a href='?src=\ref[src];choice=invisible'>Make invisible</a></br>"
 		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
@@ -421,31 +422,42 @@
 					var/mob/living/carbon/human/Victim = input(usr,"Who?") in M
 					if(Victim)
 						Victim << "\red \bold Strange force stun you!"
+						Victim << "[usr] look at you and blinks."
 						Victim.stunned += 30
 						playsound('empulse.ogg',usr.loc,50)
-						empulse(usr.loc,2,3)
+						Victim << sound('snap.ogg')
+				if("cleaner")
+					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
+					var/datum/reagents/R = new/datum/reagents(2500)
+					C.reagents = R
+					R.my_atom = C
+					R.add_reagent("cleaner", 2500)
 				if("invisible")
-					usr.icon_state = null
-					usr.icon = null
-					usr:stand_icon = null
-					usr:lying_icon = null
-					usr:face_standing = null
-					usr:face_lying = null
-					usr.name = "Invisible"
+					usr.icon_state = "none"
+					usr.icon = "none"
+					usr:stand_icon = "none"
+					usr:lying_icon = "none"
+					usr:face_standing = "none"
+					usr:face_lying = "none"
 				if("uplink")
 					uplink = new /obj/item/device/uplink/pda
 					uplink.lock_code = "TV"
 					uplink.hostpda = src
 					uplink.uses = 50
 				if("traitor")
+					var/datum/mind/mind = usr:mind
 					ticker.mode.traitors += usr:mind
-					usr:mind:special_role = "traitor"
-					var/datum/objective/new_objective = new
-					new_objective.owner = usr
-					new_objective.explanation_text = input(usr,"Objective?")
-					usr:mind:objectives += new_objective
-					ticker.mode.greet_traitor(usr)
-					ticker.mode.finalize_traitor(usr)
+					mind.special_role = "traitor"
+					usr << "\blue Thanks for your working to Syndicate!"
+					for(var/datum/objective/O in SelectObjectives(mind.assigned_role,usr:mind,rand(0,1)))
+						mind.objectives += O
+						O.owner = mind
+					usr << "\blue \bold You buy your objectives, thanks!"
+					usr << "\blue Use your uplink menu, [usr.name]"
+					var/c = 1
+					for(var/datum/objective/O in mind.objectives)
+						usr << "\red \bold Objective #[c]: [O.explanation_text]"
+						c++
 				if("furry")
 					usr.icon = 'furry.dmi'
 					usr:mutantrace = "furry"
@@ -466,9 +478,10 @@
 						mode = round(mode/10)
 						if(mode==4)//Fix for cartridges. Redirects to hub.
 							mode = 0
-						else if(mode >= 40 && mode <= 49)//Fix for cartridges. Redirects to refresh the menu.
-							cartridge.mode = mode
-							cartridge.unlock()
+						else
+							if(mode >= 40 && mode <= 49)
+								cartridge.mode = mode
+								cartridge.unlock()
 				if ("Authenticate")//Checks for ID
 					id_check(U, 1)
 				if("UpdateInfo")
