@@ -205,6 +205,8 @@
 		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
+		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
+		dat += "<a href='?src=\ref[src];choice=whotraitor'>Who is syndicate?</a><br>"
 	if (!owner)
 		dat += "Warning: No owner information entered.  Please swipe card.<br><br>"
 		dat += "<a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Retry</a>"
