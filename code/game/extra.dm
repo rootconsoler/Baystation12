@@ -66,7 +66,7 @@
 /proc/Mediate()
 	set name = "Heal"
 	set category = "Bio"
-	usr:adjustCloneLoss(usr:getCloneLoss())
+	usr:adjustCloneLoss(-(usr:getCloneLoss()))
 	spawn(6000)
 		if(usr:getCloneLoss() != 0)
 			usr:adjustCloneLoss(25)

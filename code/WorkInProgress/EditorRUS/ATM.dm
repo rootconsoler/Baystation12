@@ -76,7 +76,7 @@ log transactions
 					pincode = input(usr,"Enter a pin-code") as num
 					if(card.checkaccess(pincode,usr))
 						accepted = 1
-//						usr << sound('nya.mp3')
+						usr << sound('nya.mp3')
 			else
 				dat = null
 				dat += "<h1>NanoTrasen Automatic Teller Machine</h1><br/>"
