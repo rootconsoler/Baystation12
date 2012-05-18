@@ -159,7 +159,7 @@
 	ammo = 30
 
 /obj/item/weapon/spacecash
-	name = "space cash"
+	name = "stack of credits"
 	desc = "It's worth 1 credit."
 	gender = PLURAL
 	icon = 'items.dmi'
@@ -222,8 +222,8 @@
 	if(href_list["takemoney"])
 		var/a = 1
 		a = input(usr,"How much you want take?") as num
-		if(a > src.amount)
-			usr << "\red You don't have that amount of cash"
+		if((a > src.amount) || (a < 0))
+			usr << "\red You don't have that many credits."
 			return
 		src.amount -= a
 		var/obj/item/weapon/spacecash/S
@@ -254,7 +254,7 @@
 		return
 	if(istype(I,src))
 		src.amount += I:amount
-		user << "You add [I:amount] cashes to stack"
+		user << "You add [I:amount] credits to stack."
 		del(I)
 
 
@@ -624,7 +624,6 @@
 	var/assignment = null
 	var/over_jumpsuit = 1 // If set to 0, it won't display on top of the mob's jumpsuit
 	var/dorm = 0		// determines if this ID has claimed a dorm already
-	var/obj/item/weapon/credit_card/Card
 	var/blood_type = "\[UNSET\]"
 	var/dna_hash = "\[UNSET\]"
 	var/fingerprint_hash = "\[UNSET\]"
@@ -911,6 +910,7 @@
 /obj/item/weapon/handcuffs/cable
 	name = "cable restraints"
 	desc = "Looks like some cables tied together. Could be used to tie something up."
+	icon_state = "cuff_red"
 
 /obj/item/weapon/locator
 	name = "locator"

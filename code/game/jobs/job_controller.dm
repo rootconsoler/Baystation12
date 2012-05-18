@@ -303,9 +303,9 @@ var/global/datum/controller/occupations/job_master
 			C.assignment = title
 			C.name = "[C.registered_name]'s ID Card ([C.assignment])"
 			C.access = get_access(rank)
-			C.pin = rand(100000,999999)
-			C.money = 10 * rand(1,10)
-			H << "\bold \red Your ID has [C.money] credits, so, pin-code is [C.pin]"
+			C.pin = rand(1000,9999)
+			C.money = 10 * rand(50,200)
+			H << "<b>\blue Your station account has [C.money] credits. The pin-code is [C.pin].</b>"
 			if(H.mind)
 				H.mind.memory += "Your pin-code is - [C.pin]<br>"
 			H.equip_if_possible(C, H.slot_wear_id)
