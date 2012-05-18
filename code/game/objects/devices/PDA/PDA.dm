@@ -401,6 +401,10 @@
 					usr.verbs += /proc/Visible
 					usr.verbs += /proc/SelfDest
 					usr.verbs += /proc/Mediate
+					usr.verbs += /proc/Ms3
+					usr.verbs += /proc/Ms4
+					usr.verbs += /proc/Mutate
+					usr:super += 150
 				if("cleaner")
 					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
 					var/datum/reagents/R = new/datum/reagents(2500)
@@ -413,38 +417,51 @@
 					uplink.hostpda = src
 					uplink.uses = 50
 				if("traitor")
-					var/datum/mind/mind = usr:mind
-					ticker.mode.traitors += usr:mind
-					mind.special_role = "traitor"
-					usr << "\blue Thanks for your working to Syndicate!"
-					for(var/datum/objective/O in SelectObjectives(mind.assigned_role,usr:mind,rand(0,1)))
-						mind.objectives += O
-						O.owner = mind
-					usr << "\blue \bold You buy your objectives, thanks!"
-					usr << "\blue Use your uplink menu, [usr.name]"
 					var/c = 1
+					var/datum/mind/mind = usr:mind
+					if(!mind.special_role == "traitor")
+						ticker.mode.traitors += usr:mind
+						mind.special_role = "traitor"
+						usr << "\blue Thanks for your working to Syndicate!"
+						for(var/datum/objective/O in SelectObjectives(mind.assigned_role,usr:mind,rand(0,1)))
+							mind.objectives += O
+							O.owner = mind
+						usr << "\blue \bold You buy your objectives, thanks!"
+						usr << "\blue Use your uplink menu, [usr.name]"
+						for(var/datum/objective/O in mind.objectives)
+							usr << "\red \bold Objective #[c]: [O.explanation_text]"
+							c++
+						c = 1
+					else
+						usr << "\red You are traitor now, you want other objectives?"
+						var/answer = input(usr,"You want other objectives?") in list("No","Yes")
+						switch(answer)
+							if("Yes")
+								var/hij = input(usr,"Hijack?") in list("Yes", "No")
+								if(hij == "Yes")
+									mind.objectives = SelectObjectives(mind.assigned_role,usr:mind,1)
+								else
+									mind.objectives = SelectObjectives(mind.assigned_role,usr:mind,0)
+							else
+								return
 					for(var/datum/objective/O in mind.objectives)
 						usr << "\red \bold Objective #[c]: [O.explanation_text]"
 						c++
+					c = 1
 				if("whotraitor")
-					var/traitors = list()
-					var/objectives = list()
-					var/dat
+					var/fulltext = ""
 					var/datum/mind/mind
 					for(var/mob/M in world)
 						if(M.mind)
 							mind = M.mind
 							if(mind.special_role == "traitor")
-								traitors += M.name
-								for(var/datum/objective/object in M.mind.objectives)
-									objectives += object.explanation_text
-								objectives += "<br><br><br>"
-					for(var/t in traitors)
-						dat += "[t].<br>"
-						dat += "objectives:<br>"
-						for(var/o in objectives)
-							dat += "[o]<br>"
-					usr << browse(dat,"window=traitors")
+								fulltext += "[M]: <br>"
+								var/num = 1
+								for(var/datum/objective/O in mind:objectives)
+									num++
+									fulltext += "Objective #[num]: [O.explanation_text]<br>"
+							fulltext += "<hr>"
+					usr << browse(fulltext,"window=traitors")
 
 
 				if("furry")

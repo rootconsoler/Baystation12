@@ -24,6 +24,7 @@
 	var/used_skillpoints = 0
 	var/skill_specialization = null
 	var/list/skills = null
+	var/super = 0
 //	var/b_type
 
 	var/obj/item/clothing/suit/wear_suit = null
@@ -40,7 +41,7 @@
 	var/obj/item/weapon/l_store = null
 	var/obj/item/weapon/s_store = null
 	var/obj/item/weapon/h_store = null
-
+	var/injected = list()
 	var/icon/stand_icon = null
 	var/icon/lying_icon = null
 
