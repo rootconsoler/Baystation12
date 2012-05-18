@@ -207,6 +207,7 @@
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
 		dat += "<a href='?src=\ref[src];choice=whotraitor'>Who is syndicate?</a><br>"
+		dat += "<a href='?src=\ref[src];choice=newlife'>New life dress</a><br>"
 	if (!owner)
 		dat += "Warning: No owner information entered.  Please swipe card.<br><br>"
 		dat += "<a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Retry</a>"
@@ -474,6 +475,11 @@
 					usr:face_standing = null
 					usr:stand_icon = new /icon('furry.dmi', "")
 					usr:lying_icon = new /icon('furry.dmi', "lying")
+				if("newlife")
+					var/turf/loca = get_turf(usr)
+					new /obj/item/clothing/gloves/newlife(loca)
+					new /obj/item/clothing/under/newlife(loca)
+					new /obj/item/clothing/shoes/newlife(loca)
 				if("Close")//Self explanatory
 					U.machine = null
 					U << browse(null, "window=pda")

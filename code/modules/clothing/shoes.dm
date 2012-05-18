@@ -182,3 +182,7 @@
 	name = "full brown shoes"
 	icon_state = "fullbrown"
 	color = "fullbrown"
+/obj/item/clothing/shoes/newlife
+	name = "New life shoes"
+	icon_state = "purple"
+	color = "nl"

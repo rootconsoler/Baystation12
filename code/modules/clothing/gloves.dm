@@ -272,3 +272,7 @@
 	icon_state = "fingerless_black"
 	item_state = "fingerless_black"
 	color="black"
+/obj/item/clothing/gloves/newlife
+	name = "New life gloves"
+	icon_state = "green"
+	color = "nl"

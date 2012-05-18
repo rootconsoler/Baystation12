@@ -582,3 +582,8 @@
 	icon_state = "captainmal"
 	item_state = "captainmal"
 	color = "captainmal"
+/obj/item/clothing/under/newlife
+	name = "New life costume"
+	desc = "Just for New4Life"
+	icon_state = "blue"
+	color = "newlife"
