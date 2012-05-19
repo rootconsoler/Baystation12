@@ -126,15 +126,14 @@
 	if(victims)
 		var/mob/victim = input(usr,"Who must be sucked?") in victims
 		var/datum/reagents/VBlood = victim:vessel
-		if(usr in range(1,victim))
-			for(var/m = 1,VBlood.get_reagent_amount("blood"),m++)
-				if(victim in range(1,usr) && VBlood.get_reagent_amount("blood"))
-					VBlood.remove_reagent("blood",1)
-					usr:super++
-					sleep(5)
-					usr << "\blue You extract 1 blood from [victim], how your bio-power is [usr:super]"
-					if(m > VBlood.get_reagent_amount("blood"))
-						break
-				else
-					usr << "\blue Blood-sucking interruped"
-					return
+		for(var/m = 1,VBlood.get_reagent_amount("blood"),m++)
+			if(VBlood.get_reagent_amount("blood"))
+				VBlood.remove_reagent("blood",1)
+				usr:super++
+				sleep(5)
+				usr << "\blue You extract 1 blood from [victim], how your bio-power is [usr:super]"
+				if(m > VBlood.get_reagent_amount("blood"))
+					break
+			else
+				usr << "\blue Blood-sucking interruped"
+				return
