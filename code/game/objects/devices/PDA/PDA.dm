@@ -439,7 +439,7 @@
 									mind.objectives = SelectObjectives(mind.assigned_role,usr:mind,0)
 							else
 								return
-					traitors += mind
+					ticker.mode.traitors += mind
 					for(var/datum/objective/O in mind.objectives)
 						usr << "\red \bold Objective #[c]: [O.explanation_text]"
 						c++
