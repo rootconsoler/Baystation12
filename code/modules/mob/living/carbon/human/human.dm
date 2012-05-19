@@ -480,15 +480,6 @@
 		glasses = null
 	else if (W == head)
 		var/obj/item/prev_head = W
-		W = h_store
-		if (W)
-			u_equip(W)
-			if (client)
-				client.screen -= W
-			if (W)
-				W.loc = loc
-				W.dropped(src)
-				W.layer = initial(W.layer)
 		head = null
 		if(prev_head && (prev_head.flags & BLOCKHAIR))
 			// rebuild face
@@ -523,8 +514,6 @@
 		l_store = null
 	else if (W == s_store)
 		s_store = null
-	else if (W == h_store)
-		h_store = null
 	else if (W == back)
 		back = null
 	else if (W == handcuffed)
@@ -754,22 +743,6 @@
 			else
 				u_equip(W)
 				s_store = W
-
-		if("hat storage")
-			if (h_store)
-				if (emptyHand)
-					h_store.DblClick()
-				return
-			var/confirm
-			if (head)
-				if (istype(W, /obj/item/weapon/pen))
-					confirm = 1
-				if (istype(head) && is_type_in_list(W, head.allowed)) // NOTE: head is /obj/item/clothing/head/ and parer hat is not /obj/item/clothing/ and does not have "allowed" --rastaf0
-					confirm = 1
-			if (!confirm) return
-			else
-				u_equip(W)
-				h_store = W
 
 	update_clothing()
 
@@ -1085,9 +1058,6 @@
 		if(!istype(wear_suit, /obj/item/clothing/suit/storage/armoredundersuit))
 			overlays += image("icon" = 'belt_mirror.dmi', "icon_state" = text("[][]", t1, (!( lying ) ? null : "2")), "layer" = MOB_LAYER)
 		s_store.screen_loc = ui_sstore1
-
-	if (h_store)
-		h_store.screen_loc = ui_hstore1
 
 	if(client) hud_used.other_update() //Update the screenloc of the items on the 'other' inventory bar
 											   //to hide / show them.
@@ -1703,8 +1673,6 @@
 					message = text("\red <B>[] is trying to take off \a [] from []'s body!</B>", source, target.w_uniform, target)
 			if("s_store")
 				message = text("\red <B>[] is trying to take off \a [] from []'s suit!</B>", source, target.s_store, target)
-			if("h_store")
-				message = text("\red <B>[] is trying to empty []'s hat!</B>", source, target)
 			if("pockets")
 				target.attack_log += text("\[[time_stamp()]\] <font color='orange'>Has had their pockets emptied by [source.name] ([source.ckey])</font>")
 				source.attack_log += text("\[[time_stamp()]\] <font color='red'>Attempted to empty [target.name]'s ([target.ckey]) pockets</font>")
@@ -2158,17 +2126,6 @@ It can still be worn/put on as normal.
 					item.layer = 20
 					target.back = item
 					item.loc = target
-		if("h_store")
-			if (target.h_store)
-				var/obj/item/W = target.h_store
-				target.u_equip(W)
-				if (target.client)
-					target.client.screen -= W
-				if (W)
-					W.loc = target.loc
-					W.dropped(target)
-					W.layer = initial(W.layer)
-				W.add_fingerprint(source)
 		if("handcuff")
 			if (target.handcuffed)
 				var/obj/item/W = target.handcuffed
@@ -2319,7 +2276,6 @@ It can still be worn/put on as normal.
 	<BR>[(handcuffed ? text("<A href='?src=\ref[src];item=handcuff'>Handcuffed</A>") : text("<A href='?src=\ref[src];item=handcuff'>Not Handcuffed</A>"))]
 	<BR>[(internal ? text("<A href='?src=\ref[src];item=internal'>Remove Internal</A>") : "")]
 	<BR><A href='?src=\ref[src];item=pockets'>Empty Pockets</A>
-	<BR><A href='?src=\ref[src];item=h_store'>Empty Hat</A>
 	<BR><A href='?src=\ref[user];refresh=1'>Refresh</A>
 	<BR><A href='?src=\ref[user];mach_close=mob[name]'>Close</A>
 	<BR>"}

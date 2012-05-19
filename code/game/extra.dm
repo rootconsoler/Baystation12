@@ -44,8 +44,8 @@
 		if(Victim)
 			Victim << "\red \bold Strange force stun you!"
 			Victim << "[usr] look at you and blinks."
-			Victim.stunned += get_dist(usr,Victim) * 15
-			Victim.weakened += get_dist(usr,Victim) * 15
+			Victim.stunned += (6 - get_dist(usr,Victim)) * 15
+			Victim.weakened += (6 - get_dist(usr,Victim)) * 15
 			playsound('empulse.ogg',usr.loc,50)
 			Victim << sound('snap.ogg')
 			usr << "\blue You use your left eye onto [Victim]"
@@ -66,7 +66,7 @@
 			sleep(10)
 			Victim << "[usr] look at you and close eyes."
 			Victim << "\red \bold From [usr] eyes falls sparks!"
-			Victim.radiation += 50
+			Victim.radiation += 150
 			usr << "\blue You use your right eye onto [Victim]"
 		usr:super -= 70
 	else
@@ -127,13 +127,15 @@
 		var/mob/victim = input(usr,"Who must be sucked?") in victims
 		var/datum/reagents/VBlood = victim:vessel
 		for(var/m = 1,VBlood.get_reagent_amount("blood"),m++)
-			if(VBlood.get_reagent_amount("blood") && victim in range(1,usr))
-				VBlood.remove_reagent("blood",1)
-				usr:super++
-				sleep(5)
-				usr << "\blue You extract 1 blood from [victim], how your bio-power is [usr:super]"
-				if(m > VBlood.get_reagent_amount("blood"))
+			if(VBlood.get_reagent_amount("blood"))
+				if(victim in range(1,usr))
+					VBlood.remove_reagent("blood",1)
+					usr:super++
+					sleep(5)
+					usr << "\blue You extract 1 blood from [victim], how your bio-power is [usr:super]"
+				else
+					usr << "\blue Suck process interrupted"
 					break
 			else
-				usr << "\blue Blood-sucking interruped"
+				usr << "\blue You suck all blood"
 				return
