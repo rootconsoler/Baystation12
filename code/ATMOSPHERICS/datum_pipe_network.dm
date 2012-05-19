@@ -140,6 +140,7 @@ datum/pipe_network
 
 						corresponding.moles = trace_gas.moles*gas.volume/air_transient.volume
 		air_transient.update_values()
+		update = 1
 		return 1
 
 proc/equalize_gases(datum/gas_mixture/list/gases)
@@ -202,6 +203,4 @@ proc/equalize_gases(datum/gas_mixture/list/gases)
 						gas.trace_gases += corresponding
 
 					corresponding.moles = trace_gas.moles*gas.volume/total_volume
-			gas.update_values()
-
 	return 1

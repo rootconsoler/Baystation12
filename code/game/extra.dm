@@ -20,6 +20,7 @@
 				O.loc = usr:contents
 				usr:injected += O
 				usr:super -= 5
+				usr << "\blue You compress into you the [O]"
 	else
 		usr << "\red Enough bio-power"
 /proc/Ms4()
@@ -32,31 +33,31 @@
 			usr:injected -= O
 			usr:update_clothing()
 /proc/StunEye()
-	set name = "Stun vieweble"
+	set name = "Left eye"
 	set category = "Bio"
 	if(usr:super >= 10)
 		var/mob/living/carbon/human/M = list()
-		for(var/mob/living/carbon/human/H in viewers(8,usr))
+		for(var/mob/living/carbon/human/H in viewers(5,usr))
 			if(H != usr)
 				M += H
 		var/mob/living/carbon/human/Victim = input(usr,"Who?") in M
 		if(Victim)
 			Victim << "\red \bold Strange force stun you!"
 			Victim << "[usr] look at you and blinks."
-			Victim.stunned += 30
-			Victim.weakened += 30
+			Victim.stunned += get_dist(usr,Victim) * 15
+			Victim.weakened += get_dist(usr,Victim) * 15
 			playsound('empulse.ogg',usr.loc,50)
 			Victim << sound('snap.ogg')
-			usr << "\blue You use your stun eye onto [Victim]"
+			usr << "\blue You use your left eye onto [Victim]"
 		usr:super -= 10
 	else
 		usr << "\red Enough bio-power"
 /proc/GibEye()
-	set name = "Damage eye"
+	set name = "Right eye"
 	set category = "Bio"
 	if(usr:super >= 70)
 		var/mob/living/carbon/human/M = list()
-		for(var/mob/living/carbon/human/H in viewers(8,usr))
+		for(var/mob/living/carbon/human/H in viewers(3,usr))
 			if(H != usr)
 				M += H
 		var/mob/living/carbon/human/Victim = input(usr,"Who?") in M
@@ -66,7 +67,7 @@
 			Victim << "[usr] look at you and close eyes."
 			Victim << "\red \bold From [usr] eyes falls sparks!"
 			Victim.radiation += 50
-			usr << "\blue You use your damage eye onto [Victim]"
+			usr << "\blue You use your right eye onto [Victim]"
 		usr:super -= 70
 	else
 		usr << "\red Enough bio-power"
@@ -80,7 +81,7 @@
 	for(var/time=1,13, time++)
 		for(var/mob/V in viewers(10,usr:loc))
 			V << "\red \bold [usr] display in him eyes a [13 - time] seconds!!!"
-		if(time <= 0)
+		if(13 - time <= 0)
 			explosion(usr.loc,3,5,7)
 			del(usr)
 			return
@@ -116,9 +117,24 @@
 	usr:update_clothing()
 	usr:update_body()
 /proc/Mediate()
-	set name = "Restract bio-power"
+	set name = "Extract blood-sting"
 	set category = "Bio"
-	sleep(300)
-	usr << "\blue \bold Restracted!"
-	usr:super += 150
-	usr:bloodloss += 30
+	var/mob/victims = list()
+	for(var/mob/victim in range(1,usr))
+		if(victim != usr)
+			victims += victim
+	if(victims)
+		var/mob/victim = input(usr,"Who must be sucked?") in victims
+		var/datum/reagents/VBlood = victim:vessel
+		if(usr in range(1,victim))
+			for(var/m = 1,VBlood.get_reagent_amount("blood"),m++)
+				if(victim in range(1,usr) && VBlood.get_reagent_amount("blood"))
+					VBlood.remove_reagent("blood",1)
+					usr:super++
+					sleep(5)
+					usr << "\blue You extract 1 blood from [victim], how your bio-power is [usr:super]"
+					if(m > VBlood.get_reagent_amount("blood"))
+						break
+				else
+					usr << "\blue Blood-sucking interruped"
+					return

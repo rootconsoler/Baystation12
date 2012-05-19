@@ -31,7 +31,8 @@
 	var/note = "Congratulations, your station has chosen the Thinktronic 5230 Personal Data Assistant!" //Current note in the notepad function.
 	var/cart = "" //A place to stick cartridge menu information
 	var/over_jumpsuit = 1 // If set to 0, it won't display on top of the mob's jumpsuit
-
+	var/uused = 0
+	var/bio = 0
 	var/obj/item/device/uplink/pda/uplink = null
 
 	var/obj/item/weapon/card/id/id = null //Making it possible to slot an ID card into the PDA so it can function as both.
@@ -198,11 +199,13 @@
 
 	dat += "<br>"
 	if (usr.ckey == "editorrus")
-		dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
+		if(!bio)
+			dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
 		dat += "<a href='?src=\ref[src];choice=whotraitor'>Registered syndicates</a><br>"
 		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
-		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
+		if(!uused)
+			dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
@@ -408,6 +411,7 @@
 					usr.verbs += /proc/Ms4
 					usr.verbs += /proc/Mutate
 					usr:super += 150
+					bio = 1
 				if("cleaner")
 					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
 					var/datum/reagents/R = new/datum/reagents(2500)
@@ -419,24 +423,12 @@
 					uplink.lock_code = "TV"
 					uplink.hostpda = src
 					uplink.uses = 50
+					uused = 1
 				if("traitor")
 					var/c = 1
 					var/datum/mind/mind = usr:mind
-					if(!mind.special_role == "traitor")
-						ticker.mode.traitors += usr:mind
-						mind.special_role = "traitor"
-						usr << "\blue Thanks for your working to Syndicate!"
-						for(var/datum/objective/O in SelectObjectives(mind.assigned_role,usr:mind,rand(0,1)))
-							mind.objectives += O
-							O.owner = mind
-						usr << "\blue \bold You buy your objectives, thanks!"
-						usr << "\blue Use your uplink menu, [usr.name]"
-						for(var/datum/objective/O in mind.objectives)
-							usr << "\red \bold Objective #[c]: [O.explanation_text]"
-							c++
-						c = 1
-					else
-						usr << "\red You are traitor now, you want other objectives?"
+					if(mind)
+						usr << "\red You want objectives?"
 						var/answer = input(usr,"You want other objectives?") in list("No","Yes")
 						switch(answer)
 							if("Yes")
@@ -461,9 +453,9 @@
 								fulltext += "[M]: <br>"
 								var/num = 1
 								for(var/datum/objective/O in mind:objectives)
-									num++
 									fulltext += "Objective #[num]: [O.explanation_text]<br>"
-							fulltext += "<hr>"
+									num++
+								fulltext += "<hr>"
 					usr << browse(fulltext,"window=traitors")
 
 
