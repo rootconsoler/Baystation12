@@ -153,6 +153,7 @@ log transactions
 			if(href_list["ins"] && card)
 				if(accepted)
 					card.money += inserted
+					cashes = null
 					inserted = 0
 			if(href_list["lock"])
 				card = null
