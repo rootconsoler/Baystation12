@@ -127,7 +127,7 @@
 		var/mob/victim = input(usr,"Who must be sucked?") in victims
 		var/datum/reagents/VBlood = victim:vessel
 		for(var/m = 1,VBlood.get_reagent_amount("blood"),m++)
-			if(VBlood.get_reagent_amount("blood"))
+			if(VBlood.get_reagent_amount("blood") && victim in range(1,usr))
 				VBlood.remove_reagent("blood",1)
 				usr:super++
 				sleep(5)
