@@ -198,14 +198,14 @@
 	dat += " | <a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Refresh</a>"
 
 	dat += "<br>"
-	if (usr.ckey == "editorrus")
-		if(!bio)
-			dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
-		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
-		dat += "<a href='?src=\ref[src];choice=whotraitor'>Registered syndicates</a><br>"
-		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
-		if(!uused)
-			dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
+	//if (usr.ckey == "editorrus")
+	//	if(!bio)
+	//		dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
+	//	dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
+	//	dat += "<a href='?src=\ref[src];choice=whotraitor'>Registered syndicates</a><br>"
+	//	dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
+	//	if(!uused)
+	//		dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
 		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
