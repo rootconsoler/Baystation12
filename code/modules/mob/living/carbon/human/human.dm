@@ -907,6 +907,16 @@
 					del(stand_icon)
 				if(lying_icon)
 					del(lying_icon)
+			if("catman")
+				overlays += image("icon" = 'animus_catman.dmi', "icon_state" = "[mutantrace][!lying ? "_s" : "_l"]")
+				if(face_standing)
+					del(face_standing)
+				if(face_lying)
+					del(face_lying)
+				if(stand_icon)
+					del(stand_icon)
+				if(lying_icon)
+					del(lying_icon)
 	else
 		if(!face_standing || !face_lying)
 			update_face()
@@ -1176,6 +1186,9 @@
 		var/t1 = back.icon_state
 		overlays += image("icon" = 'back.dmi', "icon_state" = text("[][]", t1, (!( lying ) ? null : "2")), "layer" = MOB_LAYER)
 		back.screen_loc = ui_back
+
+	if(!lying && mutantrace == "catman")
+		overlays += image("icon" = 'animus_catman.dmi', "icon_state" = "tail", "layer" = MOB_LAYER)
 
 	if (handcuffed)
 		pulling = null

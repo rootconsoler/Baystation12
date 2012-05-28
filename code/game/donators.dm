@@ -124,7 +124,7 @@ world/proc/load_donators()
 				if(!istype(H))
 					owner << "\red You must be a human to do this"
 					return
-				H.mutantrace = "cat"
+				H.mutantrace = "catman"
 				special_used = 1
 			if("black catman")
 				var/mob/living/carbon/human/H = owner.mob
