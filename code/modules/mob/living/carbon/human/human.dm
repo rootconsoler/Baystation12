@@ -20,6 +20,7 @@
 	var/g_eyes = 0.0
 	var/b_eyes = 0.0
 	var/s_tone = 0.0
+	var/species = "Human"
 	age = 30.0
 	var/used_skillpoints = 0
 	var/skill_specialization = null
@@ -150,6 +151,11 @@
 		fixblood()
 
 	..()
+
+	spawn(5) // Failsafe for.. weirdness.
+		update_clothing()
+		update_body()
+
 	/*var/known_languages = list()
 	known_languages.Add("english")*/
 
@@ -160,7 +166,7 @@
 		if(B.id == "blood")
 			B.data = list("donor"=src,"viruses"=null,"blood_DNA"=dna.unique_enzymes,"blood_type"=dna.b_type,"resistances"=null,"trace_chem"=null,"virus2"=(virus2 ? virus2.getcopy() : null),"antibodies"=0)
 
-/mob/living/carbon/human/proc/drip(var/amt as num)
+/mob/living/carbon/human/drip(var/amt as num)
 	if(!amt)
 		return
 
@@ -271,13 +277,15 @@
 
 	if(reagents.has_reagent("nuka_cola")) return -1
 
+	if(analgesic) return -1
+
 	if (istype(loc, /turf/space)) return -1 // It's hard to be slowed down in space by... anything
 
 	var/health_deficiency = traumatic_shock
 	if(health_deficiency >= 40) tally += (health_deficiency / 25)
 
 	var/hungry = (500 - nutrition)/5 // So overeat would be 100 and default level would be 80
-	if (hungry >= 70) tally += hungry/50
+	if (hungry >= 70) tally += hungry/300
 
 
 	for(var/organ in list("l_leg","l_foot","r_leg","r_foot"))
@@ -1059,8 +1067,6 @@
 			overlays += image("icon" = 'belt_mirror.dmi', "icon_state" = text("[][]", t1, (!( lying ) ? null : "2")), "layer" = MOB_LAYER)
 		s_store.screen_loc = ui_sstore1
 
-	if(client) hud_used.other_update() //Update the screenloc of the items on the 'other' inventory bar
-											   //to hide / show them.
 	if (client)
 		if (i_select)
 			if (intent)
@@ -1177,6 +1183,8 @@
 		overlays += image("icon" = 'back.dmi', "icon_state" = text("[][]", t1, (!( lying ) ? null : "2")), "layer" = MOB_LAYER)
 		back.screen_loc = ui_back
 
+	if(client) hud_used.other_update() //Update the screenloc of the items on the 'other' inventory bar
+											   //to hide / show them.
 	if (handcuffed)
 		pulling = null
 		var/h1 = handcuffed.icon_state

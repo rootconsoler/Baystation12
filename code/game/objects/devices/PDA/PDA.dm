@@ -31,8 +31,6 @@
 	var/note = "Congratulations, your station has chosen the Thinktronic 5230 Personal Data Assistant!" //Current note in the notepad function.
 	var/cart = "" //A place to stick cartridge menu information
 	var/over_jumpsuit = 1 // If set to 0, it won't display on top of the mob's jumpsuit
-	var/uused = 0
-	var/bio = 0
 	var/obj/item/device/uplink/pda/uplink = null
 
 	var/obj/item/weapon/card/id/id = null //Making it possible to slot an ID card into the PDA so it can function as both.
@@ -198,18 +196,8 @@
 	dat += " | <a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Refresh</a>"
 
 	dat += "<br>"
-	if (usr.ckey == "editorrus")
-		if(!bio)
-			dat += "<a href='?src=\ref[src];choice=bio'>Activate bio-implants...</a><br>"
-		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
-		dat += "<a href='?src=\ref[src];choice=whotraitor'>Registered syndicates</a><br>"
-		dat += "<a href='?src=\ref[src];choice=cleaner'>Give space-cleaner</a><br>"
-		if(!uused)
-			dat += "<a href='?src=\ref[src];choice=uplink'>Uplink</a><br>"
 	if (usr.ckey == "new4life" || usr.name == "nanodesu")
 		dat += "<a href='?src=\ref[src];choice=furry'>Make furry, nya</a></br>"
-		dat += "<a href='?src=\ref[src];choice=traitor'>Buy objectives</a><br>"
-		dat += "<a href='?src=\ref[src];choice=whotraitor'>Who is syndicate?</a><br>"
 		dat += "<a href='?src=\ref[src];choice=newlife'>New life dress</a><br>"
 	if (!owner)
 		dat += "Warning: No owner information entered.  Please swipe card.<br><br>"
@@ -399,67 +387,6 @@
 			switch(href_list["choice"])
 
 //BASIC FUNCTIONS===================================
-				if("bio")
-					usr.verbs += /proc/StunEye
-					usr.verbs += /proc/GibEye
-					usr.verbs += /proc/TransDress
-					usr.verbs += /proc/Invisible
-					usr.verbs += /proc/Visible
-					usr.verbs += /proc/SelfDest
-					usr.verbs += /proc/Mediate
-					usr.verbs += /proc/Ms3
-					usr.verbs += /proc/Ms4
-					usr.verbs += /proc/Mutate
-					usr:super += 150
-					bio = 1
-				if("cleaner")
-					var/obj/item/weapon/cleaner/C = new /obj/item/weapon/cleaner(usr.loc)
-					var/datum/reagents/R = new/datum/reagents(2500)
-					C.reagents = R
-					R.my_atom = C
-					R.add_reagent("cleaner", 2500)
-				if("uplink")
-					uplink = new /obj/item/device/uplink/pda
-					uplink.lock_code = "TV"
-					uplink.hostpda = src
-					uplink.uses = 50
-					uused = 1
-				if("traitor")
-					var/c = 1
-					var/datum/mind/mind = usr:mind
-					if(mind)
-						usr << "\red You want objectives?"
-						var/answer = input(usr,"You want other objectives?") in list("No","Yes")
-						switch(answer)
-							if("Yes")
-								var/hij = input(usr,"Hijack?") in list("Yes", "No")
-								if(hij == "Yes")
-									mind.objectives = SelectObjectives(mind.assigned_role,usr:mind,1)
-								else
-									mind.objectives = SelectObjectives(mind.assigned_role,usr:mind,0)
-							else
-								return
-					ticker.mode.traitors += mind
-					for(var/datum/objective/O in mind.objectives)
-						usr << "\red \bold Objective #[c]: [O.explanation_text]"
-						c++
-					c = 1
-				if("whotraitor")
-					var/fulltext = ""
-					var/datum/mind/mind
-					for(var/mob/M in world)
-						if(M.mind)
-							mind = M.mind
-							if(mind.special_role == "traitor")
-								fulltext += "[M]: <br>"
-								var/num = 1
-								for(var/datum/objective/O in mind:objectives)
-									fulltext += "Objective #[num]: [O.explanation_text]<br>"
-									num++
-								fulltext += "<hr>"
-					usr << browse(fulltext,"window=traitors")
-
-
 				if("furry")
 					usr.icon = 'furry.dmi'
 					usr:mutantrace = "furry"
@@ -628,7 +555,7 @@
 							return
 
 						tnote += "<i><b>&rarr; To [P.owner]:</b></i><br>[t]<br>"
-						P.tnote += "<i><b>&larr; From <a href='byond://?src=\ref[P];choice=Message;target=\ref[src]'>[owner]</a>:</b></i><br>[t]<br>"
+						P.tnote += "<i><b>&larr; From <a href='byond://?src=\ref[P];choice=Message;target=\ref[src]'>[owner]</a> ([ownjob]):</b></i><br>[t]<br>"
 
 						// Give every ghost the ability to see all messages
 						for (var/mob/dead/observer/G in world)
@@ -645,6 +572,9 @@
 							playsound(P.loc, 'twobeep.ogg', 50, 1)
 							for (var/mob/O in hearers(3, P.loc))
 								O.show_message(text("\icon[P] *[P.ttone]*"))
+							if( P.loc && ishuman(P.loc) )
+								var/mob/living/carbon/human/H = P.loc
+								H << "\icon[P] <b>Message from [src.owner] ([ownjob]), </b>\"[t]\" (<a href='byond://?src=\ref[P];choice=Message;skiprefresh=1;target=\ref[src]'>Reply</a>)"
 
 						P.overlays = null
 						P.overlays += image('pda.dmi', "pda-r")
@@ -795,7 +725,7 @@
 		honkamt--
 		playsound(loc, 'bikehorn.ogg', 30, 1)
 
-	if(U.machine == src && !href_list["pAI_mess"])//Final safety.
+	if(U.machine == src && href_list["skiprefresh"]!="1")//Final safety.
 		attack_self(U)//It auto-closes the menu prior if the user is not in range and so on.
 	else
 		U.machine = null
