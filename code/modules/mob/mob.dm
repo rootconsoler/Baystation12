@@ -96,8 +96,6 @@
 	return 0
 
 /mob/proc/Life()
-//	if(organStructure)
-//		organStructure.ProcessOrgans()
 	return
 
 /mob/proc/update_clothing()
@@ -172,7 +170,7 @@
 		var/turf/T = get_turf(loc)
 		if (istype(T))
 			T.Entered(W)
-	update_clothing()
+		update_clothing()
 	return
 
 /mob/proc/before_take_item(var/obj/item/item)
@@ -476,9 +474,25 @@
 	set name = "Changelog"
 	set category = "OOC"
 	if (client)
-		src << browse_rsc('postcardsmall.jpg')
-		src << browse_rsc('somerights20.png')
-		src << browse_rsc('88x31.png')
+		src.getFiles('postcardsmall.jpg',
+							 'somerights20.png',
+							 '88x31.png',
+							 'bug-minus.png',
+							 'cross-circle.png',
+							 'hard-hat-exclamation.png',
+							 'image-minus.png',
+							 'image-plus.png',
+							 'music-minus.png',
+							 'music-plus.png',
+							 'tick-circle.png',
+							 'wrench-screwdriver.png',
+							 'spell-check.png',
+							 'burn-exclamation.png',
+							 'chevron.png',
+							 'chevron-expand.png',
+							 'changelog.css',
+							 'changelog.js'
+							 )
 		src << browse('changelog.html', "window=changes;size=675x650")
 		client.changes = 1
 
@@ -1129,3 +1143,13 @@ note dizziness decrements automatically in the mob's Life() proc.
 	brainloss = amount
 
 // ++++ROCKDTBEN++++ MOB PROCS //END
+
+/*
+ * Sends resource files to client cache
+ */
+/mob/proc/getFiles()
+	if(!isemptylist(args))
+		for(var/file in args)
+			src << browse_rsc(file)
+		return 1
+	return 0

@@ -368,16 +368,16 @@ To combat this, I changed the window name. -- Doohl
 	else if(istype(W,/obj/item/weapon/vending_charge/))
 		DoCharge(W,user)
 	else if(istype(W,/obj/item/weapon/spacecash))
-		var/obj/item/weapon/spacecash/I = W
-		var/ama = round(input(user,"How much you want insert? Course - [course] credit/1 point. Your amount of [I.worth] cashes - [I.amount]") as num)
+		var/obj/item/weapon/money/I = W
+		var/ama = round(input(user,"How much you want insert? Course - [course] credit/1 point. Your amount of [I.worth] cashes - [I.split]") as num)
 		if(ama <= 0)
 			return
-		if(ama > I.amount)
+		if(ama > I.split)
 			user << "\red You don't have that amount"
 			return
 		var/npoint = round(I.worth * ama / course)
-		I.amount -= ama
-		if(I.amount == 0)
+		I.split -= ama
+		if(I.split == 0)
 			del(W)
 		points += npoint
 		user << "\blue Your insert [ama] cashes to machine. [npoint] points taked."

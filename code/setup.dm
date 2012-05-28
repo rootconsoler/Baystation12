@@ -32,7 +32,7 @@
 #define DOOR_CRUSH_DAMAGE 10
 
 // Factor of how fast mob nutrition decreases
-#define	HUNGER_FACTOR 0.05
+#define	HUNGER_FACTOR 0.1
 #define	REAGENTS_METABOLISM 0.05
 #define REAGENTS_OVERDOSE 30
 
@@ -132,7 +132,7 @@ var/MAX_EXPLOSION_RANGE = 14
 
 #define OPENCONTAINER	4096	// is an open container for chemistry purposes
 
-#define ONESIZEFITSALL	8192	// can be worn by fatties (or children? ugh)
+// #define ONESIZEFITSALL	8192	// can be worn by fatties (or children? ugh)
 
 #define	NOREACT	16384 //Reagents dont' react inside this container.
 

@@ -537,6 +537,7 @@
 	set category = "Admin"
 	if(holder)
 		holder.check_antagonists()
+		log_admin("[key_name(usr)] checked antagonists.")	//for tsar~
 	//feedback_add_details("admin_verb","CHA") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	return
 
@@ -890,7 +891,7 @@
 	switch(alert("You sure you wish to edit this mob's appearance?",,"Yes","No"))
 		if("No")
 			return
-	if(istype(M,/mob/living/carbon/human/tajaran) || istype(M,/mob/living/carbon/human/birdman))
+	if(istype(M,/mob/living/carbon/human/tajaran))
 		usr << "\red Humanoid aliens do not have an editable appearance... yet!"
 	else
 		var/new_facial = input("Please select facial hair color.", "Character Generation") as color
