@@ -233,6 +233,7 @@
 			//verbs += /client/proc/cmd_modify_object_variables 		--Merged with view variables
 			verbs += /client/proc/togglebuildmodeself
 			verbs += /client/proc/debug_master_controller
+			verbs += /client/proc/omsk //:D
 		else	return
 
 		//Game Admin
@@ -566,7 +567,13 @@
 		holder.Game()
 //	feedback_add_details("admin_verb","GP") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	return
-
+/client/proc/omsk()
+	set name = "World play - 'Omsk Station 13.mp3'"
+	set category = "Fun"
+	for(var/mob/M in world)
+		M << sound('omsk.ogg')
+		M << "\blue OMSK Station 13"
+		usr << "Omsk city.mp3 now playing. (c) EditorRUS"
 /client/proc/secrets()
 	set name = "Secrets"
 	set category = "Admin"
