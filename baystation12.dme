@@ -233,6 +233,7 @@
 #include "code\ATMOSPHERICS\datum_pipe_network.dm"
 #include "code\ATMOSPHERICS\datum_pipeline.dm"
 #include "code\ATMOSPHERICS\he_pipes.dm"
+#include "code\ATMOSPHERICS\mapdebugging.dm"
 #include "code\ATMOSPHERICS\pipes.dm"
 #include "code\ATMOSPHERICS\components\portables_connector.dm"
 #include "code\ATMOSPHERICS\components\tvalve.dm"

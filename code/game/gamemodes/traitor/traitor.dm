@@ -6,7 +6,7 @@
 	name = "traitor"
 	config_tag = "traitor"
 	restricted_jobs = list("Cyborg", "AI")//Approved by headmins for a week test, if you see this it would be nice if you didn't spread it everywhere
-	protected_jobs = list("Security Officer", "Warden", "Detective", "Head of Security", "Captain")
+	protected_jobs = list("Security Officer", "Warden", "Head of Security", "Captain")
 	required_enemies = 1
 	recommended_enemies = 4
 
@@ -17,15 +17,15 @@
 	var/const/waittime_l = 600 //lower bound on time before intercept arrives (in tenths of seconds)
 	var/const/waittime_h = 1800 //upper bound on time before intercept arrives (in tenths of seconds)
 
-	var/traitors_possible = 4 //hard limit on traitors if scaling is turned off
-	var/const/traitor_scaling_coeff = 10.0 //how much does the amount of players get divided by to determine traitors
+	var/traitors_possible = 5 //hard limit on traitors if scaling is turned off
+	var/const/traitor_scaling_coeff = 8.0 //how much does the amount of players get divided by to determine traitors
 
 	var/num_players = 0
 
 
 /datum/game_mode/traitor/announce()
-	world << "<B>The current game mode is - Traitor!</B>"
-	world << "<B>There is a syndicate traitor on the station. Do not let the traitor succeed!</B>"
+	world << "<B>Текущий режим - предатели!</B>"
+	world << "<B>На станции есть предатели, которые продались синдикату. НЕ ДАЙТЕ ИМ ВЫПОЛНИТЬ ИХ ЦЕЛИ!</B>"
 
 
 /datum/game_mode/traitor/pre_setup()
@@ -110,14 +110,12 @@
 
 
 /datum/game_mode/proc/greet_traitor(var/datum/mind/traitor)
-	traitor.current << "<B><font size=3 color=red>You are the traitor.</font></B>"
-	traitor.current << "\red <B>REPEAT</B>"
-	traitor.current << "\red <B>You are the traitor.</B>"
-	spawn(rand(600,1800))			//Strumpetplaya - Just another friendly reminder so people don't forget they're the traitor.
-		traitor.current << "\red <B>In case you missed it the first time - YOU ARE THE TRAITOR!</B>"
+	traitor.current << "<B><font size=3 color=red>ВЫ ПРЕДАТЕЛЬ.</font></B>"
+	traitor.current << "\red <B>ПОВТОРЯЕМ</B>"
+	traitor.current << "\red <B>Вы ПРЕДАТЕЛЬ.</B>"
 	var/obj_count = 1
 	for(var/datum/objective/objective in traitor.objectives)
-		traitor.current << "<B>Objective #[obj_count]</B>: [objective.explanation_text]"
+		traitor.current << "<B>Цель #[obj_count]</B>: [objective.explanation_text]"
 		obj_count++
 	return
 
@@ -136,27 +134,19 @@
 
 
 /datum/game_mode/proc/add_law_zero(mob/living/silicon/ai/killer)
-	var/law = "Accomplish your objectives at all costs."
-	killer << "<b>Your laws have been changed!</b>"
+	var/law = sanitize("\red Выполнить вашу цель любой ценой.")
+	killer << sanitize("<b>Ваши законы были изменены!</b>")
 	killer.set_zeroth_law(law)
-	killer << "New law: 0. [law]"
+	killer << sanitize("Новый закон: 0. [law]")
 
 	//Begin code phrase.
-	killer << "The Syndicate provided you with the following information on how to identify their agents:"
-	if(prob(80))
-		killer << "\red Code Phrase: \black [syndicate_code_phrase]"
-		killer.mind.store_memory("<b>Code Phrase</b>: [syndicate_code_phrase]")
-	else
-		killer << "Unfortunately, the Syndicate did not provide you with a code phrase."
-	if(prob(80))
-		killer << "\red Code Response: \black [syndicate_code_response]"
-		killer.mind.store_memory("<b>Code Response</b>: [syndicate_code_response]")
-	else
-		killer << "Unfortunately, the Syndicate did not provide you with a code response."
-	killer << "Use the code words in the order provided, during regular conversation, to identify other agents. Proceed with caution, however, as everyone is a potential foe."
-	spawn(30)
-		killer << sound('AISyndiHack.ogg',volume=50)
-	//End code phrase.
+	killer << sanitize("\red Синдикат предоставил следующую информацию, чтобы найти других")
+	killer << sanitize("\red \bold Кодовая фраза: \black [syndicate_code_phrase]")
+	killer.mind.store_memory(sanitize("<b>Кодовая фраза</b>: [syndicate_code_phrase]"))
+	killer << sanitize("\red \bold Кодовый ответ: \black [syndicate_code_response]")
+	killer.mind.store_memory(sanitize("<b>Кодовый ответ</b>: [syndicate_code_response]"))
+	killer << sanitize("Используйте кодовые слова с осторожностью ведь каждый может оказаться врагом!")
+//End code phrase.
 
 
 /datum/game_mode/proc/auto_declare_completion_traitor()
@@ -188,10 +178,10 @@
 				count++
 
 			if(traitorwin)
-				world << "<B>The [special_role_text] was successful!<B>"
+				world << "<B>The [special_role_text] УСПЕШЕН!<B>"
 				//feedback_add_details("traitor_success","SUCCESS")
 			else
-				world << "<B>The [special_role_text] has failed!<B>"
+				world << "<B>The [special_role_text] ПРОВАЛИЛСЯ!<B>"
 				//feedback_add_details("traitor_success","FAIL")
 
 			var/datum/traitorinfo/info = logtraitors[traitor]
@@ -211,7 +201,7 @@
 	. = 1
 	if (traitor_mob.mind)
 		if (traitor_mob.mind.assigned_role == "Clown")
-			traitor_mob << "Your training has allowed you to overcome your clownish nature, allowing you to wield weapons without harming yourself."
+			traitor_mob << sanitize("Вы натренированы сдерживать свою клоунскую натуру, и пользоваться оружием без вреда себе.")
 			traitor_mob.mutations &= ~CLUMSY
 
 	// find a radio! toolbox(es), backpack, belt, headset, pockets
@@ -288,32 +278,24 @@
 			T.icon_state = R.icon_state
 			T.item_state = R.item_state
 			T.origradio = R
-			traitor_mob << "The Syndicate have cunningly disguised a Syndicate Uplink as your [R.name] [loc]. Simply dial the frequency [format_frequency(freq)] to unlock its hidden features."
-			traitor_mob.mind.store_memory("<B>Radio Freq:</B> [format_frequency(freq)] ([R.name] [loc]).")
+			traitor_mob << sanitize("Синдикат вставил аплинк в ваш наушник. Просто настройтесь на частоту [format_frequency(freq)] чтобы разблокировать меню.")
+			traitor_mob.mind.store_memory(sanitize("<B>Radio Freq:</B> [format_frequency(freq)] ([R.name] [loc])."))
 		else if (istype(R, /obj/item/device/pda))
 			// generate a passcode if the uplink is hidden in a PDA
-			var/pda_pass = "[rand(100,999)] [pick("Alpha","Bravo","Delta","Omega")]"
+			var/pda_pass = "[rand(1,999999)]"
 
 			var/obj/item/device/uplink/pda/T = new /obj/item/device/uplink/pda(R)
 			R:uplink = T
 			T.lock_code = pda_pass
 			T.hostpda = R
-			traitor_mob << "The Syndicate have cunningly disguised a Syndicate Uplink as your [R.name] [loc]. Simply enter the code \"[pda_pass]\" into the ringtone select to unlock its hidden features."
-			traitor_mob.mind.store_memory("<B>Uplink Passcode:</B> [pda_pass] ([R.name] [loc]).")
+			traitor_mob << sanitize("Синдикат вставил аплинк в ваш КПК. Введите код \"[pda_pass]\" в поле для рингтона для разблокировки меню.")
+			traitor_mob.mind.store_memory(sanitize("<B>Uplink Passcode:</B> [pda_pass] ([R.name] [loc])."))
 	//Begin code phrase.
 	if(!safety)//If they are not a rev. Can be added on to.
-		traitor_mob << "The Syndicate provided you with the following information on how to identify other agents:"
-		if(prob(80))
-			traitor_mob << "\red Code Phrase: \black [syndicate_code_phrase]"
-			traitor_mob.mind.store_memory("<b>Code Phrase</b>: [syndicate_code_phrase]")
-		else
-			traitor_mob << "Unfortunately, the Syndicate did not provide you with a code phrase."
-		if(prob(80))
-			traitor_mob << "\red Code Response: \black [syndicate_code_response]"
-			traitor_mob.mind.store_memory("<b>Code Response</b>: [syndicate_code_response]")
-		else
-			traitor_mob << "Unfortunately, the Syndicate did not provide you with a code response."
-		traitor_mob << "Use the code words in the order provided, during regular conversation, to identify other agents. Proceed with caution, however, as everyone is a potential foe."
-		spawn(30)
-			traitor_mob << sound('syndicate intro.ogg',volume=50)
+		traitor_mob << sanitize("Синдикат предоставил следующую информацию для поиска своих:")
+		traitor_mob << sanitize("\red Кодовая фраза: \black [syndicate_code_phrase]")
+		traitor_mob.mind.store_memory(sanitize("<b>Code Phrase</b>: [syndicate_code_phrase]"))
+		traitor_mob << sanitize("\red Кодовый ответ: \black [syndicate_code_response]")
+		traitor_mob.mind.store_memory(sanitize("<b>Кодовый ответ</b>: [syndicate_code_response]"))
+		traitor_mob << sanitize("Используйте кодовые слова с осторожностью, ведь каждый может оказаться врагом!")
 	//End code phrase.

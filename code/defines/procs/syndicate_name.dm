@@ -46,7 +46,7 @@ var/syndicate_code_response//Code response for traitors.
 	One example of an earlier system is commented below.
 	/N
 	*/
-
+/*
 /proc/generate_code_phrase()//Proc is used for phrase and response in master_controller.dm
 
 	var/code_phrase = ""//What is returned when the proc finishes.
@@ -109,89 +109,60 @@ var/syndicate_code_response//Code response for traitors.
 			code_phrase += ", "
 
 	return code_phrase
+*/
 
-/*
 //This proc tests the gen above.
-/client/verb/test_code_phrase()
-	set name = "Generate Code Phrase"
-	set category = "Debug"
+/proc/generate_traitors()
 
-	world << "\red Code Phrase is: \black [generate_code_phrase()]"
-	return
-
-
-	This was an earlier attempt at code phrase system, aside from an even earlier attempt (and failure).
-	This system more or less works as intended--aside from being unfinished--but it's still very predictable.
-	Particularly, the phrase opening statements are pretty easy to recognize and identify when metagaming.
-	I think the above-used method solves this issue by using words in a sequence, providing for much greater flexibility.
-	/N
-
+	var/choice = rand(1,3)
 	switch(choice)
 		if(1)
-			syndicate_code_phrase += pick("I'm looking for","Have you seen","Maybe you've seen","I'm trying to find","I'm tracking")
+			syndicate_code_phrase += sanitize(pick("Я видел","Может кто видел","Может быть вы видели","Я пытаюсь найти","Я слежу за"))
 			syndicate_code_phrase += " "
 			syndicate_code_phrase += pick(pick(first_names_male,first_names_female))
 			syndicate_code_phrase += " "
 			syndicate_code_phrase += pick(last_names)
 			syndicate_code_phrase += "."
 		if(2)
-			syndicate_code_phrase += pick("How do I get to","How do I find","Where is","Where do I find")
+			syndicate_code_phrase += sanitize(pick("Как я могу попасть в","Как мне найти","Где","Где я могу найти"))
 			syndicate_code_phrase += " "
-			syndicate_code_phrase += pick("Escape","Engineering","Atmos","the bridge","the brig","Clown Planet","CentCom","the library","the chapel","a bathroom","Med Bay","Tool Storage","the escape shuttle","Robotics","a locker room","the living quarters","the gym","the autolathe","QM","the bar","the theater","the derelict")
+			syndicate_code_phrase += sanitize(pick("Отбытие","инженерный отсек","атмос","мостик","бриг","планету клованов","ЦК","библиотеку","церковь","ванную","мед-бей","хранилище инструментов","шаттл отбытия","роботику","туалет","жилой отсек","гимнастерку","автолат","карго-бей","бар","театр","дереликт"))
 			syndicate_code_phrase += "?"
 		if(3)
 			if(prob(70))
-				syndicate_code_phrase += pick("Get me","I want","I'd like","Make me")
-				syndicate_code_phrase += " a "
+				syndicate_code_phrase += sanitize(pick("Дайте мне","Я хочу","Я люблю","Сделайте мне"))
 			else
-				syndicate_code_phrase += pick("One")
+				syndicate_code_phrase += sanitize(pick("Дайте"))
 				syndicate_code_phrase += " "
-			syndicate_code_phrase += pick("vodka and tonic","gin fizz","bahama mama","manhattan","black Russian","whiskey soda","long island tea","margarita","Irish coffee"," manly dwarf","Irish cream","doctor's delight","Beepksy Smash","tequilla sunrise","brave bull","gargle blaster","bloody mary","whiskey cola","white Russian","vodka martini","martini","Cuba libre","kahlua","vodka","wine","moonshine")
+			syndicate_code_phrase += pick("водку с тоником","джин физз","багаму маму","манхеттен","черной России","виски с содой","чай далеких островов","маргариту","иранское кофе","аутистичного дварфа","иранский крем","докторского делайта","бибски-коктейл","восход текиллы","смелого быка","грызлодера","кровавой мери","виски-колу","белой России","водку с мартини","мартини","Куба либрэ","какхлуэ","водку","вино","лунного света")
 			syndicate_code_phrase += "."
-		if(4)
-			syndicate_code_phrase += pick("I wish I was","My dad was","His mom was","Where do I find","The hero this station needs is","I'd fuck","I wouldn't trust","Someone caught","HoS caught","Someone found","I'd wrestle","I wanna kill")
-			syndicate_code_phrase += " [pick("a","the")] "
-			syndicate_code_phrase += pick("wizard","ninja","xeno","lizard","metroid","monkey","syndicate","cyborg","clown","space carp","singularity","singulo","mime")
-			syndicate_code_phrase += "."
-		if(5)
-			syndicate_code_phrase += pick("Do we have","Is there","Where is","Where's","Who's")
-			syndicate_code_phrase += " "
-			syndicate_code_phrase += "[pick(get_all_jobs())]"
-			syndicate_code_phrase += "?"
 
 	switch(choice)
 		if(1)
 			if(prob(80))
-				syndicate_code_response += pick("Try looking for them near","I they ran off to","Yes. I saw them near","Nope. I'm heading to","Try searching")
+				syndicate_code_response += sanitize(pick("Попробуйте посмотреть рядом с","Да, я видел этого человека рядом с","Нет, но возможно этот человек был в","Попробуйте поискать рядом с"))
 				syndicate_code_response += " "
-				syndicate_code_response += pick("Escape","Engineering","Atmos","the bridge","the brig","Clown Planet","CentCom","the library","the chapel","a bathroom","Med Bay","Tool Storage","the escape shuttle","Robotics","a locker room","the living quarters","the gym","the autolathe","QM","the bar","the theater","the derelict")
+				syndicate_code_response += sanitize(pick("Отбытием","инженерный отсеком","атмосом","мостиком","бригом","библиотекой","церковью","ванной","мед-беем","хранилищем инструментов","роботикой","туалетом","дормиторием","гимнастеркой","автолатом","карго-беем","баром","театром"))
 				syndicate_code_response += "."
 			else if(prob(60))
-				syndicate_code_response += pick("No. I'm busy, sorry.","I don't have the time.","Not sure, maybe?","There is no time.")
+				syndicate_code_response += sanitize(pick("Нет, я слишком занят","У меня нет на это времени.","Нет времени."))
 			else
-				syndicate_code_response += pick("*shrug*","*smile*","*blink*","*sigh*","*laugh*","*nod*","*giggle*")
+				syndicate_code_response += sanitize(pick("*shrug*","*smile*","*blink*","*sigh*","*laugh*","*nod*","*giggle*"))
 		if(2)
 			if(prob(80))
-				syndicate_code_response += pick("Go to","Navigate to","Try","Sure, run to","Try searching","It's near","It's around")
-				syndicate_code_response += " the "
-				syndicate_code_response += pick("[pick("south","north","east","west")] maitenance door","nearby maitenance","teleporter","[pick("cold","dead")] space","morgue","vacuum","[pick("south","north","east","west")] hall ","[pick("south","north","east","west")] hallway","[pick("white","black","red","green","blue","pink","purple")] [pick("rabbit","frog","lion","tiger","panther","snake","facehugger")]")
+				syndicate_code_response += sanitize(pick("Идите в","Поищите","Попробуйте зайти в","Попробуйте найти"))
+				syndicate_code_response += " "
+				syndicate_code_response += sanitize(pick("[pick("южную","северную","восточную","западную")] техническую дверь","ближайший техтоннель","телепортер","морг","[pick("южный","северный","восточный","западный")] коридор "))
 				syndicate_code_response += "."
 			else if(prob(60))
-				syndicate_code_response += pick("Try asking","Ask","Talk to","Go see","Follow","Hunt down")
+				syndicate_code_response += sanitize(pick("Спросите у","Поговорите с","Найдите","Следуйте за"))
 				syndicate_code_response += " "
 				if(prob(50))
-					syndicate_code_response += pick(pick(first_names_male,first_names_female))
+					syndicate_code_response += sanitize(pick(pick(first_names_male,first_names_female)))
 					syndicate_code_response += " "
-					syndicate_code_response += pick(last_names)
+					syndicate_code_response += sanitize(pick(last_names))
 				else
-					syndicate_code_response += " the "
-					syndicate_code_response += "[pic(get_all_jobs())]"
+					syndicate_code_response += "[pick(get_all_jobs())]"
 				syndicate_code_response += "."
 			else
-				syndicate_code_response += pick("*shrug*","*smile*","*blink*","*sigh*","*laugh*","*nod*","*giggle*")
-		if(3)
-		if(4)
-		if(5)
-
-	return
-*/
+				syndicate_code_response += sanitize(pick("*shrug*","*smile*","*blink*","*sigh*","*laugh*","*nod*","*giggle*"))
